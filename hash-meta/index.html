@@ -1,0 +1,3153 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Generador de Código HASH y Extractor de Metadatos Forenses 100% local y sin conexión a internet.">
+    <meta name="author" content="Isaí Figueroa J.">
+    <title>Generador de Código HASH - Creado por Isaí Figueroa J.</title>
+    <link rel="icon" type="image/x-icon" href="https://isaifijer.com.mx/imagenes/favicon.ico">
+
+    <style>
+        /* =========================================================
+           MOTOR DE ESTILOS OFFLINE INTEGRADO (SIN DEPENDENCIA DE RED)
+           ========================================================= */
+        *, ::before, ::after {
+            box-sizing: border-box;
+            border-width: 0;
+            border-style: solid;
+            border-color: #334155;
+        }
+
+        body {
+            font-family: 'Rajdhani', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #050505;
+            color: #ffffff;
+            margin: 0;
+            overflow-x: hidden;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        h3, h4, h5, h6, p {
+            margin: 0;
+        }
+
+        button, input {
+            font-family: inherit;
+            font-size: 100%;
+            margin: 0;
+            padding: 0;
+            color: inherit;
+            background: none;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        /* Fondo de Red Interactiva idéntico a la Calculadora Forense */
+        #network-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at center, #1e293b 0%, #020617 100%);
+            opacity: 0.65;
+            pointer-events: none;
+        }
+
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .dropzone-active {
+            border-color: #3b82f6 !important;
+            background: rgba(59, 130, 246, 0.15) !important;
+            transform: scale(1.02);
+        }
+
+        .transition-all-smooth {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.05); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.4); }
+
+        .file-card:hover {
+            border-color: rgba(56, 189, 248, 0.6) !important;
+            box-shadow: 0 0 25px rgba(56, 189, 248, 0.25), inset 0 0 15px rgba(56, 189, 248, 0.08);
+            background: rgba(30, 41, 59, 0.75);
+            transform: translateY(-2px);
+        }
+
+        .match-true {
+            border-color: #22c55e !important;
+            box-shadow: 0 0 20px rgba(34, 197, 94, 0.3) !important;
+        }
+
+        .match-dim {
+            opacity: 0.3;
+            filter: grayscale(80%);
+        }
+
+        .hidden { display: none !important; }
+        .flex { display: flex; }
+        .grid { display: grid; }
+        .flex-col { flex-direction: column; }
+        .flex-grow { flex-grow: 1; }
+        .items-center { align-items: center; }
+        .items-end { align-items: flex-end; }
+        .justify-center { justify-content: center; }
+        .justify-between { justify-content: space-between; }
+        .justify-end { justify-content: flex-end; }
+        .relative { position: relative; }
+        .absolute { position: absolute; }
+        .fixed { position: fixed; }
+        .inset-0 { top: 0; right: 0; bottom: 0; left: 0; }
+        .right-0 { right: 0; }
+        .z-10 { z-index: 10; }
+        .z-50 { z-index: 50; }
+        .overflow-hidden { overflow: hidden; }
+        .overflow-y-auto { overflow-y: auto; }
+        .break-words { overflow-wrap: break-word; word-break: break-word; }
+        .break-all { word-break: break-all; }
+        .cursor-pointer { cursor: pointer; }
+        .cursor-not-allowed { cursor: not-allowed; }
+
+        /* Dimensiones y Espaciados */
+        .w-full { width: 100%; }
+        .w-16 { width: 4rem; }
+        .w-12 { width: 3rem; }
+        .w-10 { width: 2.5rem; }
+        .w-3\.5 { width: 0.875rem; }
+        .w-3 { width: 0.75rem; }
+        .w-2\.5 { width: 0.625rem; }
+        .h-full { height: 100%; }
+        .h-24 { height: 6rem; }
+        .h-16 { height: 4rem; }
+        .h-12 { height: 3rem; }
+        .h-10 { height: 2.5rem; }
+        .h-2\.5 { height: 0.625rem; }
+        .min-h-screen { min-height: 100vh; }
+        .min-h-\[100px\] { min-height: 100px; }
+        .max-w-7xl { max-width: 80rem; }
+        .max-w-6xl { max-width: 72rem; }
+        .max-w-xl { max-width: 36rem; }
+        .max-w-md { max-width: 28rem; }
+        .max-h-\[3\.2em\] { max-height: 3.2em; }
+        .mx-auto { margin-left: auto; margin-right: auto; }
+        .mx-1 { margin-left: 0.25rem; margin-right: 0.25rem; }
+
+        .gap-1 { gap: 0.25rem; }
+        .gap-1\.5 { gap: 0.375rem; }
+        .gap-2 { gap: 0.5rem; }
+        .gap-3 { gap: 0.75rem; }
+        .gap-4 { gap: 1rem; }
+        .gap-5 { gap: 1.25rem; }
+
+        .p-2 { padding: 0.5rem; }
+        .p-2\.5 { padding: 0.625rem; }
+        .p-3 { padding: 0.75rem; }
+        .p-4 { padding: 1rem; }
+        .p-6 { padding: 1.5rem; }
+        .py-0\.5 { padding-top: 0.125rem; padding-bottom: 0.125rem; }
+        .py-1 { padding-top: 0.25rem; padding-bottom: 0.25rem; }
+        .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+        .py-2\.5 { padding-top: 0.625rem; padding-bottom: 0.625rem; }
+        .py-8 { padding-top: 2rem; padding-bottom: 2rem; }
+        .px-2 { padding-left: 0.5rem; padding-right: 0.5rem; }
+        .px-2\.5 { padding-left: 0.625rem; padding-right: 0.625rem; }
+        .px-3 { padding-left: 0.75rem; padding-right: 0.75rem; }
+        .px-4 { padding-left: 1rem; padding-right: 1rem; }
+        .px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
+
+        .mt-1 { margin-top: 0.25rem; }
+        .mt-1\.5 { margin-top: 0.375rem; }
+        .mt-2 { margin-top: 0.5rem; }
+        .mt-3 { margin-top: 0.75rem; }
+        .mt-4 { margin-top: 1rem; }
+        .mb-1 { margin-bottom: 0.25rem; }
+        .mb-2 { margin-bottom: 0.5rem; }
+        .mb-3 { margin-bottom: 0.75rem; }
+        .mb-6 { margin-bottom: 1.5rem; }
+        .ml-2 { margin-left: 0.5rem; }
+        .ml-14 { margin-left: 3.5rem; }
+
+        /* Tipografía */
+        .font-mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+        .text-\[10px\] { font-size: 10px; line-height: 1.25; }
+        .text-\[11px\] { font-size: 11px; line-height: 1.3; }
+        .text-xs { font-size: 0.75rem; line-height: 1rem; }
+        .text-sm { font-size: 0.875rem; line-height: 1.25rem; }
+        .text-base { font-size: 1rem; line-height: 1.5rem; }
+        .text-lg { font-size: 1.125rem; line-height: 1.75rem; }
+        .text-xl { font-size: 1.25rem; line-height: 1.75rem; }
+        .text-2xl { font-size: 1.5rem; line-height: 2rem; }
+        .font-medium { font-weight: 500; }
+        .font-semibold { font-weight: 600; }
+        .font-bold { font-weight: 700; }
+        .uppercase { text-transform: uppercase; }
+        .text-center { text-align: center; }
+        .leading-tight { line-height: 1.25; }
+        .leading-relaxed { line-height: 1.625; }
+        .tracking-wide { letter-spacing: 0.025em; }
+        .tracking-wider { letter-spacing: 0.05em; }
+        .tracking-widest { letter-spacing: 0.1em; }
+
+        /* Colores y Fondos */
+        .text-white { color: #ffffff; }
+        .text-gray-200 { color: #e5e7eb; }
+        .text-gray-300 { color: #d1d5db; }
+        .text-gray-400 { color: #9ca3af; }
+        .text-blue-100 { color: #dbeafe; }
+        .text-blue-300 { color: #93c5fd; }
+        .text-blue-400 { color: #60a5fa; }
+        .text-blue-500 { color: #3b82f6; }
+        .text-cyan-200 { color: #a5f3fc; }
+        .text-cyan-300 { color: #67e8f9; }
+        .text-cyan-300\/80 { color: rgba(103, 232, 249, 0.8); }
+        .text-cyan-400 { color: #22d3ee; }
+        .text-green-400 { color: #4ade80; }
+        .text-green-500 { color: #22c55e; }
+        .text-purple-100 { color: #f3e8ff; }
+        .text-purple-200 { color: #e9d5ff; }
+        .text-purple-300 { color: #d8b4fe; }
+        .text-purple-400 { color: #c084fc; }
+        .text-purple-500 { color: #a855f7; }
+        .text-purple-500\/70 { color: rgba(168, 85, 247, 0.7); }
+        .text-red-200 { color: #fecaca; }
+        .text-red-300 { color: #fca5a5; }
+        .text-red-400 { color: #f87171; }
+        .text-red-500 { color: #ef4444; }
+        .text-yellow-300 { color: #fde047; }
+        .text-yellow-500 { color: #eab308; }
+        .text-pink-400 { color: #f472b6; }
+
+        .bg-slate-900 { background-color: #0f172a; }
+        .bg-slate-900\/80 { background-color: rgba(15, 23, 42, 0.8); }
+        .bg-slate-900\/95 { background-color: rgba(15, 23, 42, 0.95); }
+        .bg-gray-900 { background-color: #111827; }
+        .bg-gray-900\/80 { background-color: rgba(17, 24, 39, 0.8); }
+        .bg-gray-800\/50 { background-color: rgba(31, 41, 55, 0.5); }
+        .bg-gray-800\/60 { background-color: rgba(31, 41, 55, 0.6); }
+        .bg-black\/70 { background-color: rgba(0, 0, 0, 0.7); }
+        .bg-blue-500\/20 { background-color: rgba(59, 130, 246, 0.2); }
+        .bg-blue-500\/30 { background-color: rgba(59, 130, 246, 0.3); }
+        .bg-blue-900\/10 { background-color: rgba(30, 58, 138, 0.1); }
+        .bg-purple-500\/30 { background-color: rgba(168, 85, 247, 0.3); }
+        .bg-purple-900\/20 { background-color: rgba(88, 28, 135, 0.2); }
+        .bg-cyan-500\/30 { background-color: rgba(6, 182, 212, 0.3); }
+        .bg-cyan-900\/30 { background-color: rgba(22, 78, 99, 0.3); }
+        .bg-red-500\/10 { background-color: rgba(239, 68, 68, 0.1); }
+        .bg-red-500\/20 { background-color: rgba(239, 68, 68, 0.2); }
+        .bg-red-500\/30 { background-color: rgba(239, 68, 68, 0.3); }
+        .bg-red-600 { background-color: #dc2626; }
+
+        /* Bordes y Sombras */
+        .border { border-width: 1px; }
+        .border-2 { border-width: 2px; }
+        .border-dashed { border-style: dashed; }
+        .border-white\/10 { border-color: rgba(255, 255, 255, 0.1); }
+        .border-gray-500 { border-color: #6b7280; }
+        .border-gray-600 { border-color: #4b5563; }
+        .border-gray-700\/50 { border-color: rgba(55, 65, 81, 0.5); }
+        .border-slate-600 { border-color: #475569; }
+        .border-blue-500\/50 { border-color: rgba(59, 130, 246, 0.5); }
+        .border-purple-500\/30 { border-color: rgba(168, 85, 247, 0.3); }
+        .border-purple-500\/50 { border-color: rgba(168, 85, 247, 0.5); }
+        .border-cyan-500\/30 { border-color: rgba(6, 182, 212, 0.3); }
+        .border-cyan-500\/50 { border-color: rgba(6, 182, 212, 0.5); }
+        .border-red-500\/30 { border-color: rgba(239, 68, 68, 0.3); }
+        .border-red-500\/50 { border-color: rgba(239, 68, 68, 0.5); }
+
+        .rounded { border-radius: 0.25rem; }
+        .rounded-md { border-radius: 0.375rem; }
+        .rounded-lg { border-radius: 0.5rem; }
+        .rounded-xl { border-radius: 0.75rem; }
+        .rounded-2xl { border-radius: 1.15rem; }
+        .rounded-full { border-radius: 9999px; }
+
+        .shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3); }
+        .shadow-inner { box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.3); }
+        .shadow-purple-glow { box-shadow: 0 0 15px rgba(168, 85, 247, 0.3); }
+        .shadow-cyan-glow { box-shadow: 0 0 15px rgba(6, 182, 212, 0.3); }
+
+        .object-cover { object-fit: cover; }
+        .opacity-0 { opacity: 0; }
+        .opacity-50 { opacity: 0.5; }
+        .opacity-90 { opacity: 0.9; }
+        .scale-95 { transform: scale(0.95); }
+        .backdrop-blur-sm { backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
+
+        /* Enlace de Autor y Hovers */
+        .u-link { text-decoration: none; }
+        .u-link:hover { color: #93c5fd; text-decoration: underline; }
+        .transition-colors { transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease; }
+        .transition-transform { transition: transform 0.2s ease; }
+        .transition-opacity { transition: opacity 0.3s ease; }
+        .group:hover .group-hover\:scale-110 { transform: scale(1.1); }
+        .hover\:bg-green-500\/20:hover { background-color: rgba(34, 197, 94, 0.2); }
+        .hover\:border-green-500\/50:hover { border-color: rgba(34, 197, 94, 0.5); }
+        .hover\:bg-blue-500\/20:hover { background-color: rgba(59, 130, 246, 0.2); }
+        .hover\:bg-purple-500\/20:hover { background-color: rgba(168, 85, 247, 0.2); }
+        .hover\:bg-red-500\/20:hover { background-color: rgba(239, 68, 68, 0.2); }
+        .hover\:bg-red-500\/30:hover { background-color: rgba(239, 68, 68, 0.3); }
+        .hover\:bg-red-500:hover { background-color: #ef4444; }
+        .hover\:bg-cyan-500\/20:hover { background-color: rgba(6, 182, 212, 0.2); }
+        .hover\:border-blue-400:hover { border-color: #60a5fa; }
+        .hover\:border-yellow-400:hover { border-color: #facc15; }
+        .hover\:text-blue-300:hover { color: #93c5fd; }
+        .hover\:text-yellow-300:hover { color: #fde047; }
+        .hover\:text-white:hover { color: #ffffff; }
+        .focus\:outline-none:focus { outline: none; }
+        .focus\:border-blue-500:focus { border-color: #3b82f6; }
+
+        .header-icon-box {
+            background: linear-gradient(135deg, #2563eb 0%, #3b82f6 50%, #06b6d4 100%);
+            box-shadow: 0 0 25px rgba(59, 130, 246, 0.65);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 1.15rem;
+        }
+
+        .header-logo-svg {
+            width: 3.25rem;
+            height: 3.25rem;
+            display: block;
+            filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.45));
+        }
+
+        .title-gradient {
+            background: linear-gradient(to right, #ffffff, #bfdbfe);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .btn-inicio {
+            position: fixed;
+            top: 1.25rem;
+            left: 1.25rem;
+            z-index: 40;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.55rem 1rem;
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(59, 130, 246, 0.4);
+            border-radius: 0.65rem;
+            color: #bfdbfe;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            text-decoration: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4), 0 0 12px rgba(59, 130, 246, 0.15);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .btn-inicio:hover {
+            background: rgba(37, 99, 235, 0.25);
+            border-color: #22d3ee;
+            color: #ffffff;
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.45);
+            transform: translateY(-1px);
+        }
+
+        .logo-fge {
+            position: fixed;
+            top: 0.9rem;
+            right: 1.25rem;
+            z-index: 40;
+            width: 5.75rem;
+            height: 5.75rem;
+            background: transparent;
+            filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.75));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.25s ease, filter 0.25s ease;
+            user-select: none;
+        }
+        .logo-fge:hover {
+            transform: scale(1.05);
+            filter: drop-shadow(0 0 14px rgba(148, 163, 184, 0.45));
+        }
+
+        @media (max-width: 639px) {
+            .btn-inicio {
+                top: 0.85rem;
+                left: 0.85rem;
+                padding: 0.45rem 0.75rem;
+                font-size: 0.72rem;
+            }
+            .logo-fge {
+                top: 0.65rem;
+                right: 0.75rem;
+                width: 4.1rem;
+                height: 4.1rem;
+            }
+        }
+
+        /* Iconos SVG Offline */
+        .svg-icon,
+        .svg-sm,
+        .svg-lg,
+        .svg-xl {
+            display: inline-block;
+            width: 1.25em;
+            height: 1.25em;
+            vertical-align: -0.2em;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            flex-shrink: 0;
+        }
+        .svg-sm { width: 1em; height: 1em; }
+        .svg-lg { width: 1.65rem; height: 1.65rem; }
+        .svg-xl { width: 2.5rem; height: 2.5rem; }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        @keyframes ping {
+            75%, 100% { transform: scale(2); opacity: 0; }
+        }
+        @keyframes pulse {
+            50% { opacity: 0.5; }
+        }
+        .animate-spin { animation: spin 1.2s linear infinite; }
+        .animate-ping { animation: ping 1.2s cubic-bezier(0, 0, 0.2, 1) infinite; }
+        .animate-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+
+        /* Cuadrículas Responsivas */
+        .grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+        .grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+        @media (min-width: 640px) {
+            .sm\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+        @media (min-width: 768px) {
+            .md-px-8, .md\:px-8 { padding-left: 2rem; padding-right: 2rem; }
+            .md\:text-base { font-size: 1rem; line-height: 1.5rem; }
+            .md\:text-2xl { font-size: 1.5rem; line-height: 2rem; }
+            .md-text-3xl, .md\:text-3xl { font-size: 1.875rem; line-height: 2.25rem; }
+            .md\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+            .md\:flex-row { flex-direction: row; }
+            .md\:absolute { position: absolute; }
+        }
+        @media (min-width: 1024px) {
+            .lg\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+            .lg\:grid-cols-6 { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+        }
+        @media (min-width: 1280px) {
+            .xl\:grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center py-8 px-4 md-px-8 relative min-h-screen">
+
+    <canvas id="network-canvas"></canvas>
+
+    <!-- BOTÓN SUPERIOR IZQUIERDO: REGRESAR AL MENÚ PRINCIPAL (../index.html) -->
+    <a href="../index.html" class="btn-inicio" title="Volver al Menú Principal">
+        <svg class="svg-icon text-cyan-400" style="width: 1.25em; height: 1.25em;" viewBox="0 0 24 24">
+            <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+            <polyline points="9 22 9 12 15 12 15 22"/>
+        </svg>
+        <span>Inicio</span>
+    </a>
+
+    <!-- LOGO SUPERIOR DERECHO: FISCALÍA GENERAL DEL ESTADO DE MORELOS (100% OFFLINE SVG SIN FONDO BLANCO) -->
+    <div class="logo-fge" title="Fiscalía General del Estado de Morelos">
+        <svg viewBox="0 0 240 240" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <!-- Arco superior para "MORELOS" -->
+                <path id="fge-arc-top" d="M 31,120 A 89,89 0 1,1 209,120" />
+                <!-- Arco inferior para "FISCALÍA GENERAL DEL ESTADO" -->
+                <path id="fge-arc-bottom" d="M 19.3,98.6 A 103,103 0 1,0 220.7,98.6" />
+                <!-- Máscara para recortar los anillos detrás del escudo manteniendo el fondo 100% transparente -->
+                <mask id="fge-shield-cutout">
+                    <rect x="0" y="0" width="240" height="240" fill="#ffffff" />
+                    <path d="M 71,67 Q 120,51 169,67 L 169,128 C 169,157 146.5,174 120,185 C 93.5,174 71,157 71,128 Z" fill="#000000" />
+                </mask>
+            </defs>
+
+            <!-- Círculo Exterior Transparente con Línea Plata/Acero (#94a3b8) -->
+            <circle cx="120" cy="120" r="115" fill="none" stroke="#94a3b8" stroke-width="4.5"/>
+
+            <!-- Tres Anillos Concéntricos Centrales en Línea Plata/Acero (Recortados al borde del escudo) -->
+            <g mask="url(#fge-shield-cutout)" fill="none" stroke="#94a3b8" stroke-width="3.6">
+                <circle cx="120" cy="120" r="78"/>
+                <circle cx="120" cy="120" r="70"/>
+                <circle cx="120" cy="120" r="62"/>
+            </g>
+
+            <!-- Líneas diagonales laterales separadoras -->
+            <line x1="34" y1="81" x2="49" y2="62" stroke="#94a3b8" stroke-width="4.5" stroke-linecap="round"/>
+            <line x1="206" y1="81" x2="191" y2="62" stroke="#94a3b8" stroke-width="4.5" stroke-linecap="round"/>
+
+            <!-- Texto Curvo Superior en Blanco de Alto Contraste: MORELOS -->
+            <text fill="#ffffff" font-family="system-ui, -apple-system, 'Segoe UI', Arial, sans-serif" font-size="21" font-weight="900" letter-spacing="3.5">
+                <textPath href="#fge-arc-top" startOffset="50%" text-anchor="middle">MORELOS</textPath>
+            </text>
+
+            <!-- Texto Curvo Inferior en Blanco de Alto Contraste: FISCALÍA GENERAL DEL ESTADO -->
+            <text fill="#ffffff" font-family="system-ui, -apple-system, 'Segoe UI', Arial, sans-serif" font-size="18" font-weight="900" letter-spacing="1.6">
+                <textPath href="#fge-arc-bottom" startOffset="50%" text-anchor="middle">FISCALÍA GENERAL DEL ESTADO</textPath>
+            </text>
+
+            <!-- Doble Contorno del Escudo Central y Divisiones Internas en Plata/Acero (#94a3b8) -->
+            <path d="M 72,68 Q 120,52 168,68 L 168,128 C 168,156 146,173 120,184 C 94,173 72,156 72,128 Z" fill="none" stroke="#94a3b8" stroke-width="3.5" stroke-linejoin="round"/>
+            <path d="M 78,73 Q 120,58.5 162,73 L 162,128 C 162,152 143,167 120,177 C 97,167 78,152 78,128 Z" fill="none" stroke="#94a3b8" stroke-width="3" stroke-linejoin="round"/>
+            <!-- División vertical central y horizontal derecha -->
+            <line x1="120" y1="64" x2="120" y2="177" stroke="#94a3b8" stroke-width="3.2"/>
+            <line x1="120" y1="123" x2="162" y2="123" stroke="#94a3b8" stroke-width="3.2"/>
+
+            <!-- Siglas F G E en Blanco de Alto Contraste (#ffffff) -->
+            <text x="100" y="103" fill="#ffffff" font-family="system-ui, -apple-system, 'Segoe UI', Arial, sans-serif" font-size="26" font-weight="900" text-anchor="middle">F</text>
+            <text x="100" y="131" fill="#ffffff" font-family="system-ui, -apple-system, 'Segoe UI', Arial, sans-serif" font-size="26" font-weight="900" text-anchor="middle">G</text>
+            <text x="100" y="158" fill="#ffffff" font-family="system-ui, -apple-system, 'Segoe UI', Arial, sans-serif" font-size="26" font-weight="900" text-anchor="middle">E</text>
+
+            <!-- Símbolo Superior Derecho: Balanza de la Justicia y Ojo Visor en Línea Plata/Acero (#94a3b8) -->
+            <g stroke="#94a3b8" fill="none">
+                <!-- Base escalonada y mástil de la balanza -->
+                <line x1="128" y1="100" x2="150" y2="100" stroke-width="3" stroke-linecap="round"/>
+                <line x1="131" y1="95.5" x2="147" y2="95.5" stroke-width="2.8" stroke-linecap="round"/>
+                <line x1="139" y1="80" x2="139" y2="95.5" stroke-width="2.8" stroke-linecap="round"/>
+                <!-- Brazo superior y platillos -->
+                <path d="M 130,82.5 L 136,82.5 L 139,80.5 L 142,82.5 L 148,82.5" stroke-width="2.4" stroke-linejoin="round"/>
+                <line x1="130.5" y1="82.5" x2="130.5" y2="88.5" stroke-width="2"/>
+                <path d="M 126.5,88.5 A 4,4 0 0,0 134.5,88.5 Z" fill="#94a3b8" stroke="none"/>
+                <line x1="147.5" y1="82.5" x2="147.5" y2="88.5" stroke-width="2"/>
+                <path d="M 143.5,88.5 A 4,4 0 0,0 151.5,88.5 Z" fill="#94a3b8" stroke="none"/>
+                <!-- Ojo visor inferior -->
+                <path d="M 127.5,113.5 Q 139,104 150.5,113.5" stroke-width="3" stroke-linecap="round"/>
+                <circle cx="139" cy="113.5" r="4.5" stroke-width="2.8"/>
+            </g>
+
+            <!-- Símbolo Inferior Derecho: Silueta del Estado de Morelos trazada en Línea (#94a3b8) -->
+            <path d="M 131.5,128.5 L 136.5,129.5 L 138.5,132 L 142,131.5 L 145,133.5 L 151.5,132 L 150,136.5 L 148,141 L 150.5,145.5 L 146.5,150.5 L 144.5,158 L 141.5,156 L 138,156 L 135,160 L 131,154 L 125.5,149.5 L 124.5,145 L 127.5,141.5 L 127,136.5 L 131,133.5 Z" fill="none" stroke="#94a3b8" stroke-width="2.3" stroke-linejoin="round"/>
+        </svg>
+    </div>
+
+    <main class="w-full max-w-7xl relative z-10 flex flex-col gap-5">
+        
+        <!-- ENCABEZADO -->
+        <header class="flex flex-col items-center justify-center mb-2">
+            <div class="flex flex-col items-center justify-center gap-3">
+                <div class="w-16 h-16 rounded-2xl header-icon-box flex items-center justify-center relative">
+                    <!-- Icono Candado + Lupa + Circuito 256 SVG Offline en Blanco -->
+                    <svg class="header-logo-svg" viewBox="0 0 120 130" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <clipPath id="lens-clip">
+                                <circle cx="58" cy="78" r="29" />
+                            </clipPath>
+                        </defs>
+
+                        <!-- Arco superior del candado (Blanco) -->
+                        <path d="M29 45 V27 A18 18 0 0 1 65 27 V45" fill="none" stroke="#ffffff" stroke-width="8.5" stroke-linecap="round" />
+
+                        <!-- Cuerpo del candado (Blanco) -->
+                        <rect x="13" y="40" width="68" height="66" rx="14" fill="#ffffff" />
+
+                        <!-- Mango de la lupa (Blanco con contorno de recorte azul) -->
+                        <path d="M77 103 L85 95 L108 119 A6.5 6.5 0 0 1 99 128 L77 103 Z" fill="#ffffff" stroke="#1e3a8a" stroke-width="2" stroke-linejoin="round" />
+
+                        <!-- Lente de la lupa con aro blanco y fondo azul oscuro para resaltar los detalles -->
+                        <circle cx="58" cy="78" r="35" fill="#1e3a8a" />
+                        <circle cx="58" cy="78" r="31.5" fill="#0f172a" stroke="#ffffff" stroke-width="5.5" />
+
+                        <!-- Líneas de circuito, nodos y 256 en blanco dentro de la lupa -->
+                        <g clip-path="url(#lens-clip)">
+                            <!-- Nodos superiores -->
+                            <g stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" opacity="0.9">
+                                <line x1="42" y1="47" x2="42" y2="61" />
+                                <line x1="49" y1="47" x2="49" y2="64" />
+                                <line x1="56" y1="47" x2="56" y2="61" />
+                                <line x1="63" y1="47" x2="63" y2="63" />
+                                <line x1="70" y1="47" x2="70" y2="59" />
+                            </g>
+                            <g fill="#ffffff">
+                                <circle cx="42" cy="61" r="2.7" />
+                                <circle cx="49" cy="64" r="1.9" />
+                                <circle cx="56" cy="61" r="2.7" />
+                                <circle cx="63" cy="63" r="1.9" />
+                                <circle cx="70" cy="59" r="2.3" />
+                            </g>
+
+                            <!-- Nodos inferiores -->
+                            <g stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" opacity="0.9">
+                                <line x1="42" y1="109" x2="42" y2="93" />
+                                <line x1="49" y1="109" x2="49" y2="96" />
+                                <line x1="56" y1="109" x2="56" y2="92" />
+                                <line x1="63" y1="109" x2="63" y2="95" />
+                                <line x1="70" y1="109" x2="70" y2="91" />
+                            </g>
+                            <g fill="#ffffff">
+                                <circle cx="42" cy="93" r="2.5" />
+                                <circle cx="49" cy="96" r="1.9" />
+                                <circle cx="56" cy="92" r="2.9" />
+                                <circle cx="63" cy="95" r="1.9" />
+                                <circle cx="70" cy="91" r="2.9" />
+                            </g>
+
+                            <!-- Texto digital "256" en blanco -->
+                            <g fill="#ffffff" fill-rule="evenodd">
+                                <!-- Dígito 2 -->
+                                <path d="M39 70 H48 V79 H42 V82 H48 V85 H39 V76 H45 V73 H39 Z" />
+                                <!-- Dígito 5 -->
+                                <path d="M51 70 H60 V73 H54 V76 H60 V85 H51 V82 H57 V79 H51 Z" />
+                                <!-- Dígito 6 -->
+                                <path d="M63 70 H72 V73 H66 V76 H72 V85 H63 Z M66 79 V82 H69 V79 Z" />
+                            </g>
+                        </g>
+                    </svg>
+                    <!-- Indicador rojo parpadeante -->
+                    <span class="absolute w-2.5 h-2.5 rounded-full animate-ping" style="top: 6px; right: 6px; background-color: #f87171;"></span>
+                    <span class="absolute w-2.5 h-2.5 rounded-full" style="top: 6px; right: 6px; background-color: #ef4444; border: 1px solid rgba(255,255,255,0.6);"></span>
+                </div>
+                <h1 class="text-2xl md-text-3xl font-bold uppercase tracking-wide title-gradient text-center">
+                    GENERADOR DE CÓDIGO HASH
+                </h1>
+            </div>
+            <h2 class="text-sm font-medium mt-1.5 tracking-wider uppercase text-center" style="color: rgba(147, 197, 253, 0.85);">
+                Creado por <a class="u-link font-bold text-blue-400 hover:text-blue-300 transition-colors" href="http://www.isaifijer.com.mx" target="_blank">Isaí Figueroa J.</a>
+            </h2>
+        </header>
+
+        <!-- DASHBOARD FORENSE -->
+        <section class="w-full max-w-6xl mx-auto">
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+                
+                <!-- Exportar Reporte (Icono CSV) -->
+                <button onclick="exportCSV()" class="glass-panel p-3 rounded-lg flex flex-col items-center hover:bg-green-500/20 hover:border-green-500/50 transition-colors group">
+                    <svg class="svg-icon svg-lg text-green-400 mb-2 group-hover:scale-110 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                        <path d="M9.5 14.5c-.4-.4-1-.5-1.5-.3-.7.3-1 1.1-.8 1.9.2.6.8 1 1.5.9.3 0 .6-.2.8-.4"/>
+                        <path d="M13.5 14.3c-.3-.2-.8-.3-1.2-.1-.4.2-.5.7-.2 1l1.2.7c.4.3.3.8-.1 1-.4.2-.9.1-1.3-.1"/>
+                        <polyline points="15.3 14.2 16.3 17 17.3 14.2"/>
+                    </svg>
+                    <span class="text-[11px] font-semibold text-center text-gray-200">Exportar Reporte</span>
+                </button>
+
+                <!-- Comparador -->
+                <button onclick="toggleVerify()" id="btn-verify" class="glass-panel p-3 rounded-lg flex flex-col items-center hover:bg-blue-500/20 transition-colors group">
+                    <svg class="svg-icon svg-lg text-blue-400 mb-2 group-hover:scale-110 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"/>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                        <line x1="8" y1="13" x2="8" y2="10"/>
+                        <line x1="11" y1="13" x2="11" y2="8"/>
+                        <line x1="14" y1="13" x2="14" y2="11"/>
+                    </svg>
+                    <span class="text-[11px] font-semibold text-center text-gray-200 uppercase">Comparar HASH</span>
+                </button>
+                
+                <!-- Tiempos MAC (Solo disponible con Modo HASH) -->
+                <button onclick="toggleMac()" id="btn-mac" class="glass-panel p-3 rounded-lg flex flex-col items-center hover:bg-purple-500/20 transition-colors group opacity-50 cursor-not-allowed">
+                    <svg class="svg-icon svg-lg text-purple-400 mb-2 group-hover:scale-110 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+                        <polyline points="3 3 3 8 8 8"/>
+                        <polyline points="12 7 12 12 16 14"/>
+                    </svg>
+                    <span class="text-[11px] font-semibold text-center text-gray-200">Tiempos MAC</span>
+                </button>
+                
+                <!-- SHA-1 -->
+                <button onclick="toggleSha1()" id="btn-sha1" class="glass-panel p-3 rounded-lg flex flex-col items-center hover:bg-red-500/20 transition-colors group">
+                    <svg class="svg-icon svg-lg text-red-400 mb-2 group-hover:scale-110 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                        <line x1="12" y1="8" x2="12" y2="12"/>
+                        <line x1="12" y1="16" x2="12.01" y2="16"/>
+                    </svg>
+                    <span class="text-[11px] font-semibold text-center text-gray-200 uppercase">Activar SHA-1</span>
+                </button>
+
+                <!-- Activar MODO METADATOS -->
+                <button onclick="toggleMode('metadata')" id="btn-mode-metadata" class="glass-panel p-3 rounded-lg flex flex-col items-center hover:bg-purple-500/20 transition-colors group relative overflow-hidden">
+                    <svg class="svg-icon svg-lg text-purple-400 mb-2 group-hover:scale-110 transition-transform relative z-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="2" y="2" width="20" height="8" rx="2" ry="2"/>
+                        <rect x="2" y="14" width="20" height="8" rx="2" ry="2"/>
+                        <line x1="6" y1="6" x2="6.01" y2="6"/>
+                        <line x1="6" y1="18" x2="6.01" y2="18"/>
+                        <line x1="10" y1="6" x2="18" y2="6"/>
+                        <line x1="10" y1="18" x2="18" y2="18"/>
+                    </svg>
+                    <span class="text-[11px] font-semibold text-center text-gray-200 uppercase relative z-10">Modo Metadatos</span>
+                </button>
+
+                <!-- Activar MODO HASH -->
+                <button onclick="toggleMode('hash')" id="btn-mode-hash" class="glass-panel p-3 rounded-lg flex flex-col items-center hover:bg-cyan-500/20 transition-colors group relative overflow-hidden">
+                    <svg class="svg-icon svg-lg text-cyan-400 mb-2 group-hover:scale-110 transition-transform relative z-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="4" y="4" width="16" height="16" rx="2"/>
+                        <rect x="9" y="9" width="6" height="6"/>
+                        <path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 14h3M1 9h3M1 14h3"/>
+                    </svg>
+                    <span class="text-[11px] font-semibold text-center text-gray-200 uppercase relative z-10">Modo HASH</span>
+                </button>
+
+            </div>
+            
+            <div id="verify-module" class="hidden mt-3 glass-panel p-3 rounded-lg border-blue-500/50 bg-blue-900/10 transition-all-smooth">
+                <div class="flex items-center gap-3">
+                    <svg class="svg-icon svg-lg text-blue-400 ml-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                    <input type="text" id="hash-search" oninput="searchHash(this.value)" placeholder="Pega un MD5, SHA-256 o SHA-1 para validar evidencia..." class="w-full bg-slate-900/80 border border-slate-600 rounded-md py-2.5 px-4 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors font-mono">
+                </div>
+            </div>
+        </section>
+
+        <!-- ZONA DE CARGA DE EVIDENCIA -->
+        <section class="glass-panel rounded-xl p-4 w-full max-w-xl mx-auto border-2 border-dashed border-gray-500 hover:border-blue-400 transition-all-smooth text-center cursor-pointer group flex flex-col items-center justify-center min-h-[100px] mt-2 relative overflow-hidden" id="dropzone">
+            <div class="w-10 h-10 mb-2 rounded-full bg-blue-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <svg class="svg-icon text-blue-400 text-lg" viewBox="0 0 24 24">
+                    <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/>
+                    <path d="M12 13v6"/>
+                    <path d="m9 16 3-3 3 3"/>
+                </svg>
+            </div>
+            <h2 class="text-sm md:text-base font-semibold mb-1 text-gray-200">Arrastra archivos o carpetas aquí</h2>
+            
+            <div class="flex items-center justify-center gap-4 mt-2">
+                <button onclick="document.getElementById('file-input').click(); event.stopPropagation();" class="text-[11px] text-gray-400 hover:text-blue-300 border border-gray-600 hover:border-blue-400 px-3 py-1 rounded transition-colors bg-gray-800/50 flex items-center gap-1.5">
+                    <svg class="svg-icon svg-sm" viewBox="0 0 24 24">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                        <line x1="12" y1="18" x2="12" y2="12"/>
+                        <line x1="9" y1="15" x2="15" y2="15"/>
+                    </svg>
+                    Subir Archivos
+                </button>
+                <button onclick="document.getElementById('folder-input').click(); event.stopPropagation();" class="text-[11px] text-gray-400 hover:text-yellow-300 border border-gray-600 hover:border-yellow-400 px-3 py-1 rounded transition-colors bg-gray-800/50 flex items-center gap-1.5">
+                    <svg class="svg-icon svg-sm" viewBox="0 0 24 24">
+                        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+                    </svg>
+                    Subir Carpeta
+                </button>
+            </div>
+            
+            <input type="file" id="file-input" class="hidden" multiple>
+            <input type="file" id="folder-input" class="hidden" webkitdirectory directory multiple>
+        </section>
+
+        <section class="w-full mt-4">
+            <div id="results-header" class="hidden flex flex-col md:flex-row justify-center items-center mb-6 gap-4 relative w-full">
+                <h3 class="text-xl md:text-2xl font-semibold uppercase tracking-widest text-blue-100 text-center">Evidencia Procesada</h3>
+                <button id="clear-btn" class="md:absolute right-0 bg-red-500/10 hover:bg-red-500/30 text-red-300 border border-red-500/30 px-4 py-2 rounded-lg transition-all-smooth flex items-center gap-2 text-sm font-medium shadow-lg">
+                    <svg class="svg-icon svg-sm" viewBox="0 0 24 24">
+                        <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/>
+                        <path d="M21 3v5h-5"/>
+                    </svg>
+                    Limpiar
+                </button>
+            </div>
+            <div id="results-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"></div>
+        </section>
+    </main>
+
+    <!-- ALERTA DE SEGURIDAD (MODOS) -->
+    <div id="custom-alert-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm transition-opacity opacity-0">
+        <div class="bg-slate-900 border border-red-500/50 rounded-xl p-6 max-w-md shadow-lg transform scale-95 transition-transform" id="custom-alert-box" style="width: 90%; box-shadow: 0 0 30px rgba(239, 68, 68, 0.25);">
+            <div class="flex items-center gap-4 mb-3">
+                <div class="w-10 h-10 rounded-full bg-red-500/20 flex items-center justify-center">
+                    <svg class="svg-icon text-xl text-red-500" viewBox="0 0 24 24">
+                        <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
+                        <line x1="12" y1="9" x2="12" y2="13"/>
+                        <line x1="12" y1="17" x2="12.01" y2="17"/>
+                    </svg>
+                </div>
+                <h3 class="text-lg font-bold text-white uppercase tracking-wide">Acción Requerida</h3>
+            </div>
+            <p id="custom-alert-text" class="text-gray-300 text-sm mb-6 ml-14">Debe activar el Modo Metadatos o el Modo HASH antes de cargar evidencia.</p>
+            <div class="flex justify-end" style="justify-content: flex-end;">
+                <button onclick="closeAlert()" class="bg-red-600 hover:bg-red-500 text-white font-semibold py-2 px-6 rounded-lg transition-colors shadow-lg">Entendido</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* =========================================================
+           MOTORES CRIPTOGRÁFICOS Y EXIF 100% OFFLINE (SIN CDN)
+           ========================================================= */
+
+        // 1. Motor Incremental MD5 (Compatible con SparkMD5.ArrayBuffer)
+        const SparkMD5 = (function() {
+            const S = [
+                7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22,
+                5,  9, 14, 20, 5,  9, 14, 20, 5,  9, 14, 20, 5,  9, 14, 20,
+                4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23,
+                6, 10, 15, 21, 6, 10, 15, 21, 6, 10, 15, 21, 6, 10, 15, 21
+            ];
+            const K = new Uint32Array(64);
+            for (let i = 0; i < 64; i++) {
+                K[i] = Math.floor(Math.abs(Math.sin(i + 1)) * 4294967296) >>> 0;
+            }
+
+            function md5cycle(x, k) {
+                let a = x[0], b = x[1], c = x[2], d = x[3];
+                for (let i = 0; i < 64; i++) {
+                    let f, g;
+                    if (i < 16) {
+                        f = (b & c) | ((~b) & d);
+                        g = i;
+                    } else if (i < 32) {
+                        f = (d & b) | ((~d) & c);
+                        g = (5 * i + 1) % 16;
+                    } else if (i < 48) {
+                        f = b ^ c ^ d;
+                        g = (3 * i + 5) % 16;
+                    } else {
+                        f = c ^ (b | (~d));
+                        g = (7 * i) % 16;
+                    }
+                    const temp = d;
+                    d = c;
+                    c = b;
+                    const sum = (a + f + K[i] + k[g]) | 0;
+                    const s = S[i];
+                    b = (b + ((sum << s) | (sum >>> (32 - s)))) | 0;
+                    a = temp;
+                }
+                x[0] = (x[0] + a) | 0;
+                x[1] = (x[1] + b) | 0;
+                x[2] = (x[2] + c) | 0;
+                x[3] = (x[3] + d) | 0;
+            }
+
+            class ArrayBufferHasher {
+                constructor() {
+                    this.reset();
+                }
+                reset() {
+                    this.state = new Int32Array([0x67452301, 0xefcdab89, 0x98badcfe, 0x10325476]);
+                    this.buffer = new Uint8Array(64);
+                    this.bufferLen = 0;
+                    this.totalBytes = 0;
+                }
+                append(arrBuf) {
+                    const input = new Uint8Array(arrBuf);
+                    let offset = 0;
+                    const len = input.length;
+                    this.totalBytes += len;
+                    const blockWords = new Int32Array(16);
+
+                    if (this.bufferLen > 0) {
+                        const needed = 64 - this.bufferLen;
+                        if (len < needed) {
+                            this.buffer.set(input, this.bufferLen);
+                            this.bufferLen += len;
+                            return this;
+                        }
+                        this.buffer.set(input.subarray(0, needed), this.bufferLen);
+                        for (let i = 0; i < 16; i++) {
+                            const j = i * 4;
+                            blockWords[i] = this.buffer[j] | (this.buffer[j + 1] << 8) | (this.buffer[j + 2] << 16) | (this.buffer[j + 3] << 24);
+                        }
+                        md5cycle(this.state, blockWords);
+                        offset += needed;
+                        this.bufferLen = 0;
+                    }
+
+                    while (offset + 64 <= len) {
+                        for (let i = 0; i < 16; i++) {
+                            const j = offset + i * 4;
+                            blockWords[i] = input[j] | (input[j + 1] << 8) | (input[j + 2] << 16) | (input[j + 3] << 24);
+                        }
+                        md5cycle(this.state, blockWords);
+                        offset += 64;
+                    }
+
+                    if (offset < len) {
+                        this.bufferLen = len - offset;
+                        this.buffer.set(input.subarray(offset), 0);
+                    }
+                    return this;
+                }
+                end() {
+                    const tail = new Uint8Array(128);
+                    tail.set(this.buffer.subarray(0, this.bufferLen), 0);
+                    tail[this.bufferLen] = 0x80;
+                    const padLen = this.bufferLen < 56 ? 64 : 128;
+                    const bitLen = this.totalBytes * 8;
+                    const lowBits = bitLen >>> 0;
+                    const highBits = Math.floor(bitLen / 4294967296) >>> 0;
+                    const view = new DataView(tail.buffer);
+                    view.setUint32(padLen - 8, lowBits, true);
+                    view.setUint32(padLen - 4, highBits, true);
+
+                    const blockWords = new Int32Array(16);
+                    for (let b = 0; b < padLen; b += 64) {
+                        for (let i = 0; i < 16; i++) {
+                            blockWords[i] = view.getInt32(b + i * 4, true);
+                        }
+                        md5cycle(this.state, blockWords);
+                    }
+
+                    let hex = '';
+                    for (let i = 0; i < 4; i++) {
+                        const w = this.state[i];
+                        for (let byteIdx = 0; byteIdx < 4; byteIdx++) {
+                            hex += ((w >>> (byteIdx * 8)) & 0xff).toString(16).padStart(2, '0');
+                        }
+                    }
+                    return hex;
+                }
+            }
+            return { ArrayBuffer: ArrayBufferHasher };
+        })();
+
+        // 2. Motor Incremental SHA-256 (Compatible con sha256.create())
+        const sha256 = (function() {
+            const K = new Uint32Array([
+                0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
+                0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
+                0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da,
+                0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967,
+                0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13, 0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85,
+                0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070,
+                0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
+                0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2
+            ]);
+
+            class SHA256Hasher {
+                constructor() {
+                    this.H = new Uint32Array([
+                        0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a,
+                        0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19
+                    ]);
+                    this.W = new Uint32Array(64);
+                    this.buffer = new Uint8Array(64);
+                    this.bufferLen = 0;
+                    this.totalBytes = 0;
+                }
+                processBlock(bytes, offset) {
+                    const W = this.W;
+                    for (let i = 0; i < 16; i++) {
+                        const j = offset + i * 4;
+                        W[i] = ((bytes[j] << 24) | (bytes[j + 1] << 16) | (bytes[j + 2] << 8) | bytes[j + 3]) >>> 0;
+                    }
+                    for (let i = 16; i < 64; i++) {
+                        const v0 = W[i - 15];
+                        const s0 = (((v0 >>> 7) | (v0 << 25)) ^ ((v0 >>> 18) | (v0 << 14)) ^ (v0 >>> 3)) >>> 0;
+                        const v1 = W[i - 2];
+                        const s1 = (((v1 >>> 17) | (v1 << 15)) ^ ((v1 >>> 19) | (v1 << 13)) ^ (v1 >>> 10)) >>> 0;
+                        W[i] = (W[i - 16] + s0 + W[i - 7] + s1) >>> 0;
+                    }
+                    let [a, b, c, d, e, f, g, h] = this.H;
+                    for (let i = 0; i < 64; i++) {
+                        const S1 = (((e >>> 6) | (e << 26)) ^ ((e >>> 11) | (e << 21)) ^ ((e >>> 25) | (e << 7))) >>> 0;
+                        const ch = ((e & f) ^ ((~e) & g)) >>> 0;
+                        const temp1 = (h + S1 + ch + K[i] + W[i]) >>> 0;
+                        const S0 = (((a >>> 2) | (a << 30)) ^ ((a >>> 13) | (a << 19)) ^ ((a >>> 22) | (a << 10))) >>> 0;
+                        const maj = ((a & b) ^ (a & c) ^ (b & c)) >>> 0;
+                        const temp2 = (S0 + maj) >>> 0;
+
+                        h = g; g = f; f = e;
+                        e = (d + temp1) >>> 0;
+                        d = c; c = b; b = a;
+                        a = (temp1 + temp2) >>> 0;
+                    }
+                    this.H[0] = (this.H[0] + a) >>> 0;
+                    this.H[1] = (this.H[1] + b) >>> 0;
+                    this.H[2] = (this.H[2] + c) >>> 0;
+                    this.H[3] = (this.H[3] + d) >>> 0;
+                    this.H[4] = (this.H[4] + e) >>> 0;
+                    this.H[5] = (this.H[5] + f) >>> 0;
+                    this.H[6] = (this.H[6] + g) >>> 0;
+                    this.H[7] = (this.H[7] + h) >>> 0;
+                }
+                update(arrBuf) {
+                    const input = new Uint8Array(arrBuf);
+                    let offset = 0;
+                    const len = input.length;
+                    this.totalBytes += len;
+
+                    if (this.bufferLen > 0) {
+                        const needed = 64 - this.bufferLen;
+                        if (len < needed) {
+                            this.buffer.set(input, this.bufferLen);
+                            this.bufferLen += len;
+                            return this;
+                        }
+                        this.buffer.set(input.subarray(0, needed), this.bufferLen);
+                        this.processBlock(this.buffer, 0);
+                        offset += needed;
+                        this.bufferLen = 0;
+                    }
+
+                    while (offset + 64 <= len) {
+                        this.processBlock(input, offset);
+                        offset += 64;
+                    }
+
+                    if (offset < len) {
+                        this.bufferLen = len - offset;
+                        this.buffer.set(input.subarray(offset), 0);
+                    }
+                    return this;
+                }
+                hex() {
+                    const tail = new Uint8Array(128);
+                    tail.set(this.buffer.subarray(0, this.bufferLen), 0);
+                    tail[this.bufferLen] = 0x80;
+                    const padLen = this.bufferLen < 56 ? 64 : 128;
+                    const bitLen = this.totalBytes * 8;
+                    const lowBits = bitLen >>> 0;
+                    const highBits = Math.floor(bitLen / 4294967296) >>> 0;
+                    const view = new DataView(tail.buffer);
+                    view.setUint32(padLen - 8, highBits, false);
+                    view.setUint32(padLen - 4, lowBits, false);
+
+                    for (let b = 0; b < padLen; b += 64) {
+                        this.processBlock(tail, b);
+                    }
+                    let out = '';
+                    for (let i = 0; i < 8; i++) {
+                        out += this.H[i].toString(16).padStart(8, '0');
+                    }
+                    return out;
+                }
+            }
+            return { create: () => new SHA256Hasher() };
+        })();
+
+        // 3. Motor Incremental SHA-1 (Compatible con sha1.create())
+        const sha1 = (function() {
+            class SHA1Hasher {
+                constructor() {
+                    this.H = new Uint32Array([0x67452301, 0xefcdab89, 0x98badcfe, 0x10325476, 0xc3d2e1f0]);
+                    this.W = new Uint32Array(80);
+                    this.buffer = new Uint8Array(64);
+                    this.bufferLen = 0;
+                    this.totalBytes = 0;
+                }
+                processBlock(bytes, offset) {
+                    const W = this.W;
+                    for (let i = 0; i < 16; i++) {
+                        const j = offset + i * 4;
+                        W[i] = ((bytes[j] << 24) | (bytes[j + 1] << 16) | (bytes[j + 2] << 8) | bytes[j + 3]) >>> 0;
+                    }
+                    for (let i = 16; i < 80; i++) {
+                        const n = W[i - 3] ^ W[i - 8] ^ W[i - 14] ^ W[i - 16];
+                        W[i] = ((n << 1) | (n >>> 31)) >>> 0;
+                    }
+                    let [a, b, c, d, e] = this.H;
+                    for (let i = 0; i < 80; i++) {
+                        let f, k;
+                        if (i < 20) {
+                            f = ((b & c) | ((~b) & d)) >>> 0;
+                            k = 0x5a827999;
+                        } else if (i < 40) {
+                            f = (b ^ c ^ d) >>> 0;
+                            k = 0x6ed9eba1;
+                        } else if (i < 60) {
+                            f = ((b & c) | (b & d) | (c & d)) >>> 0;
+                            k = 0x8f1bbcdc;
+                        } else {
+                            f = (b ^ c ^ d) >>> 0;
+                            k = 0xca62c1d6;
+                        }
+                        const temp = ((((a << 5) | (a >>> 27)) >>> 0) + f + e + k + W[i]) >>> 0;
+                        e = d; d = c;
+                        c = ((b << 30) | (b >>> 2)) >>> 0;
+                        b = a; a = temp;
+                    }
+                    this.H[0] = (this.H[0] + a) >>> 0;
+                    this.H[1] = (this.H[1] + b) >>> 0;
+                    this.H[2] = (this.H[2] + c) >>> 0;
+                    this.H[3] = (this.H[3] + d) >>> 0;
+                    this.H[4] = (this.H[4] + e) >>> 0;
+                }
+                update(arrBuf) {
+                    const input = new Uint8Array(arrBuf);
+                    let offset = 0;
+                    const len = input.length;
+                    this.totalBytes += len;
+
+                    if (this.bufferLen > 0) {
+                        const needed = 64 - this.bufferLen;
+                        if (len < needed) {
+                            this.buffer.set(input, this.bufferLen);
+                            this.bufferLen += len;
+                            return this;
+                        }
+                        this.buffer.set(input.subarray(0, needed), this.bufferLen);
+                        this.processBlock(this.buffer, 0);
+                        offset += needed;
+                        this.bufferLen = 0;
+                    }
+
+                    while (offset + 64 <= len) {
+                        this.processBlock(input, offset);
+                        offset += 64;
+                    }
+
+                    if (offset < len) {
+                        this.bufferLen = len - offset;
+                        this.buffer.set(input.subarray(offset), 0);
+                    }
+                    return this;
+                }
+                hex() {
+                    const tail = new Uint8Array(128);
+                    tail.set(this.buffer.subarray(0, this.bufferLen), 0);
+                    tail[this.bufferLen] = 0x80;
+                    const padLen = this.bufferLen < 56 ? 64 : 128;
+                    const bitLen = this.totalBytes * 8;
+                    const lowBits = bitLen >>> 0;
+                    const highBits = Math.floor(bitLen / 4294967296) >>> 0;
+                    const view = new DataView(tail.buffer);
+                    view.setUint32(padLen - 8, highBits, false);
+                    view.setUint32(padLen - 4, lowBits, false);
+
+                    for (let b = 0; b < padLen; b += 64) {
+                        this.processBlock(tail, b);
+                    }
+                    let out = '';
+                    for (let i = 0; i < 5; i++) {
+                        out += this.H[i].toString(16).padStart(8, '0');
+                    }
+                    return out;
+                }
+            }
+            return { create: () => new SHA1Hasher() };
+        })();
+
+        // 4. Lector EXIF Nativo Offline (JPEG / TIFF)
+        const EXIF = (function() {
+            const TAG_MAP = {
+                0x010F: "Make",
+                0x0110: "Model",
+                0x0131: "Software",
+                0x013B: "Artist",
+                0x0132: "DateTime",
+                0x9003: "DateTimeOriginal",
+                0x8769: "ExifIFDPointer"
+            };
+
+            function readExifString(view, offset, length) {
+                let str = '';
+                for (let i = 0; i < length; i++) {
+                    if (offset + i >= view.byteLength) break;
+                    const code = view.getUint8(offset + i);
+                    if (code === 0) break;
+                    str += String.fromCharCode(code);
+                }
+                return str.trim();
+            }
+
+            function parseIFD(view, tiffStart, dirStart, littleEndian, tags) {
+                if (dirStart + 2 > view.byteLength) return;
+                const entries = view.getUint16(dirStart, littleEndian);
+                for (let i = 0; i < entries; i++) {
+                    const entryOffset = dirStart + 2 + i * 12;
+                    if (entryOffset + 12 > view.byteLength) break;
+                    const tagId = view.getUint16(entryOffset, littleEndian);
+                    const type = view.getUint16(entryOffset + 2, littleEndian);
+                    const numValues = view.getUint32(entryOffset + 4, littleEndian);
+                    const tagName = TAG_MAP[tagId];
+                    if (!tagName) continue;
+
+                    if (tagName === "ExifIFDPointer") {
+                        const subDirOffset = view.getUint32(entryOffset + 8, littleEndian);
+                        parseIFD(view, tiffStart, tiffStart + subDirOffset, littleEndian, tags);
+                    } else if (type === 2) {
+                        const valueOffset = numValues > 4
+                            ? tiffStart + view.getUint32(entryOffset + 8, littleEndian)
+                            : entryOffset + 8;
+                        tags[tagName] = readExifString(view, valueOffset, numValues);
+                    }
+                }
+            }
+
+            function extractTagsFromBuffer(buffer) {
+                const view = new DataView(buffer);
+                const tags = {};
+                if (view.byteLength < 12) return tags;
+
+                let tiffOffset = -1;
+                if (view.getUint16(0, false) === 0xFFD8) {
+                    let offset = 2;
+                    while (offset + 4 < view.byteLength) {
+                        if (view.getUint8(offset) !== 0xFF) break;
+                        const marker = view.getUint8(offset + 1);
+                        const segLen = view.getUint16(offset + 2, false);
+                        if (marker === 0xE1 && offset + 10 < view.byteLength && view.getUint32(offset + 4, false) === 0x45786966) {
+                            tiffOffset = offset + 10;
+                            break;
+                        }
+                        offset += 2 + segLen;
+                    }
+                } else if (view.getUint16(0, false) === 0x4949 || view.getUint16(0, false) === 0x4D4D) {
+                    tiffOffset = 0;
+                }
+
+                if (tiffOffset >= 0 && tiffOffset + 8 <= view.byteLength) {
+                    const endianMark = view.getUint16(tiffOffset, false);
+                    const littleEndian = endianMark === 0x4949;
+                    const firstIFDOffset = view.getUint32(tiffOffset + 4, littleEndian);
+                    parseIFD(view, tiffOffset, tiffOffset + firstIFDOffset, littleEndian, tags);
+                }
+                return tags;
+            }
+
+            return {
+                getData(file, callback) {
+                    file.slice(0, 128 * 1024).arrayBuffer().then(buf => {
+                        file.exifdata = extractTagsFromBuffer(buf);
+                        if (typeof callback === 'function') callback.call(file);
+                    }).catch(() => {});
+                },
+                getTag(imgObj, tag) {
+                    return (imgObj && imgObj.exifdata) ? imgObj.exifdata[tag] : undefined;
+                }
+            };
+        })();
+
+        /* =========================================================
+           FONDO DE PARTÍCULAS (IDÉNTICO A LA CALCULADORA FORENSE)
+           ========================================================= */
+        let config = { modeHash: false, modeMetadata: false, macTime: false, sha1: false, verifyMode: false };
+        let processedEvidence = []; 
+        let rootMap = {}; 
+
+        const canvas = document.getElementById('network-canvas');
+        const ctx = canvas.getContext('2d');
+        let particlesArray = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor(x, y, directionX, directionY, size, color) {
+                this.x = x;
+                this.y = y;
+                this.directionX = directionX;
+                this.directionY = directionY;
+                this.size = size;
+                this.color = color;
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+            }
+            update() {
+                if (this.x > canvas.width || this.x < 0) this.directionX = -this.directionX;
+                if (this.y > canvas.height || this.y < 0) this.directionY = -this.directionY;
+                this.x += this.directionX;
+                this.y += this.directionY;
+                this.draw();
+            }
+        }
+
+        function initParticles() {
+            particlesArray = [];
+            let numberOfParticles = (canvas.height * canvas.width) / 18000;
+            for (let i = 0; i < numberOfParticles; i++) {
+                let size = (Math.random() * 2) + 1;
+                let x = (Math.random() * ((canvas.width - size * 2) - (size * 2)) + size * 2);
+                let y = (Math.random() * ((canvas.height - size * 2) - (size * 2)) + size * 2);
+                let directionX = (Math.random() * 1) - 0.5;
+                let directionY = (Math.random() * 1) - 0.5;
+
+                // Colores random (verde neón, púrpura, azul cyan) respetando la temática ciber
+                let colors = ['#5dff00', '#bc13fe', '#00f3ff', '#3b82f6'];
+                let color = colors[Math.floor(Math.random() * colors.length)];
+
+                particlesArray.push(new Particle(x, y, directionX, directionY, size, color));
+            }
+        }
+
+        function animateParticles() {
+            requestAnimationFrame(animateParticles);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            for (let i = 0; i < particlesArray.length; i++) {
+                particlesArray[i].update();
+            }
+            connectParticles();
+        }
+
+        function connectParticles() {
+            let opacityValue = 1;
+            for (let a = 0; a < particlesArray.length; a++) {
+                for (let b = a; b < particlesArray.length; b++) {
+                    let distance = ((particlesArray[a].x - particlesArray[b].x) * (particlesArray[a].x - particlesArray[b].x)) +
+                                   ((particlesArray[a].y - particlesArray[b].y) * (particlesArray[a].y - particlesArray[b].y));
+
+                    if (distance < (canvas.width / 10) * (canvas.height / 10)) {
+                        opacityValue = 1 - (distance / 20000);
+                        ctx.strokeStyle = 'rgba(93, 255, 0,' + (opacityValue * 0.3) + ')';
+                        ctx.lineWidth = 1;
+                        ctx.beginPath();
+                        ctx.moveTo(particlesArray[a].x, particlesArray[a].y);
+                        ctx.lineTo(particlesArray[b].x, particlesArray[b].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+        initParticles();
+        animateParticles();
+
+        /* =========================================================
+           ICONOS VECTORIALES DINÁMICOS OFFLINE
+           ========================================================= */
+        const OFFLINE_ICONS = {
+            folder: `<svg class="svg-icon svg-sm w-3" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>`,
+            signature: `<svg class="svg-icon svg-sm w-3" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>`,
+            scale: `<svg class="svg-icon svg-sm w-3" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="12" cy="12" r="4"/></svg>`,
+            calendarPlus: `<svg class="svg-icon svg-sm w-3" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="12" y1="14" x2="12" y2="18"/><line x1="10" y1="16" x2="14" y2="16"/></svg>`,
+            calendarCheck: `<svg class="svg-icon svg-sm w-3" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="m9 16 2 2 4-4"/></svg>`,
+            user: `<svg class="svg-icon svg-sm w-3" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`,
+            image: `<svg class="svg-icon svg-sm w-3" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>`,
+            film: `<svg class="svg-icon svg-sm w-3" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/></svg>`,
+            clock: `<svg class="svg-icon svg-sm w-3" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`,
+            copy: `<svg class="svg-icon svg-sm" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`,
+            check: `<svg class="svg-icon svg-sm text-green-400" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>`,
+            chipSpin: `<svg class="svg-xl text-cyan-400 mb-3 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 14h3M1 9h3M1 14h3"/></svg>`
+        };
+
+        function isVideoFile(file) {
+            if (!file) return false;
+            const type = file.type || '';
+            const name = file.name || '';
+            return type.startsWith('video/') || /\.(mp4|mov|avi|mkv|dav|ts|webm|wmv|flv|3gp|m4v|mpg|mpeg|vob|asf|m2ts|mts|ogv|264|265|h264|h265|hevc)$/i.test(name);
+        }
+
+        function getFileIconSVG(file) {
+            const type = file.type || '';
+            const name = (file.name || '').toLowerCase();
+            if (isVideoFile(file)) {
+                return `<svg class="svg-xl text-pink-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>`;
+            }
+            if (type.includes('audio/') || /\.(mp3|wav|ogg|flac|aac|m4a|wma)$/i.test(name)) {
+                return `<svg class="svg-xl text-purple-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>`;
+            }
+            if (type === 'application/pdf' || name.endsWith('.pdf')) {
+                return `<svg class="svg-xl text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M9 15h6"/><path d="M9 11h6"/></svg>`;
+            }
+            if (type.includes('msword') || name.endsWith('.doc') || name.endsWith('.docx')) {
+                return `<svg class="svg-xl text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M8 13l1.5 5 2.5-4 2.5 4 1.5-5"/></svg>`;
+            }
+            if (type.includes('excel') || name.endsWith('.xls') || name.endsWith('.xlsx') || name.endsWith('.csv')) {
+                return `<svg class="svg-xl text-green-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="m9 13 6 5"/><path d="m15 13-6 5"/></svg>`;
+            }
+            if (type.includes('zip') || type.includes('rar') || name.endsWith('.zip') || name.endsWith('.rar')) {
+                return `<svg class="svg-xl text-yellow-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 8v13H3V8"/><path d="M1 3h22v5H1z"/><path d="M10 12h4"/></svg>`;
+            }
+            return `<svg class="svg-xl text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>`;
+        }
+
+        function showAlert(msg = "Debe activar el Modo Metadatos o el Modo HASH antes de cargar evidencia.") {
+            const modal = document.getElementById('custom-alert-modal');
+            const box = document.getElementById('custom-alert-box');
+            document.getElementById('custom-alert-text').innerText = msg;
+            modal.classList.remove('hidden');
+            setTimeout(() => { modal.classList.remove('opacity-0'); box.classList.remove('scale-95'); }, 10);
+        }
+        function closeAlert() {
+            const modal = document.getElementById('custom-alert-modal');
+            const box = document.getElementById('custom-alert-box');
+            modal.classList.add('opacity-0'); box.classList.add('scale-95');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        }
+
+        function toggleMode(mode) {
+            if (mode === 'metadata') {
+                config.modeMetadata = !config.modeMetadata;
+                const btn = document.getElementById('btn-mode-metadata');
+                if(config.modeMetadata) btn.classList.add('bg-purple-500/30', 'border-purple-500/50', 'shadow-purple-glow');
+                else btn.classList.remove('bg-purple-500/30', 'border-purple-500/50', 'shadow-purple-glow');
+            } else if (mode === 'hash') {
+                config.modeHash = !config.modeHash;
+                const btn = document.getElementById('btn-mode-hash');
+                const btnMac = document.getElementById('btn-mac');
+                if(config.modeHash) {
+                    btn.classList.add('bg-cyan-500/30', 'border-cyan-500/50', 'shadow-cyan-glow');
+                    btnMac.classList.remove('opacity-50', 'cursor-not-allowed');
+                } else {
+                    btn.classList.remove('bg-cyan-500/30', 'border-cyan-500/50', 'shadow-cyan-glow');
+                    config.macTime = false;
+                    btnMac.classList.remove('bg-purple-500/30', 'border-purple-500/50', 'shadow-purple-glow');
+                    btnMac.classList.add('opacity-50', 'cursor-not-allowed');
+                    document.querySelectorAll('.metadata-row').forEach(row => row.style.display = 'none');
+                }
+            }
+        }
+
+        function toggleMac() {
+            if (!config.modeHash) {
+                showAlert("El botón de Tiempos MAC solo puede activarse cuando se utiliza el Modo HASH.");
+                return;
+            }
+            config.macTime = !config.macTime;
+            const btn = document.getElementById('btn-mac');
+            if (config.macTime) {
+                btn.classList.add('bg-purple-500/30', 'border-purple-500/50', 'shadow-purple-glow');
+            } else {
+                btn.classList.remove('bg-purple-500/30', 'border-purple-500/50', 'shadow-purple-glow');
+            }
+            document.querySelectorAll('.metadata-row').forEach(row => {
+                row.style.display = config.macTime ? 'flex' : 'none';
+            });
+        }
+
+        function toggleVerify() {
+            config.verifyMode = !config.verifyMode;
+            const btn = document.getElementById('btn-verify');
+            const module = document.getElementById('verify-module');
+            if(config.verifyMode) { btn.classList.add('bg-blue-500/30', 'border-blue-500/50'); module.classList.remove('hidden'); } 
+            else { btn.classList.remove('bg-blue-500/30', 'border-blue-500/50'); module.classList.add('hidden'); document.getElementById('hash-search').value = ''; searchHash(''); }
+        }
+
+        function toggleSha1() {
+            config.sha1 = !config.sha1;
+            const btn = document.getElementById('btn-sha1');
+            if(config.sha1) btn.classList.add('bg-red-500/30', 'border-red-500/50');
+            else btn.classList.remove('bg-red-500/30', 'border-red-500/50');
+        }
+
+        function searchHash(query) {
+            if(!config.verifyMode) return;
+            query = query.trim().toLowerCase();
+            const cards = document.querySelectorAll('.file-card');
+            if(!query) { cards.forEach(card => card.classList.remove('match-true', 'match-dim')); return; }
+            cards.forEach(card => {
+                if(card.innerText.toLowerCase().includes(query)) { card.classList.add('match-true'); card.classList.remove('match-dim'); } 
+                else { card.classList.add('match-dim'); card.classList.remove('match-true'); }
+            });
+        }
+
+        function validateModesActive() {
+            if (!config.modeHash && !config.modeMetadata) { showAlert(); return false; }
+            return true;
+        }
+
+        const dropzone = document.getElementById('dropzone');
+        const fileInput = document.getElementById('file-input');
+        const folderInput = document.getElementById('folder-input');
+        
+        window.addEventListener('dragover', e => e.preventDefault());
+        window.addEventListener('drop', e => e.preventDefault());
+        dropzone.addEventListener('dragenter', e => { e.preventDefault(); dropzone.classList.add('dropzone-active'); });
+        dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('dropzone-active'); });
+        dropzone.addEventListener('dragleave', e => { e.preventDefault(); dropzone.classList.remove('dropzone-active'); });
+        
+        dropzone.addEventListener('drop', async (e) => {
+            e.preventDefault(); dropzone.classList.remove('dropzone-active');
+            if (!validateModesActive()) return;
+            const filesToProcess = [];
+            
+            // Atrapar ruta principal antes de que Windows la oculte
+            if (e.dataTransfer.files) {
+                for(let i = 0; i < e.dataTransfer.files.length; i++){
+                    let f = e.dataTransfer.files[i];
+                    if (f.path) rootMap[f.name] = f.path; 
+                }
+            }
+            if (e.dataTransfer && e.dataTransfer.items) {
+                const promises = [];
+                for (let i = 0; i < e.dataTransfer.items.length; i++) {
+                    const item = e.dataTransfer.items[i];
+                    if (item.kind === 'file') {
+                        const entry = item.webkitGetAsEntry ? item.webkitGetAsEntry() : null;
+                        if (entry && entry.isDirectory) promises.push(traverseDirectory(entry, filesToProcess));
+                        else {
+                            const file = item.getAsFile();
+                            if (file) { file.customPath = file.path || rootMap[file.name] || file.name; filesToProcess.push(file); }
+                        }
+                    }
+                }
+                await Promise.all(promises);
+            }
+            if (filesToProcess.length > 0) handleFiles(filesToProcess);
+        });
+
+        async function traverseDirectory(entry, fileArray) {
+            return new Promise((resolve) => {
+                if (entry.isFile) {
+                    entry.file(file => {
+                        const pathParts = entry.fullPath.split('/').filter(p => p); 
+                        if (pathParts.length > 0) {
+                            const rootName = pathParts[0]; 
+                            const absoluteRoot = rootMap[rootName]; 
+                            if (absoluteRoot) {
+                                let finalPath = absoluteRoot;
+                                if (pathParts.length > 1) { finalPath = absoluteRoot + '\\' + pathParts.slice(1).join('\\'); }
+                                file.customPath = finalPath;
+                            } else file.customPath = entry.fullPath;
+                        }
+                        fileArray.push(file); resolve();
+                    }, resolve);
+                } else if (entry.isDirectory) {
+                    const dirReader = entry.createReader();
+                    const readAllEntries = (entriesArray) => {
+                        dirReader.readEntries(async (results) => {
+                            if (results.length > 0) { entriesArray.push(...results); readAllEntries(entriesArray); } 
+                            else { for (let i = 0; i < entriesArray.length; i++) await traverseDirectory(entriesArray[i], fileArray); resolve(); }
+                        }, resolve);
+                    };
+                    readAllEntries([]);
+                } else resolve();
+            });
+        }
+
+        function handleManualSelection(e) {
+            if (!validateModesActive()) { e.target.value = ''; return; }
+            if (e.target.files.length > 0) {
+                const files = Array.from(e.target.files);
+                files.forEach(f => f.customPath = f.path || f.webkitRelativePath || f.name);
+                handleFiles(files);
+            }
+            e.target.value = '';
+        }
+
+        fileInput.addEventListener('change', handleManualSelection);
+        folderInput.addEventListener('change', handleManualSelection);
+        document.getElementById('clear-btn').addEventListener('click', () => {
+            document.getElementById('results-grid').innerHTML = '';
+            document.getElementById('results-header').classList.add('hidden');
+            processedEvidence = []; 
+            if(config.verifyMode) searchHash('');
+        });
+
+        function handleFiles(files) {
+            document.getElementById('results-header').classList.remove('hidden');
+            files.forEach(file => {
+                const evidenceItem = { file: file, hashes: {}, extraMeta: {} };
+                const fileCard = createFileCard(file, evidenceItem);
+                document.getElementById('results-grid').prepend(fileCard);
+                processLargeFile(evidenceItem, fileCard);
+            });
+        }
+
+        function formatBytes(bytes) {
+            if (!+bytes) return '0 Bytes';
+            const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(1024));
+            return `${parseFloat((bytes / Math.pow(1024, i)).toFixed(2))} ${sizes[i]}`;
+        }
+        function formatDuration(sec) {
+            if (!sec || isNaN(sec) || !isFinite(sec) || sec <= 0) return 'Desc';
+            const totalSec = Math.round(sec);
+            const h = Math.floor(totalSec / 3600);
+            const m = Math.floor((totalSec % 3600) / 60);
+            const s = Math.floor(totalSec % 60);
+            return `${h > 0 ? h + 'h ' : ''}${m}m ${s}s`;
+        }
+
+        function createFileCard(file, evidenceItem) {
+            const cardId = `file-${Math.random().toString(36).substr(2, 9)}`;
+            evidenceItem.id = cardId; 
+            
+            const type = file.type || '';
+            const isImage = type.startsWith('image/');
+            const isVideo = isVideoFile(file);
+            const lastMod = file.lastModified ? new Date(file.lastModified).toLocaleString('es-MX') : 'Desconocido';
+            const rutaAbsoluta = file.customPath || file.path || file.name;
+            const extension = file.name.includes('.') ? file.name.split('.').pop().toUpperCase() : 'N/A';
+            const mime = file.type || (isVideo ? `video/${extension.toLowerCase()}` : 'Desconocido/Sin Firma');
+            
+            let previewHTML = `<div class="w-full h-24 bg-gray-800/60 border border-gray-700/50 rounded-lg flex items-center justify-center">
+                                 ${getFileIconSVG(file)}
+                               </div>`;
+            if (isImage) {
+                try { previewHTML = `<div class="w-full h-24 bg-gray-900 rounded-lg overflow-hidden flex items-center justify-center border border-gray-700/50"><img src="${URL.createObjectURL(file)}" alt="${file.name}" class="object-cover w-full h-full opacity-90"></div>`; } catch(e) {}
+            }
+
+            const card = document.createElement('div');
+            card.className = 'file-card glass-panel rounded-xl p-4 flex flex-col relative overflow-hidden transition-all-smooth border border-white/10';
+            card.id = cardId;
+            
+            let htmlContent = `
+                <div class="mb-3 w-full">
+                    ${previewHTML}
+                </div>
+                <div class="mb-2 w-full flex flex-col justify-center">
+                    <h4 class="font-bold text-base text-white break-words w-full leading-tight">${file.name}</h4>
+                    ${config.modeHash && !config.modeMetadata ? `
+                    <div class="flex justify-between items-center mt-1.5 gap-2">
+                        <p class="text-xs text-gray-400">${formatBytes(file.size)}</p>
+                        ${isVideo ? `
+                        <span id="hash-vid-dur-${cardId}" class="text-[11px] text-cyan-300 bg-cyan-900/30 border border-cyan-500/30 px-2 py-0.5 rounded font-mono flex items-center gap-1">
+                            ${OFFLINE_ICONS.clock} <span class="animate-pulse">Calculando...</span>
+                        </span>` : ''}
+                    </div>
+                    <div class="metadata-row items-center gap-1.5 mt-2 bg-purple-900/20 px-2.5 py-1 rounded text-[11px] text-purple-300 border border-purple-500/30" style="display: ${config.macTime ? 'flex' : 'none'}">
+                        ${OFFLINE_ICONS.clock} Modificado: ${lastMod}
+                    </div>` : ''}
+                </div>`;
+
+            if (config.modeMetadata) {
+                evidenceItem.extraMeta.creationDate = lastMod;
+                evidenceItem.extraMeta.creator = 'Sistema Local / Sin Firma';
+
+                htmlContent += `
+                    <div class="bg-purple-900/20 p-2.5 rounded border border-purple-500/30 mb-2 flex flex-col gap-1.5 shadow-inner">
+                        <p class="text-[10px] text-purple-300 font-mono break-all leading-tight">${OFFLINE_ICONS.folder} <b class="text-purple-100">RUTA:</b> ${rutaAbsoluta}</p>
+                        <p class="text-[10px] text-purple-300 font-mono break-all leading-tight">${OFFLINE_ICONS.signature} <b class="text-purple-100">TIPO:</b> ${extension} <span class="mx-1 text-purple-500">|</span> <b class="text-purple-100">MIME:</b> ${mime}</p>
+                        <p class="text-[10px] text-purple-300 font-mono break-all leading-tight">${OFFLINE_ICONS.scale} <b class="text-purple-100">TAMAÑO:</b> ${formatBytes(file.size)} <span class="text-purple-500/70">(${file.size} bytes)</span></p>
+                        
+                        <p id="meta-creation-${cardId}" class="text-[10px] text-purple-300 font-mono break-all leading-tight">${OFFLINE_ICONS.calendarPlus} <b class="text-purple-100">CREACIÓN:</b> <span class="animate-pulse text-purple-200">Analizando...</span></p>
+                        <p class="text-[10px] text-purple-300 font-mono break-all leading-tight">${OFFLINE_ICONS.calendarCheck} <b class="text-purple-100">MODIFICACIÓN:</b> ${lastMod}</p>
+                        <p id="meta-creator-${cardId}" class="text-[10px] text-purple-300 font-mono break-all leading-tight">${OFFLINE_ICONS.user} <b class="text-purple-100">CREADOR:</b> <span class="animate-pulse text-purple-200">Analizando...</span></p>
+                        
+                        ${isImage ? `<p id="meta-dim-${cardId}" class="text-[10px] text-purple-300 font-mono break-all leading-tight">${OFFLINE_ICONS.image} <b class="text-purple-100">RESOLUCIÓN:</b> <span class="animate-pulse">Calculando...</span></p>` : ''}
+                        ${isVideo ? `<p id="meta-dim-${cardId}" class="text-[10px] text-purple-300 font-mono break-all leading-tight">${OFFLINE_ICONS.film} <b class="text-purple-100">RESOLUCIÓN:</b> <span class="animate-pulse">Calculando...</span></p>
+                                     <p id="meta-dur-${cardId}" class="text-[10px] text-purple-300 font-mono break-all leading-tight">${OFFLINE_ICONS.clock} <b class="text-purple-100">DURACIÓN:</b> <span class="animate-pulse">Calculando...</span></p>` : ''}
+                    </div>`;
+            }
+
+            if (config.modeHash) {
+                htmlContent += `
+                    <div class="flex-grow flex flex-col gap-2 mt-1">
+                        ${createHashSection('MD5', cardId)}
+                        ${createHashSection('SHA-256', cardId)}
+                        ${config.sha1 ? createHashSection('SHA-1', cardId) : ''}
+                    </div>`;
+            }
+            
+            if (config.modeHash) {
+                htmlContent += `
+                    <div id="loader-${cardId}" class="absolute inset-0 bg-slate-900/95 backdrop-blur-sm flex flex-col items-center justify-center z-10 transition-opacity">
+                        ${OFFLINE_ICONS.chipSpin}
+                        <span id="progress-${cardId}" class="text-lg font-bold tracking-widest text-cyan-200">0%</span>
+                        <span class="text-[10px] text-gray-400 mt-1 uppercase tracking-wider">Calculando Hashes...</span>
+                    </div>`;
+            }
+
+            card.innerHTML = htmlContent;
+            return card;
+        }
+
+        function createHashSection(algName, cardId) {
+            const id = `${algName.toLowerCase().replace('-', '')}-${cardId}`;
+            return `
+                <div class="bg-gray-900/80 rounded p-2 border border-gray-700/50">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-[10px] uppercase font-bold tracking-wider text-cyan-300/80">${algName}</span>
+                        <button id="btn-copy-${id}" onclick="copyHash('${id}')" class="text-gray-400 hover:text-white transition-colors">${OFFLINE_ICONS.copy}</button>
+                    </div>
+                    <div id="${id}" class="text-xs text-gray-300 font-mono break-all leading-relaxed max-h-[3.2em] overflow-y-auto">...</div>
+                </div>`;
+        }
+
+        window.copyHash = function(elementId) {
+            const text = document.getElementById(elementId).innerText;
+            if(text === '...') return;
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = document.getElementById(`btn-copy-${elementId}`);
+                if (btn) {
+                    btn.innerHTML = OFFLINE_ICONS.check;
+                    setTimeout(() => { btn.innerHTML = OFFLINE_ICONS.copy; }, 2000);
+                }
+            });
+        };
+
+        function formatExifDateString(exifDate) {
+            if (!exifDate || typeof exifDate !== 'string') return null;
+            const clean = exifDate.trim();
+            const match = clean.match(/^(\d{4})[:\-](\d{2})[:\-](\d{2})\s+(\d{2}):(\d{2}):(\d{2})/);
+            if (match) {
+                const d = new Date(
+                    parseInt(match[1], 10),
+                    parseInt(match[2], 10) - 1,
+                    parseInt(match[3], 10),
+                    parseInt(match[4], 10),
+                    parseInt(match[5], 10),
+                    parseInt(match[6], 10)
+                );
+                if (!isNaN(d.getTime())) return d.toLocaleString('es-MX');
+            }
+            return clean;
+        }
+
+        function parseFilenameCreationDateObj(filename) {
+            if (!filename) return null;
+            const regex = /(20\d{2})[\-_]?([01]\d)[\-_]?([0-3]\d)[\-_\sT]*([0-2]\d)[\.:_]?([0-5]\d)[\.:_]?([0-5]\d)/;
+            const m = filename.match(regex);
+            if (m) {
+                const year = parseInt(m[1], 10);
+                const month = parseInt(m[2], 10) - 1;
+                const day = parseInt(m[3], 10);
+                const hour = parseInt(m[4], 10);
+                const min = parseInt(m[5], 10);
+                const sec = parseInt(m[6], 10);
+                if (month >= 0 && month < 12 && day >= 1 && day <= 31 && hour < 24) {
+                    const d = new Date(year, month, day, hour, min, sec);
+                    if (!isNaN(d.getTime())) return d;
+                }
+            }
+            return null;
+        }
+
+        function parseFilenameCreationDate(filename) {
+            const d = parseFilenameCreationDateObj(filename);
+            return d ? d.toLocaleString('es-MX') : null;
+        }
+
+        function parseMp4MvhdInfo(uint8) {
+            if (!uint8 || uint8.length < 36) return null;
+            const view = new DataView(uint8.buffer, uint8.byteOffset, uint8.byteLength);
+            for (let i = 0; i <= uint8.length - 36; i++) {
+                if (uint8[i] === 0x6D && uint8[i + 1] === 0x76 && uint8[i + 2] === 0x68 && uint8[i + 3] === 0x64) {
+                    const version = uint8[i + 4];
+                    if (version !== 0 && version !== 1) continue;
+                    if (uint8[i + 5] !== 0 || uint8[i + 6] !== 0 || uint8[i + 7] !== 0) continue;
+
+                    let seconds1904 = 0;
+                    let timescale = 0;
+                    let durationUnits = 0;
+
+                    if (version === 0) {
+                        seconds1904 = view.getUint32(i + 8, false);
+                        timescale = view.getUint32(i + 16, false);
+                        durationUnits = view.getUint32(i + 20, false);
+                    } else if (version === 1 && i + 36 <= uint8.length) {
+                        seconds1904 = (view.getUint32(i + 8, false) * 4294967296) + view.getUint32(i + 12, false);
+                        timescale = view.getUint32(i + 24, false);
+                        durationUnits = (view.getUint32(i + 28, false) * 4294967296) + view.getUint32(i + 32, false);
+                    }
+
+                    let creationDateStr = null;
+                    if (seconds1904 > 2082844800) {
+                        const unixMs = (seconds1904 - 2082844800) * 1000;
+                        const d = new Date(unixMs);
+                        const yr = d.getFullYear();
+                        if (yr >= 1995 && yr <= 2050) {
+                            creationDateStr = d.toLocaleString('es-MX');
+                        }
+                    }
+
+                    let durationSec = null;
+                    if (timescale > 0 && durationUnits > 0 && durationUnits !== 0xFFFFFFFF) {
+                        const calcSec = durationUnits / timescale;
+                        if (calcSec > 0 && calcSec < 365 * 24 * 3600) {
+                            durationSec = calcSec;
+                        }
+                    }
+
+                    if (creationDateStr || durationSec) {
+                        return { creationDateStr, durationSec };
+                    }
+                }
+            }
+            return null;
+        }
+
+        function parseMp4MvhdDate(uint8) {
+            const info = parseMp4MvhdInfo(uint8);
+            return info ? info.creationDateStr : null;
+        }
+
+        /* =========================================================
+           MOTOR BINARIO MULTIFORMATO PARA LECTURA DE DURACIÓN Y
+           RESOLUCIÓN (MP4, MOV, AVI, MKV, WEBM, FLV, CCTV > 15 HRS)
+           ========================================================= */
+        function parseHeaderBoxTiming(uint8, offset) {
+            if (offset + 24 > uint8.length) return null;
+            const view = new DataView(uint8.buffer, uint8.byteOffset, uint8.byteLength);
+            const version = uint8[offset + 4];
+            if (version !== 0 && version !== 1) return null;
+            if (uint8[offset + 5] !== 0 || uint8[offset + 6] !== 0 || uint8[offset + 7] !== 0) return null;
+
+            // Si tenemos los 4 bytes previos, validamos que correspondan al tamaño estándar de mvhd o mdhd
+            if (offset >= 4) {
+                const boxSize = view.getUint32(offset - 4, false);
+                if (boxSize < 24 || boxSize > 512) return null;
+            }
+
+            let timescale = 0;
+            let durationUnits = 0;
+
+            if (version === 0) {
+                timescale = view.getUint32(offset + 16, false);
+                durationUnits = view.getUint32(offset + 20, false);
+            } else if (offset + 36 <= uint8.length) {
+                timescale = view.getUint32(offset + 24, false);
+                durationUnits = (view.getUint32(offset + 28, false) * 4294967296) + view.getUint32(offset + 32, false);
+            }
+
+            if (timescale > 0 && timescale <= 50000000 && durationUnits > 0 && durationUnits !== 0xFFFFFFFF) {
+                const sec = durationUnits / timescale;
+                if (sec > 0.05 && sec < 180 * 24 * 3600) {
+                    return { timescale, durationUnits, durationSec: sec };
+                }
+            }
+            return { timescale, durationUnits: 0, durationSec: null };
+        }
+
+        function scanMp4BufferForMeta(uint8) {
+            if (!uint8 || uint8.length < 32) return { durationSec: null, resolution: null };
+            const view = new DataView(uint8.buffer, uint8.byteOffset, uint8.byteLength);
+            let bestDurationSec = null;
+            let resolution = null;
+            let lastMdhdTimescale = 0;
+
+            for (let i = 0; i <= uint8.length - 28; i++) {
+                const b0 = uint8[i], b1 = uint8[i + 1], b2 = uint8[i + 2], b3 = uint8[i + 3];
+
+                // 1. Átomo 'mvhd' (Movie Header) o 'mdhd' (Media Track Header)
+                const isMvhd = (b0 === 0x6D && b1 === 0x76 && b2 === 0x68 && b3 === 0x64);
+                const isMdhd = (b0 === 0x6D && b1 === 0x64 && b2 === 0x68 && b3 === 0x64);
+                if (isMvhd || isMdhd) {
+                    const timing = parseHeaderBoxTiming(uint8, i);
+                    if (timing) {
+                        if (isMdhd && timing.timescale > 0) lastMdhdTimescale = timing.timescale;
+                        if (timing.durationSec && (!bestDurationSec || timing.durationSec > bestDurationSec)) {
+                            bestDurationSec = timing.durationSec;
+                        }
+                    }
+                }
+
+                // 2. Átomo 'stts' (Time-to-Sample) si mvhd/mdhd tenían duración 0
+                if (!bestDurationSec && lastMdhdTimescale > 0 && b0 === 0x73 && b1 === 0x74 && b2 === 0x74 && b3 === 0x73) {
+                    if (uint8[i + 4] === 0 && uint8[i + 5] === 0 && uint8[i + 6] === 0 && uint8[i + 7] === 0 && i + 12 <= uint8.length) {
+                        const entryCount = view.getUint32(i + 8, false);
+                        if (entryCount > 0 && entryCount < 500000 && i + 12 + entryCount * 8 <= uint8.length) {
+                            let totalDelta = 0;
+                            let pos = i + 12;
+                            for (let e = 0; e < entryCount; e++) {
+                                const count = view.getUint32(pos, false);
+                                const delta = view.getUint32(pos + 4, false);
+                                totalDelta += (count * delta);
+                                pos += 8;
+                            }
+                            const calcSec = totalDelta / lastMdhdTimescale;
+                            if (calcSec > 0.05 && calcSec < 180 * 24 * 3600) {
+                                bestDurationSec = calcSec;
+                            }
+                        }
+                    }
+                }
+
+                // 3. Resolución en VisualSampleEntry ('avc1', 'avc3', 'hvc1', 'hev1', 'mp4v', 'vp08', 'vp09', 'av01')
+                if (!resolution) {
+                    const isVisualCodec = (
+                        (b0 === 0x61 && b1 === 0x76 && b2 === 0x63 && (b3 === 0x31 || b3 === 0x33)) || // avc1, avc3
+                        (b0 === 0x68 && b1 === 0x76 && b2 === 0x63 && b3 === 0x31) || // hvc1
+                        (b0 === 0x68 && b1 === 0x65 && b2 === 0x76 && b3 === 0x31) || // hev1
+                        (b0 === 0x6D && b1 === 0x70 && b2 === 0x34 && b3 === 0x76) || // mp4v
+                        (b0 === 0x76 && b1 === 0x70 && b2 === 0x30 && (b3 === 0x38 || b3 === 0x39)) || // vp08, vp09
+                        (b0 === 0x61 && b1 === 0x76 && b2 === 0x30 && b3 === 0x31)    // av01
+                    );
+                    if (isVisualCodec && i + 32 <= uint8.length) {
+                        const w = view.getUint16(i + 28, false);
+                        const h = view.getUint16(i + 30, false);
+                        if (w >= 64 && w <= 16384 && h >= 64 && h <= 16384) {
+                            resolution = `${w}x${h} px`;
+                        }
+                    }
+                }
+
+                // 4. Resolución en 'tkhd' (Track Header)
+                if (!resolution && b0 === 0x74 && b1 === 0x6B && b2 === 0x68 && b3 === 0x64 && i + 88 <= uint8.length) {
+                    const version = uint8[i + 4];
+                    if (version === 0 && i + 84 <= uint8.length) {
+                        const w = view.getUint16(i + 76, false);
+                        const h = view.getUint16(i + 80, false);
+                        if (w >= 64 && w <= 16384 && h >= 64 && h <= 16384) {
+                            resolution = `${w}x${h} px`;
+                        }
+                    } else if (version === 1 && i + 96 <= uint8.length) {
+                        const w = view.getUint16(i + 88, false);
+                        const h = view.getUint16(i + 92, false);
+                        if (w >= 64 && w <= 16384 && h >= 64 && h <= 16384) {
+                            resolution = `${w}x${h} px`;
+                        }
+                    }
+                }
+            }
+
+            return { durationSec: bestDurationSec, resolution };
+        }
+
+        // Recorre el árbol jerárquico de átomos MP4/MOV sin importar si el archivo pesa varios GB
+        async function extractMp4MetadataByBoxTree(file) {
+            const CONTAINER_BOXES = new Set(['moov', 'trak', 'mdia', 'minf', 'stbl', 'edts', 'mvex', 'moof', 'traf']);
+            let bestDurationSec = null;
+            let movieTimescale = 0;
+            let resolution = null;
+            let lastTrackTimescale = 0;
+
+            async function walkRange(startOffset, endOffset, depth) {
+                if (depth > 8) return;
+                let offset = startOffset;
+                let safetyCount = 0;
+
+                while (offset + 8 <= endOffset && safetyCount < 200) {
+                    safetyCount++;
+                    const hdrBuf = await file.slice(offset, Math.min(offset + 16, endOffset)).arrayBuffer();
+                    if (hdrBuf.byteLength < 8) break;
+                    const view = new DataView(hdrBuf);
+                    const bytes = new Uint8Array(hdrBuf);
+
+                    let boxSize = view.getUint32(0, false);
+                    const boxType = String.fromCharCode(bytes[4], bytes[5], bytes[6], bytes[7]);
+                    let headerLen = 8;
+
+                    if (boxSize === 1) {
+                        if (hdrBuf.byteLength < 16) break;
+                        boxSize = (view.getUint32(8, false) * 4294967296) + view.getUint32(12, false);
+                        headerLen = 16;
+                    } else if (boxSize === 0) {
+                        boxSize = endOffset - offset;
+                    }
+
+                    if (!/^[a-zA-Z0-9\s\xA9]{4}$/.test(boxType) || boxSize < headerLen || offset + boxSize > endOffset + 8) {
+                        break;
+                    }
+
+                    const boxEnd = Math.min(offset + boxSize, endOffset);
+
+                    if (CONTAINER_BOXES.has(boxType)) {
+                        await walkRange(offset + headerLen, boxEnd, depth + 1);
+                    } else if (boxType === 'mvhd' || boxType === 'mdhd') {
+                        const buf = await file.slice(offset + 4, Math.min(boxEnd, offset + 128)).arrayBuffer();
+                        const timing = parseHeaderBoxTiming(new Uint8Array(buf), 0);
+                        if (timing) {
+                            if (boxType === 'mvhd' && timing.timescale > 0) movieTimescale = timing.timescale;
+                            if (boxType === 'mdhd' && timing.timescale > 0) lastTrackTimescale = timing.timescale;
+                            if (timing.durationSec && (!bestDurationSec || timing.durationSec > bestDurationSec)) {
+                                bestDurationSec = timing.durationSec;
+                            }
+                        }
+                    } else if (boxType === 'mehd' && movieTimescale > 0) {
+                        const buf = await file.slice(offset + headerLen, Math.min(boxEnd, offset + headerLen + 16)).arrayBuffer();
+                        if (buf.byteLength >= 8) {
+                            const v = new DataView(buf);
+                            const ver = v.getUint8(0);
+                            const fragDur = ver === 1 && buf.byteLength >= 12
+                                ? (v.getUint32(4, false) * 4294967296) + v.getUint32(8, false)
+                                : v.getUint32(4, false);
+                            const sec = fragDur / movieTimescale;
+                            if (sec > 0.05 && sec < 180 * 24 * 3600 && (!bestDurationSec || sec > bestDurationSec)) {
+                                bestDurationSec = sec;
+                            }
+                        }
+                    } else if (boxType === 'tkhd' && !resolution) {
+                        const buf = await file.slice(offset + 4, Math.min(boxEnd, offset + 112)).arrayBuffer();
+                        const meta = scanMp4BufferForMeta(new Uint8Array(buf));
+                        if (meta.resolution) resolution = meta.resolution;
+                    } else if (boxType === 'stsd' && !resolution) {
+                        const buf = await file.slice(offset + 4, Math.min(boxEnd, offset + 4096)).arrayBuffer();
+                        const meta = scanMp4BufferForMeta(new Uint8Array(buf));
+                        if (meta.resolution) resolution = meta.resolution;
+                    } else if (boxType === 'stts' && !bestDurationSec && lastTrackTimescale > 0) {
+                        const buf = await file.slice(offset + 4, Math.min(boxEnd, offset + 4 * 1024 * 1024)).arrayBuffer();
+                        const u8 = new Uint8Array(buf);
+                        if (u8.length >= 12) {
+                            const v = new DataView(buf);
+                            const entryCount = v.getUint32(8, false);
+                            const maxEntries = Math.min(entryCount, Math.floor((u8.length - 12) / 8));
+                            let totalDelta = 0;
+                            for (let e = 0; e < maxEntries; e++) {
+                                const pos = 12 + e * 8;
+                                totalDelta += v.getUint32(pos, false) * v.getUint32(pos + 4, false);
+                            }
+                            const sec = totalDelta / lastTrackTimescale;
+                            if (sec > 0.05 && sec < 180 * 24 * 3600) bestDurationSec = sec;
+                        }
+                    }
+
+                    offset += boxSize;
+                }
+            }
+
+            await walkRange(0, file.size, 0);
+            if (bestDurationSec || resolution) {
+                return { durationSec: bestDurationSec, resolution };
+            }
+            return null;
+        }
+
+        // Lector binario para archivos AVI (RIFF....AVI )
+        function parseAviHeaderMeta(uint8) {
+            if (!uint8 || uint8.length < 64) return null;
+            if (uint8[0] !== 0x52 || uint8[1] !== 0x49 || uint8[2] !== 0x46 || uint8[3] !== 0x46) return null;
+            if (uint8[8] !== 0x41 || uint8[9] !== 0x56 || uint8[10] !== 0x49 || uint8[11] !== 0x20) return null;
+
+            const view = new DataView(uint8.buffer, uint8.byteOffset, uint8.byteLength);
+            let durationSec = null;
+            let resolution = null;
+
+            for (let i = 12; i < uint8.length - 56; i++) {
+                // Cabecera principal 'avih'
+                if (uint8[i] === 0x61 && uint8[i + 1] === 0x76 && uint8[i + 2] === 0x69 && uint8[i + 3] === 0x68) {
+                    const microSecPerFrame = view.getUint32(i + 8, true);
+                    const totalFrames = view.getUint32(i + 24, true);
+                    const width = view.getUint32(i + 40, true);
+                    const height = view.getUint32(i + 44, true);
+
+                    if (width >= 64 && width <= 16384 && height >= 64 && height <= 16384) {
+                        resolution = `${width}x${height} px`;
+                    }
+                    if (microSecPerFrame > 0 && totalFrames > 0) {
+                        const sec = (microSecPerFrame * totalFrames) / 1000000;
+                        if (sec > 0.05 && sec < 180 * 24 * 3600) durationSec = sec;
+                    }
+                }
+                // Cabecera de pista 'strh' -> 'vids'
+                if (uint8[i] === 0x73 && uint8[i + 1] === 0x74 && uint8[i + 2] === 0x72 && uint8[i + 3] === 0x68) {
+                    if (uint8[i + 8] === 0x76 && uint8[i + 9] === 0x69 && uint8[i + 10] === 0x64 && uint8[i + 11] === 0x73) {
+                        const scale = view.getUint32(i + 28, true);
+                        const rate = view.getUint32(i + 32, true);
+                        const length = view.getUint32(i + 40, true);
+                        if (scale > 0 && rate > 0 && length > 0) {
+                            const sec = (length * scale) / rate;
+                            if (sec > 0.05 && sec < 180 * 24 * 3600) durationSec = sec;
+                        }
+                    }
+                }
+            }
+            if (durationSec || resolution) return { durationSec, resolution };
+            return null;
+        }
+
+        // Lector binario para archivos Matroska MKV / WebM (EBML 0x1A45DFA3)
+        function parseMkvWebmHeaderMeta(uint8) {
+            if (!uint8 || uint8.length < 32) return null;
+            if (uint8[0] !== 0x1A || uint8[1] !== 0x45 || uint8[2] !== 0xDF || uint8[3] !== 0xA3) return null;
+
+            const view = new DataView(uint8.buffer, uint8.byteOffset, uint8.byteLength);
+            let timestampScale = 1000000; // Por defecto 1,000,000 ns (1 ms)
+            let durationSec = null;
+            let width = 0, height = 0;
+
+            for (let i = 4; i < uint8.length - 12; i++) {
+                // TimestampScale ID: 0x2AD7B1
+                if (uint8[i] === 0x2A && uint8[i + 1] === 0xD7 && uint8[i + 2] === 0xB1) {
+                    const len = uint8[i + 3] & 0x7F;
+                    if (len >= 1 && len <= 4 && i + 4 + len <= uint8.length) {
+                        let val = 0;
+                        for (let k = 0; k < len; k++) val = (val * 256) + uint8[i + 4 + k];
+                        if (val > 0 && val <= 1000000000) timestampScale = val;
+                    }
+                }
+                // Duration ID: 0x4489 (Float 4 u 8 bytes)
+                if (uint8[i] === 0x44 && uint8[i + 1] === 0x89) {
+                    const sizeByte = uint8[i + 2];
+                    let rawDur = 0;
+                    if (sizeByte === 0x84 && i + 7 <= uint8.length) {
+                        rawDur = view.getFloat32(i + 3, false);
+                    } else if (sizeByte === 0x88 && i + 11 <= uint8.length) {
+                        rawDur = view.getFloat64(i + 3, false);
+                    }
+                    if (rawDur > 0 && isFinite(rawDur)) {
+                        const sec = (rawDur * timestampScale) / 1000000000;
+                        if (sec > 0.05 && sec < 180 * 24 * 3600) durationSec = sec;
+                    }
+                }
+                // PixelWidth (0xB0) y PixelHeight (0xBA)
+                if (!width && uint8[i] === 0xB0 && (uint8[i + 1] === 0x82 || uint8[i + 1] === 0x81)) {
+                    const len = uint8[i + 1] & 0x7F;
+                    const w = len === 2 ? view.getUint16(i + 2, false) : uint8[i + 2];
+                    if (w >= 64 && w <= 16384) width = w;
+                }
+                if (!height && uint8[i] === 0xBA && (uint8[i + 1] === 0x82 || uint8[i + 1] === 0x81)) {
+                    const len = uint8[i + 1] & 0x7F;
+                    const h = len === 2 ? view.getUint16(i + 2, false) : uint8[i + 2];
+                    if (h >= 64 && h <= 16384) height = h;
+                }
+            }
+
+            const resolution = (width > 0 && height > 0) ? `${width}x${height} px` : null;
+            if (durationSec || resolution) return { durationSec, resolution };
+            return null;
+        }
+
+        // Lector binario para archivos FLV ('FLV\x01')
+        function parseFlvHeaderMeta(uint8) {
+            if (!uint8 || uint8.length < 32) return null;
+            if (uint8[0] !== 0x46 || uint8[1] !== 0x4C || uint8[2] !== 0x56) return null;
+
+            const view = new DataView(uint8.buffer, uint8.byteOffset, uint8.byteLength);
+            let durationSec = null;
+            let width = 0, height = 0;
+
+            for (let i = 13; i < Math.min(uint8.length - 16, 16384); i++) {
+                // Busca cadena "duration" seguida de marcador Number AMF0 (0x00)
+                if (
+                    uint8[i] === 0x64 && uint8[i + 1] === 0x75 && uint8[i + 2] === 0x72 &&
+                    uint8[i + 3] === 0x61 && uint8[i + 4] === 0x74 && uint8[i + 5] === 0x69 &&
+                    uint8[i + 6] === 0x6F && uint8[i + 7] === 0x6E && uint8[i + 8] === 0x00
+                ) {
+                    const val = view.getFloat64(i + 9, false);
+                    if (val > 0 && val < 180 * 24 * 3600) durationSec = val;
+                }
+                if (
+                    !width && uint8[i] === 0x77 && uint8[i + 1] === 0x69 && uint8[i + 2] === 0x64 &&
+                    uint8[i + 3] === 0x74 && uint8[i + 4] === 0x68 && uint8[i + 5] === 0x00
+                ) {
+                    const w = Math.round(view.getFloat64(i + 6, false));
+                    if (w >= 64 && w <= 16384) width = w;
+                }
+                if (
+                    !height && uint8[i] === 0x68 && uint8[i + 1] === 0x65 && uint8[i + 2] === 0x69 &&
+                    uint8[i + 3] === 0x67 && uint8[i + 4] === 0x68 && uint8[i + 5] === 0x74 && uint8[i + 6] === 0x00
+                ) {
+                    const h = Math.round(view.getFloat64(i + 7, false));
+                    if (h >= 64 && h <= 16384) height = h;
+                }
+            }
+
+            const resolution = (width > 0 && height > 0) ? `${width}x${height} px` : null;
+            if (durationSec || resolution) return { durationSec, resolution };
+            return null;
+        }
+
+        // Lector de resolución desde el bitstream H.264 (SPS) y H.265 (HEVC SPS) para streams de CCTV (IMKH / MPEG-PS / TS)
+        function parseH264OrHevcSpsResolution(uint8) {
+            if (!uint8 || uint8.length < 64) return null;
+
+            function removeEmulationPrevention(arr) {
+                const out = [];
+                for (let i = 0; i < arr.length; i++) {
+                    if (i >= 2 && arr[i] === 0x03 && arr[i - 1] === 0x00 && arr[i - 2] === 0x00) {
+                        continue;
+                    }
+                    out.push(arr[i]);
+                }
+                return new Uint8Array(out);
+            }
+
+            class BitReader {
+                constructor(bytes) {
+                    this.bytes = bytes;
+                    this.bitPos = 0;
+                }
+                readBits(n) {
+                    let val = 0;
+                    for (let i = 0; i < n; i++) {
+                        const byteIdx = this.bitPos >> 3;
+                        if (byteIdx >= this.bytes.length) return 0;
+                        const bitIdx = 7 - (this.bitPos & 7);
+                        val = (val << 1) | ((this.bytes[byteIdx] >> bitIdx) & 1);
+                        this.bitPos++;
+                    }
+                    return val >>> 0;
+                }
+                readUE() {
+                    let zeros = 0;
+                    while (this.bitPos < this.bytes.length * 8 && this.readBits(1) === 0 && zeros < 31) {
+                        zeros++;
+                    }
+                    if (zeros === 0) return 0;
+                    return ((1 << zeros) - 1 + this.readBits(zeros)) >>> 0;
+                }
+                readSE() {
+                    const ue = this.readUE();
+                    return (ue & 1) ? ((ue + 1) >> 1) : -(ue >> 1);
+                }
+            }
+
+            for (let i = 0; i < uint8.length - 32; i++) {
+                if (uint8[i] === 0x00 && uint8[i + 1] === 0x00 && uint8[i + 2] === 0x01) {
+                    const nalByte = uint8[i + 3];
+                    const h264Type = nalByte & 0x1F;
+                    const hevcType = (nalByte >> 1) & 0x3F;
+
+                    // H.264 SPS (NAL type 7)
+                    if (h264Type === 7 && (nalByte & 0x80) === 0) {
+                        try {
+                            const rbsp = removeEmulationPrevention(uint8.subarray(i + 4, Math.min(i + 128, uint8.length)));
+                            const br = new BitReader(rbsp);
+                            const profileIdc = br.readBits(8);
+                            br.readBits(8); // constraint flags
+                            br.readBits(8); // level idc
+                            br.readUE();    // seq_parameter_set_id
+
+                            let chromaFormatIdc = 1;
+                            if ([100, 110, 122, 244, 44, 83, 86, 118, 128, 138, 139, 134, 135].includes(profileIdc)) {
+                                chromaFormatIdc = br.readUE();
+                                if (chromaFormatIdc === 3) br.readBits(1);
+                                br.readUE(); // bit_depth_luma_minus8
+                                br.readUE(); // bit_depth_chroma_minus8
+                                br.readBits(1); // qpprime_y_zero_transform_bypass_flag
+                                const seqScalingMatrixPresent = br.readBits(1);
+                                if (seqScalingMatrixPresent) {
+                                    const limit = chromaFormatIdc !== 3 ? 8 : 12;
+                                    for (let s = 0; s < limit; s++) {
+                                        if (br.readBits(1)) {
+                                            const sizeOfList = s < 6 ? 16 : 64;
+                                            let lastScale = 8, nextScale = 8;
+                                            for (let j = 0; j < sizeOfList; j++) {
+                                                if (nextScale !== 0) {
+                                                    const deltaScale = br.readSE();
+                                                    nextScale = (lastScale + deltaScale + 256) % 256;
+                                                }
+                                                lastScale = (nextScale === 0) ? lastScale : nextScale;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            br.readUE(); // log2_max_frame_num_minus4
+                            const pocType = br.readUE();
+                            if (pocType === 0) {
+                                br.readUE();
+                            } else if (pocType === 1) {
+                                br.readBits(1);
+                                br.readSE();
+                                br.readSE();
+                                const numRef = br.readUE();
+                                for (let r = 0; r < Math.min(numRef, 255); r++) br.readSE();
+                            }
+                            br.readUE(); // max_num_ref_frames
+                            br.readBits(1); // gaps_in_frame_num_value_allowed_flag
+
+                            const picWidthInMbsMinus1 = br.readUE();
+                            const picHeightInMapUnitsMinus1 = br.readUE();
+                            const frameMbsOnlyFlag = br.readBits(1);
+                            if (!frameMbsOnlyFlag) br.readBits(1);
+                            br.readBits(1); // direct_8x8_inference_flag
+
+                            const frameCroppingFlag = br.readBits(1);
+                            let cropLeft = 0, cropRight = 0, cropTop = 0, cropBottom = 0;
+                            if (frameCroppingFlag) {
+                                cropLeft = br.readUE();
+                                cropRight = br.readUE();
+                                cropTop = br.readUE();
+                                cropBottom = br.readUE();
+                            }
+
+                            const width = ((picWidthInMbsMinus1 + 1) * 16) - (cropLeft + cropRight) * 2;
+                            const height = ((2 - frameMbsOnlyFlag) * (picHeightInMapUnitsMinus1 + 1) * 16) - (cropTop + cropBottom) * (2 * (2 - frameMbsOnlyFlag));
+                            if (width >= 160 && width <= 8192 && height >= 120 && height <= 8192) {
+                                return `${width}x${height} px`;
+                            }
+                        } catch (e) {}
+                    }
+
+                    // H.265 / HEVC SPS (NAL type 33)
+                    if (hevcType === 33 && (nalByte & 0x80) === 0 && i + 5 < uint8.length) {
+                        try {
+                            const rbsp = removeEmulationPrevention(uint8.subarray(i + 5, Math.min(i + 128, uint8.length)));
+                            const br = new BitReader(rbsp);
+                            br.readBits(4); // sps_video_parameter_set_id
+                            const maxSubLayersMinus1 = br.readBits(3);
+                            br.readBits(1); // sps_temporal_id_nesting_flag
+
+                            // Saltar profile_tier_level (12 bytes base)
+                            br.readBits(32);
+                            br.readBits(32);
+                            br.readBits(32);
+                            if (maxSubLayersMinus1 > 0) {
+                                const profPresent = [];
+                                const lvlPresent = [];
+                                for (let j = 0; j < 8; j++) {
+                                    profPresent[j] = br.readBits(1);
+                                    lvlPresent[j] = br.readBits(1);
+                                }
+                                for (let j = 0; j < maxSubLayersMinus1; j++) {
+                                    if (profPresent[j]) { br.readBits(32); br.readBits(32); br.readBits(24); }
+                                    if (lvlPresent[j]) br.readBits(8);
+                                }
+                            }
+
+                            br.readUE(); // sps_seq_parameter_set_id
+                            const chromaFormatIdc = br.readUE();
+                            if (chromaFormatIdc === 3) br.readBits(1);
+                            const width = br.readUE();
+                            const height = br.readUE();
+                            if (width >= 160 && width <= 8192 && height >= 120 && height <= 8192) {
+                                return `${width}x${height} px`;
+                            }
+                        } catch (e) {}
+                    }
+                }
+            }
+            return null;
+        }
+
+        // Extrae la mediana del reloj de tiempo (en segundos) de un bloque de stream CCTV (PES PTS, MPEG-PS SCR o Dahua DHAV)
+        function extractStreamMedianTimestampSec(uint8) {
+            if (!uint8 || uint8.length < 20) return null;
+            const view = new DataView(uint8.buffer, uint8.byteOffset, uint8.byteLength);
+            const ptsList = [];
+            const scrList = [];
+            const dhavList = [];
+
+            for (let i = 0; i <= uint8.length - 20; i++) {
+                // A) Cabecera de cuadro Dahua 'DHAV' (0x44 0x48 0x41 0x56)
+                if (uint8[i] === 0x44 && uint8[i + 1] === 0x48 && uint8[i + 2] === 0x41 && uint8[i + 3] === 0x56) {
+                    const ts = view.getUint32(i + 16, true);
+                    const sec = ts & 0x3F;
+                    const min = (ts >>> 6) & 0x3F;
+                    const hr = (ts >>> 12) & 0x1F;
+                    const day = (ts >>> 17) & 0x1F;
+                    const mon = (ts >>> 22) & 0x0F;
+                    const yr = 2000 + ((ts >>> 26) & 0x3F);
+                    if (yr >= 2005 && yr <= 2045 && mon >= 1 && mon <= 12 && day >= 1 && day <= 31 && hr < 24 && min < 60 && sec < 60) {
+                        dhavList.push(new Date(yr, mon - 1, day, hr, min, sec).getTime() / 1000);
+                    }
+                }
+
+                // B) PES Video/Audio Packet PTS (0x00 0x00 0x01 0xE0 / 0xC0) o Pack Header MPEG-PS SCR (0x00 0x00 0x01 0xBA)
+                if (uint8[i] === 0x00 && uint8[i + 1] === 0x00 && uint8[i + 2] === 0x01) {
+                    const streamId = uint8[i + 3];
+
+                    // PES Video (0xE0) o Audio (0xC0) con validación estricta de bits marcadores
+                    if ((streamId === 0xE0 || streamId === 0xC0) && i + 14 < uint8.length) {
+                        const b6 = uint8[i + 6];
+                        const b7 = uint8[i + 7];
+                        const hdrDataLen = uint8[i + 8];
+                        const b9 = uint8[i + 9], b10 = uint8[i + 10], b11 = uint8[i + 11], b12 = uint8[i + 12], b13 = uint8[i + 13];
+
+                        if (
+                            (b6 & 0xC0) === 0x80 &&
+                            (b7 & 0x80) !== 0 &&
+                            hdrDataLen >= 5 && hdrDataLen <= 36 &&
+                            ((b9 & 0xF1) === 0x21 || (b9 & 0xF1) === 0x31) &&
+                            (b11 & 0x01) === 1 &&
+                            (b13 & 0x01) === 1
+                        ) {
+                            const high3 = (b9 >> 1) & 0x07;
+                            const mid15 = (b10 << 7) | (b11 >> 1);
+                            const low15 = (b12 << 7) | (b13 >> 1);
+                            const ptsTicks = (high3 * 1073741824) + (mid15 * 32768) + low15;
+                            if (ptsTicks > 0) ptsList.push(ptsTicks / 90000);
+                        }
+                    }
+
+                    // MPEG-2 / MPEG-1 Pack Header SCR (0xBA)
+                    if (streamId === 0xBA && i + 12 < uint8.length) {
+                        const b4 = uint8[i + 4], b5 = uint8[i + 5], b6 = uint8[i + 6], b7 = uint8[i + 7], b8 = uint8[i + 8];
+                        if ((b4 & 0xC0) === 0x40 && (b4 & 0x04) !== 0 && (b6 & 0x04) !== 0 && (b8 & 0x04) !== 0) {
+                            const high3 = (b4 >> 3) & 0x07;
+                            const mid15 = ((b4 & 0x03) << 13) | (b5 << 5) | (b6 >> 3);
+                            const low15 = ((b6 & 0x03) << 13) | (b7 << 5) | (b8 >> 3);
+                            const scrTicks = (high3 * 1073741824) + (mid15 * 32768) + low15;
+                            if (scrTicks > 0) scrList.push(scrTicks / 90000);
+                        }
+                    }
+                }
+            }
+
+            const chosen = dhavList.length > 0 ? dhavList : (ptsList.length > 0 ? ptsList : scrList);
+            if (chosen.length === 0) return null;
+            chosen.sort((a, b) => a - b);
+            return chosen[Math.floor(chosen.length / 2)];
+        }
+
+        // Muestreo multipunto para streams CCTV (Hikvision IMKH, MPEG-PS, MPEG-TS, Dahua DHAV)
+        async function calculateStreamDurationMultiSample(file) {
+            const numSamples = 28;
+            const sampleSize = Math.min(128 * 1024, file.size);
+            const timestamps = [];
+
+            for (let s = 0; s < numSamples; s++) {
+                const startPos = Math.floor((s / (numSamples - 1)) * Math.max(0, file.size - sampleSize));
+                const buf = await file.slice(startPos, startPos + sampleSize).arrayBuffer();
+                const ts = extractStreamMedianTimestampSec(new Uint8Array(buf));
+                if (ts !== null) timestamps.push(ts);
+            }
+
+            if (timestamps.length < 2) return null;
+
+            let totalSec = 0;
+            const MAX_33BIT_SEC = 8589934592 / 90000; // ~95443.717s (26.54 horas)
+
+            for (let k = 1; k < timestamps.length; k++) {
+                const prev = timestamps[k - 1];
+                const curr = timestamps[k];
+                let delta = 0;
+
+                if (curr >= prev) {
+                    delta = curr - prev;
+                } else {
+                    // Cruce de medianoche (86400s) o desbordamiento de reloj de 33 bits (95443.7s)
+                    if (prev > 75000 && curr < 15000) {
+                        const wrapBase = prev > 86400 ? MAX_33BIT_SEC : 86400;
+                        delta = (wrapBase - prev) + curr;
+                    } else if (curr < 600) {
+                        // Reinicio de segmento a 0
+                        delta = curr;
+                    }
+                }
+
+                // Filtrar saltos anómalos entre dos muestras contiguas
+                if (delta > 0 && delta < 14400) {
+                    totalSec += delta;
+                }
+            }
+
+            return totalSec > 0.5 ? totalSec : null;
+        }
+
+        async function extractBinaryVideoFallback(file) {
+            let resolution = null;
+            let durationSec = null;
+
+            try {
+                // 1. Escaneo rápido de cabecera inicial (primeros 2 MB) para detectar formato (AVI, MKV/WebM, FLV, MP4)
+                const headSize = Math.min(2 * 1024 * 1024, file.size);
+                const headBuf = await file.slice(0, headSize).arrayBuffer();
+                const headBytes = new Uint8Array(headBuf);
+
+                // A) ¿Es AVI?
+                const aviMeta = parseAviHeaderMeta(headBytes);
+                if (aviMeta) {
+                    if (aviMeta.durationSec) durationSec = aviMeta.durationSec;
+                    if (aviMeta.resolution) resolution = aviMeta.resolution;
+                }
+
+                // B) ¿Es MKV / WebM?
+                if (!durationSec || !resolution) {
+                    const mkvMeta = parseMkvWebmHeaderMeta(headBytes);
+                    if (mkvMeta) {
+                        if (!durationSec && mkvMeta.durationSec) durationSec = mkvMeta.durationSec;
+                        if (!resolution && mkvMeta.resolution) resolution = mkvMeta.resolution;
+                    }
+                }
+
+                // C) ¿Es FLV?
+                if (!durationSec || !resolution) {
+                    const flvMeta = parseFlvHeaderMeta(headBytes);
+                    if (flvMeta) {
+                        if (!durationSec && flvMeta.durationSec) durationSec = flvMeta.durationSec;
+                        if (!resolution && flvMeta.resolution) resolution = flvMeta.resolution;
+                    }
+                }
+
+                // D) Recorrido jerárquico de átomos MP4 / MOV / 3GP / M4V
+                if (!durationSec || !resolution) {
+                    const treeMeta = await extractMp4MetadataByBoxTree(file);
+                    if (treeMeta) {
+                        if (!durationSec && treeMeta.durationSec) durationSec = treeMeta.durationSec;
+                        if (!resolution && treeMeta.resolution) resolution = treeMeta.resolution;
+                    }
+                }
+
+                // E) Escaneo directo en cabecera inicial (2 MB) y cola final del archivo (hasta 48 MB en bloques de 8 MB)
+                if (!durationSec || !resolution) {
+                    const headMp4 = scanMp4BufferForMeta(headBytes);
+                    if (!durationSec && headMp4.durationSec) durationSec = headMp4.durationSec;
+                    if (!resolution && headMp4.resolution) resolution = headMp4.resolution;
+                }
+
+                if ((!durationSec || !resolution) && file.size > headSize) {
+                    const chunkStep = 8 * 1024 * 1024;
+                    const maxTailSearch = Math.min(48 * 1024 * 1024, file.size);
+                    for (let dist = chunkStep; dist <= maxTailSearch; dist += chunkStep) {
+                        const start = Math.max(0, file.size - dist);
+                        const end = Math.min(file.size, start + chunkStep + 1024);
+                        const tailBuf = await file.slice(start, end).arrayBuffer();
+                        const tailMeta = scanMp4BufferForMeta(new Uint8Array(tailBuf));
+                        if (!durationSec && tailMeta.durationSec) durationSec = tailMeta.durationSec;
+                        if (!resolution && tailMeta.resolution) resolution = tailMeta.resolution;
+                        if (durationSec && resolution) break;
+                    }
+                }
+
+                // F) Si es un flujo CCTV (Hikvision IMKH, Dahua DHAV, MPEG-PS, MPEG-TS):
+                //    Extraer resolución decodificando directamente el bitstream H.264 / H.265 SPS
+                if (!resolution) {
+                    resolution = parseH264OrHevcSpsResolution(headBytes);
+                }
+
+                // G) Calcular duración real del flujo de video por muestreo multipunto de relojes PTS / SCR / DHAV
+                if (!durationSec) {
+                    durationSec = await calculateStreamDurationMultiSample(file);
+                }
+            } catch (e) {}
+
+            return {
+                durationSec: durationSec || null,
+                resolution: resolution || 'Codec CCTV / Propietario',
+                duration: durationSec ? formatDuration(durationSec) : 'No indexado en cabecera'
+            };
+        }
+
+        async function extractUniversalFileMetadata(file, cardId, evidenceItem) {
+            const creatorEl = document.getElementById(`meta-creator-${cardId}`);
+            const creationEl = document.getElementById(`meta-creation-${cardId}`);
+            const lastMod = file.lastModified ? new Date(file.lastModified).toLocaleString('es-MX') : 'Desconocido';
+            const ruta = file.customPath || file.path || file.name || '';
+
+            let foundCreation = null;
+            let foundCreator = null;
+
+            if (/^DJI_/i.test(file.name)) {
+                foundCreator = 'DJI Camera / Drone';
+            } else if (/^GOPR|^GH\d/i.test(file.name)) {
+                foundCreator = 'GoPro Camera';
+            } else if (/WhatsApp/i.test(file.name)) {
+                foundCreator = 'WhatsApp Media';
+            }
+
+            const userMatch = ruta.match(/[\\\/]Users[\\\/]([^\\\/]+)[\\\/]/i) || ruta.match(/[\\\/]Usuarios[\\\/]([^\\\/]+)[\\\/]/i);
+            const osUser = userMatch && userMatch[1] ? `${userMatch[1]} (Sistema)` : null;
+
+            try {
+                const sliceSize = Math.min(256 * 1024, file.size);
+                const headBuffer = await file.slice(0, sliceSize).arrayBuffer();
+                const headBytes = new Uint8Array(headBuffer);
+                const decoder = new TextDecoder('latin1');
+                let textChunk = decoder.decode(headBytes);
+
+                let tailBytes = null;
+                if (file.size > sliceSize) {
+                    const tailStart = Math.max(sliceSize, file.size - sliceSize);
+                    const tailBuffer = await file.slice(tailStart, file.size).arrayBuffer();
+                    tailBytes = new Uint8Array(tailBuffer);
+                    textChunk += '\n' + decoder.decode(tailBytes);
+                }
+
+                if (isVideoFile(file) || file.type.startsWith('audio/') || /\.(mp4|mov|m4a|3gp)$/i.test(file.name)) {
+                    foundCreation = parseMp4MvhdDate(headBytes) || (tailBytes ? parseMp4MvhdDate(tailBytes) : null);
+                    if (!foundCreator) {
+                        if (textChunk.includes('DJI')) foundCreator = 'DJI Camera / Drone';
+                        else if (textChunk.includes('IMKH') || textChunk.includes('Hikvision')) foundCreator = 'Hikvision DVR / CCTV';
+                        else if (textChunk.includes('DHAV') || textChunk.includes('Dahua')) foundCreator = 'Dahua DVR / CCTV';
+                        else if (textChunk.includes('Apple')) foundCreator = 'Apple QuickTime / iOS';
+                        else if (textChunk.includes('GoPro')) foundCreator = 'GoPro Camera';
+                        else if (textChunk.includes('Android')) foundCreator = 'Android Video Recorder';
+                        else if (textChunk.includes('Lavf')) foundCreator = 'FFmpeg / Lavf Encoder';
+                    }
+                }
+
+                if (!foundCreation) {
+                    const xmpDate = textChunk.match(/<(?:xmp:CreateDate|dcterms:created|photoshop:DateCreated)[^>]*>([^<]+)</i);
+                    if (xmpDate && xmpDate[1]) {
+                        const d = new Date(xmpDate[1].trim());
+                        if (!isNaN(d.getTime())) foundCreation = d.toLocaleString('es-MX');
+                    }
+                }
+                if (!foundCreation) {
+                    const pdfDate = textChunk.match(/\/CreationDate\s*\(D:(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/);
+                    if (pdfDate) {
+                        const d = new Date(
+                            parseInt(pdfDate[1], 10),
+                            parseInt(pdfDate[2], 10) - 1,
+                            parseInt(pdfDate[3], 10),
+                            parseInt(pdfDate[4], 10),
+                            parseInt(pdfDate[5], 10),
+                            parseInt(pdfDate[6], 10)
+                        );
+                        if (!isNaN(d.getTime())) foundCreation = d.toLocaleString('es-MX');
+                    }
+                }
+
+                if (!foundCreator) {
+                    const xmlCreator = textChunk.match(/<(?:dc:creator|xmp:CreatorTool|cp:lastModifiedBy)[^>]*>([^<]+)</i);
+                    if (xmlCreator && xmlCreator[1]) {
+                        const cleanCreator = xmlCreator[1].replace(/<[^>]+>/g, '').trim();
+                        if (cleanCreator) foundCreator = cleanCreator;
+                    }
+                }
+                if (!foundCreator) {
+                    const pdfAuthor = textChunk.match(/\/(?:Author|Creator|Producer)\s*\(([^)]+)\)/);
+                    if (pdfAuthor && pdfAuthor[1]) {
+                        const cleanPdf = pdfAuthor[1].replace(/[\x00-\x1F]/g, '').trim();
+                        if (cleanPdf) foundCreator = cleanPdf;
+                    }
+                }
+            } catch (e) {
+                console.warn('Aviso al escanear cabecera:', e);
+            }
+
+            if (!foundCreation) {
+                foundCreation = parseFilenameCreationDate(file.name) || lastMod;
+            }
+            if (!foundCreator) {
+                foundCreator = osUser || 'Sistema Local / Propietario OS';
+            }
+
+            evidenceItem.extraMeta.creationDate = foundCreation;
+            evidenceItem.extraMeta.creator = foundCreator;
+
+            if (creationEl) creationEl.innerHTML = `${OFFLINE_ICONS.calendarPlus} <b class="text-purple-100">CREACIÓN:</b> ${foundCreation}`;
+            if (creatorEl) creatorEl.innerHTML = `${OFFLINE_ICONS.user} <b class="text-purple-100">CREADOR:</b> ${foundCreator}`;
+
+            if (file.type === 'image/jpeg' || file.type === 'image/tiff' || /\.(jpe?g|tiff?)$/i.test(file.name)) {
+                try {
+                    EXIF.getData(file, function() {
+                        let make = EXIF.getTag(this, "Make") || '';
+                        let model = EXIF.getTag(this, "Model") || '';
+                        let software = EXIF.getTag(this, "Software") || '';
+                        let artist = EXIF.getTag(this, "Artist") || '';
+                        let datetime = EXIF.getTag(this, "DateTimeOriginal") || EXIF.getTag(this, "DateTime");
+
+                        let creatorInfo = artist || software;
+                        if (make || model) creatorInfo += creatorInfo ? ` (${make} ${model})` : `${make} ${model}`;
+
+                        if (creatorInfo && creatorInfo.trim() !== '') {
+                            evidenceItem.extraMeta.creator = creatorInfo.trim();
+                            if (creatorEl) creatorEl.innerHTML = `${OFFLINE_ICONS.user} <b class="text-purple-100">CREADOR:</b> ${evidenceItem.extraMeta.creator}`;
+                        }
+
+                        if (datetime) {
+                            const formattedExif = formatExifDateString(datetime);
+                            if (formattedExif) {
+                                evidenceItem.extraMeta.creationDate = formattedExif;
+                                if (creationEl) creationEl.innerHTML = `${OFFLINE_ICONS.calendarPlus} <b class="text-purple-100">CREACIÓN:</b> ${formattedExif}`;
+                            }
+                        }
+                    });
+                } catch (e) {}
+            }
+        }
+
+        // Lee la duración y resolución mediante elemento HTML5 <video> (incluyendo corrección para duración Infinity)
+        function probeHtml5VideoMeta(file) {
+            return new Promise((resolve) => {
+                const vid = document.createElement('video');
+                vid.preload = 'metadata';
+                vid.muted = true;
+                vid.playsInline = true;
+                const objUrl = URL.createObjectURL(file);
+                let finished = false;
+
+                const finish = (resVal, durSecVal) => {
+                    if (finished) return;
+                    finished = true;
+                    clearTimeout(timer);
+                    vid.removeAttribute('src');
+                    try { vid.load(); } catch (e) {}
+                    URL.revokeObjectURL(objUrl);
+                    resolve({ resolution: resVal, durationSec: durSecVal });
+                };
+
+                const timer = setTimeout(() => {
+                    const w = vid.videoWidth > 0 ? `${vid.videoWidth}x${vid.videoHeight} px` : null;
+                    const d = (vid.duration && isFinite(vid.duration) && vid.duration > 0) ? vid.duration : null;
+                    finish(w, d);
+                }, 2200);
+
+                vid.onloadedmetadata = () => {
+                    const res = (vid.videoWidth > 0 && vid.videoHeight > 0) ? `${vid.videoWidth}x${vid.videoHeight} px` : null;
+                    if (vid.duration === Infinity || isNaN(vid.duration)) {
+                        // Truco estándar para WebM/MKV/Fragmented MP4 que reportan Infinity al inicio
+                        vid.ontimeupdate = () => {
+                            vid.ontimeupdate = null;
+                            const d = (vid.duration && isFinite(vid.duration) && vid.duration > 0)
+                                ? vid.duration
+                                : (vid.currentTime > 0 ? vid.currentTime : null);
+                            finish(res, d);
+                        };
+                        try {
+                            vid.currentTime = 1e101;
+                        } catch (e) {
+                            finish(res, null);
+                        }
+                    } else {
+                        const d = (vid.duration > 0 && isFinite(vid.duration)) ? vid.duration : null;
+                        finish(res, d);
+                    }
+                };
+
+                vid.onerror = () => finish(null, null);
+                vid.src = objUrl;
+            });
+        }
+
+        async function extractMediaMetadata(file, cardId, evidenceItem) {
+            if (config.modeMetadata) {
+                extractUniversalFileMetadata(file, cardId, evidenceItem);
+            }
+
+            if (config.modeMetadata && file.type.startsWith('image/')) {
+                const img = new Image();
+                img.onload = () => {
+                    const res = `${img.width}x${img.height} px`;
+                    evidenceItem.extraMeta.dimensions = res;
+                    const dimEl = document.getElementById(`meta-dim-${cardId}`);
+                    if (dimEl) dimEl.innerHTML = `${OFFLINE_ICONS.image} <b class="text-purple-100">RESOLUCIÓN:</b> ${res}`;
+                    URL.revokeObjectURL(img.src);
+                };
+                img.onerror = () => {
+                    const dimEl = document.getElementById(`meta-dim-${cardId}`);
+                    if (dimEl) dimEl.innerHTML = `${OFFLINE_ICONS.image} <b class="text-purple-100">RESOLUCIÓN:</b> No disponible`;
+                    URL.revokeObjectURL(img.src);
+                };
+                img.src = URL.createObjectURL(file);
+            } 
+            else if (isVideoFile(file)) {
+                const applyVideoMetaToCard = (resText, durText) => {
+                    if (resText) evidenceItem.extraMeta.dimensions = resText;
+                    if (durText) evidenceItem.extraMeta.duration = durText;
+
+                    const dimEl = document.getElementById(`meta-dim-${cardId}`);
+                    const durEl = document.getElementById(`meta-dur-${cardId}`);
+                    const hashDurEl = document.getElementById(`hash-vid-dur-${cardId}`);
+
+                    if (dimEl && resText) {
+                        dimEl.innerHTML = `${OFFLINE_ICONS.film} <b class="text-purple-100">RESOLUCIÓN:</b> ${resText}`;
+                    }
+                    if (durEl && durText) {
+                        durEl.innerHTML = `${OFFLINE_ICONS.clock} <b class="text-purple-100">DURACIÓN:</b> ${durText}`;
+                    }
+                    if (hashDurEl && durText) {
+                        hashDurEl.innerHTML = `${OFFLINE_ICONS.clock} ${durText}`;
+                    }
+                };
+
+                // Ejecutamos en paralelo el inspector binario de cabeceras y el demuxer HTML5 <video>
+                const [binaryMeta, html5Meta] = await Promise.all([
+                    extractBinaryVideoFallback(file),
+                    probeHtml5VideoMeta(file)
+                ]);
+
+                const finalRes = html5Meta.resolution || binaryMeta.resolution || 'Codec CCTV / Propietario';
+                const finalDurSec = html5Meta.durationSec || binaryMeta.durationSec;
+                const finalDurText = finalDurSec ? formatDuration(finalDurSec) : binaryMeta.duration;
+
+                applyVideoMetaToCard(finalRes, finalDurText);
+            }
+        }
+
+        async function processLargeFile(evidenceItem, cardElement) {
+            const file = evidenceItem.file;
+            const cardId = cardElement.id;
+            
+            processedEvidence.push(evidenceItem);
+            extractMediaMetadata(file, cardId, evidenceItem);
+            
+            if (!config.modeHash) return; 
+
+            const progressText = document.getElementById(`progress-${cardId}`);
+            const loader = document.getElementById(`loader-${cardId}`);
+            
+            const chunkSize = 50 * 1024 * 1024;
+            const totalChunks = Math.max(1, Math.ceil(file.size / chunkSize));
+            let currentChunk = 0;
+            
+            const spark = new SparkMD5.ArrayBuffer();
+            const sha256Algo = sha256.create();
+            const sha1Algo = config.sha1 ? sha1.create() : null;
+            
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                if(!document.getElementById(cardId)) return; 
+                const buffer = e.target.result;
+                spark.append(buffer);
+                sha256Algo.update(buffer);
+                if(sha1Algo) sha1Algo.update(buffer);
+                
+                currentChunk++;
+                if (currentChunk < totalChunks) {
+                    if (progressText) progressText.innerText = `${Math.round((currentChunk / totalChunks) * 100)}%`;
+                    requestAnimationFrame(loadNext);
+                } else {
+                    evidenceItem.hashes = { md5: spark.end(), sha256: sha256Algo.hex(), sha1: sha1Algo ? sha1Algo.hex() : null };
+                    
+                    updateHashValue(`md5-${cardId}`, evidenceItem.hashes.md5);
+                    updateHashValue(`sha256-${cardId}`, evidenceItem.hashes.sha256);
+                    if(config.sha1) updateHashValue(`sha1-${cardId}`, evidenceItem.hashes.sha1);
+                    
+                    if(config.verifyMode) searchHash(document.getElementById('hash-search').value);
+                    if (loader) { loader.style.opacity = '0'; setTimeout(() => loader.remove(), 300); }
+                }
+            };
+            
+            reader.onerror = () => { if (loader) loader.innerHTML = `<span class="text-xs font-semibold text-red-200 uppercase tracking-wide">Error de lectura</span>`; };
+            function loadNext() { const start = currentChunk * chunkSize; const end = Math.min(start + chunkSize, file.size); reader.readAsArrayBuffer(file.slice(start, end)); }
+            loadNext();
+        }
+
+        function updateHashValue(id, hashValue) { const el = document.getElementById(id); if(el) el.innerText = hashValue; }
+
+        /* =========================================================
+           GENERADOR NATIVO DE EXCEL (.XLSX) CON FORMATO DE TABLA
+           100% OFFLINE (ENCABEZADO AZUL, FILTROS Y FILAS ALTERNADAS)
+           ========================================================= */
+        const CRC32_TABLE = (function() {
+            const table = new Uint32Array(256);
+            for (let n = 0; n < 256; n++) {
+                let c = n;
+                for (let k = 0; k < 8; k++) {
+                    c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+                }
+                table[n] = c >>> 0;
+            }
+            return table;
+        })();
+
+        function crc32Bytes(uint8) {
+            let crc = 0xFFFFFFFF;
+            for (let i = 0; i < uint8.length; i++) {
+                crc = CRC32_TABLE[(crc ^ uint8[i]) & 0xFF] ^ (crc >>> 8);
+            }
+            return (crc ^ 0xFFFFFFFF) >>> 0;
+        }
+
+        function createZipBlob(files) {
+            const encoder = new TextEncoder();
+            const localParts = [];
+            const centralParts = [];
+            let offset = 0;
+
+            files.forEach(file => {
+                const nameBytes = encoder.encode(file.name);
+                const dataBytes = typeof file.content === 'string' ? encoder.encode(file.content) : file.content;
+                const crc = crc32Bytes(dataBytes);
+                const size = dataBytes.length;
+
+                const localHeader = new Uint8Array(30 + nameBytes.length);
+                const lv = new DataView(localHeader.buffer);
+                lv.setUint32(0, 0x04034b50, true);
+                lv.setUint16(4, 20, true);
+                lv.setUint16(6, 0x0800, true);
+                lv.setUint16(8, 0, true);
+                lv.setUint16(10, 0, true);
+                lv.setUint16(12, 0x2100, true);
+                lv.setUint32(14, crc, true);
+                lv.setUint32(18, size, true);
+                lv.setUint32(22, size, true);
+                lv.setUint16(26, nameBytes.length, true);
+                lv.setUint16(28, 0, true);
+                localHeader.set(nameBytes, 30);
+
+                const centralHeader = new Uint8Array(46 + nameBytes.length);
+                const cv = new DataView(centralHeader.buffer);
+                cv.setUint32(0, 0x02014b50, true);
+                cv.setUint16(4, 20, true);
+                cv.setUint16(6, 20, true);
+                cv.setUint16(8, 0x0800, true);
+                cv.setUint16(10, 0, true);
+                cv.setUint16(12, 0, true);
+                cv.setUint16(14, 0x2100, true);
+                cv.setUint32(16, crc, true);
+                cv.setUint32(20, size, true);
+                cv.setUint32(24, size, true);
+                cv.setUint16(28, nameBytes.length, true);
+                cv.setUint16(30, 0, true);
+                cv.setUint16(32, 0, true);
+                cv.setUint16(34, 0, true);
+                cv.setUint16(36, 0, true);
+                cv.setUint32(38, 0, true);
+                cv.setUint32(42, offset, true);
+                centralHeader.set(nameBytes, 46);
+
+                localParts.push(localHeader, dataBytes);
+                centralParts.push(centralHeader);
+                offset += localHeader.length + size;
+            });
+
+            let cdSize = 0;
+            centralParts.forEach(part => { cdSize += part.length; });
+
+            const eocd = new Uint8Array(22);
+            const ev = new DataView(eocd.buffer);
+            ev.setUint32(0, 0x06054b50, true);
+            ev.setUint16(4, 0, true);
+            ev.setUint16(6, 0, true);
+            ev.setUint16(8, files.length, true);
+            ev.setUint16(10, files.length, true);
+            ev.setUint32(12, cdSize, true);
+            ev.setUint32(16, offset, true);
+            ev.setUint16(20, 0, true);
+
+            return new Blob([...localParts, ...centralParts, eocd], {
+                type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            });
+        }
+
+        function escapeXml(str) {
+            return String(str ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&apos;');
+        }
+
+        function getExcelColName(colIndex) {
+            let n = colIndex + 1;
+            let name = '';
+            while (n > 0) {
+                const rem = (n - 1) % 26;
+                name = String.fromCharCode(65 + rem) + name;
+                n = Math.floor((n - 1) / 26);
+            }
+            return name;
+        }
+
+        function exportCSV() {
+            if (processedEvidence.length === 0) {
+                showAlert("No hay evidencia procesada para exportar.");
+                return;
+            }
+
+            const hasAnyVideo = processedEvidence.some(item => isVideoFile(item.file) || (item.extraMeta && item.extraMeta.duration));
+            const headers = ["Nombre de Archivo", "Ruta", "Tamano", "Tamano (Bytes)"];
+
+            if (hasAnyVideo && !config.modeMetadata) {
+                headers.push("Duracion de Video");
+            }
+            if (config.modeMetadata) {
+                headers.push(
+                    "Extension",
+                    "Tipo MIME",
+                    "Resolucion",
+                    "Duracion de Video",
+                    "Creador / Autor",
+                    "Fecha Creacion",
+                    "Fecha Modificacion (MTIME)"
+                );
+            } else if (config.macTime) {
+                headers.push("Fecha Modificacion (Tiempos MAC)");
+            }
+            if (config.modeHash) {
+                headers.push("MD5", "SHA-256");
+                if (config.sha1) headers.push("SHA-1");
+            }
+
+            const rows = processedEvidence.map(item => {
+                const f = item.file;
+                const h = item.hashes || {};
+                const meta = item.extraMeta || {};
+                const ruta = f.customPath || f.path || f.name;
+                const lastMod = f.lastModified ? new Date(f.lastModified).toLocaleString('es-MX') : 'Desconocido';
+                const mime = f.type || 'Desconocido/No asignado';
+                const ext = f.name.includes('.') ? f.name.split('.').pop().toUpperCase() : 'Desconocido';
+                const vidDur = meta.duration || (isVideoFile(f) ? 'No disponible' : 'N/A');
+
+                const rowData = [
+                    { v: f.name, t: 's' },
+                    { v: ruta, t: 's' },
+                    { v: formatBytes(f.size), t: 's' },
+                    { v: Number(f.size) || 0, t: 'n' }
+                ];
+
+                if (hasAnyVideo && !config.modeMetadata) {
+                    rowData.push({ v: vidDur, t: 's' });
+                }
+                if (config.modeMetadata) {
+                    rowData.push(
+                        { v: ext, t: 's' },
+                        { v: mime, t: 's' },
+                        { v: meta.dimensions || 'N/A', t: 's' },
+                        { v: vidDur, t: 's' },
+                        { v: meta.creator || 'Sistema Local', t: 's' },
+                        { v: meta.creationDate || lastMod, t: 's' },
+                        { v: lastMod, t: 's' }
+                    );
+                } else if (config.macTime) {
+                    rowData.push({ v: lastMod, t: 's' });
+                }
+                if (config.modeHash) {
+                    rowData.push(
+                        { v: h.md5 || 'N/A', t: 's' },
+                        { v: h.sha256 || 'N/A', t: 's' }
+                    );
+                    if (config.sha1) {
+                        rowData.push({ v: h.sha1 || 'N/A', t: 's' });
+                    }
+                }
+                return rowData;
+            });
+
+            // Tabla de Shared Strings para compatibilidad total con Tablas de Excel
+            const sharedStrings = [];
+            const sharedStringMap = new Map();
+            function getSharedStringIdx(text) {
+                const key = String(text ?? '');
+                if (sharedStringMap.has(key)) return sharedStringMap.get(key);
+                const idx = sharedStrings.length;
+                sharedStrings.push(key);
+                sharedStringMap.set(key, idx);
+                return idx;
+            }
+
+            // Calcular el ancho óptimo para cada columna
+            const colWidths = headers.map((h, colIdx) => {
+                let maxLen = h.length + 4;
+                rows.forEach(r => {
+                    const valStr = String(r[colIdx].v ?? '');
+                    if (valStr.length > maxLen) maxLen = valStr.length;
+                });
+                return Math.min(Math.max(maxLen + 3, 12), 75);
+            });
+
+            const lastColLetter = getExcelColName(headers.length - 1);
+            const lastRowNumber = rows.length + 1;
+            const tableRef = `A1:${lastColLetter}${lastRowNumber}`;
+
+            // Construcción de filas XML
+            let sheetRowsXml = `<row r="1" ht="20" customHeight="1">`;
+            headers.forEach((hText, cIdx) => {
+                const cellRef = `${getExcelColName(cIdx)}1`;
+                const sIdx = getSharedStringIdx(hText);
+                sheetRowsXml += `<c r="${cellRef}" s="1" t="s"><v>${sIdx}</v></c>`;
+            });
+            sheetRowsXml += `</row>`;
+
+            rows.forEach((rCells, rIdx) => {
+                const rowNum = rIdx + 2;
+                const isOddDataRow = (rIdx % 2 === 0); // Fila 2 azul claro (#DDEBF7), Fila 3 blanca (#FFFFFF)
+                sheetRowsXml += `<row r="${rowNum}" ht="18">`;
+                rCells.forEach((cell, cIdx) => {
+                    const cellRef = `${getExcelColName(cIdx)}${rowNum}`;
+                    if (cell.t === 'n') {
+                        const styleId = isOddDataRow ? 4 : 5;
+                        sheetRowsXml += `<c r="${cellRef}" s="${styleId}"><v>${cell.v}</v></c>`;
+                    } else {
+                        const styleId = isOddDataRow ? 2 : 3;
+                        const sIdx = getSharedStringIdx(cell.v);
+                        sheetRowsXml += `<c r="${cellRef}" s="${styleId}" t="s"><v>${sIdx}</v></c>`;
+                    }
+                });
+                sheetRowsXml += `</row>`;
+            });
+
+            const colsXml = colWidths.map((w, idx) =>
+                `<col min="${idx + 1}" max="${idx + 1}" width="${w}" customWidth="1"/>`
+            ).join('');
+
+            const contentTypesXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml" ContentType="application/xml"/>
+  <Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>
+  <Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>
+  <Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>
+  <Override PartName="/xl/sharedStrings.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sharedStrings+xml"/>
+  <Override PartName="/xl/tables/table1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.table+xml"/>
+</Types>`;
+
+            const rootRelsXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>
+</Relationships>`;
+
+            const workbookXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+  <sheets>
+    <sheet name="Reporte Forense" sheetId="1" r:id="rId1"/>
+  </sheets>
+</workbook>`;
+
+            const workbookRelsXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/>
+  <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>
+  <Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/sharedStrings" Target="sharedStrings.xml"/>
+</Relationships>`;
+
+            // Estilos exactos: Encabezado azul (#8DB4E2) con letra blanca en negrita centrada, filas alternadas (#DDEBF7 y #FFFFFF) y bordes finos
+            const stylesXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+  <fonts count="2">
+    <font><sz val="11"/><color rgb="FF000000"/><name val="Calibri"/></font>
+    <font><b/><sz val="11"/><color rgb="FFFFFFFF"/><name val="Calibri"/></font>
+  </fonts>
+  <fills count="5">
+    <fill><patternFill patternType="none"/></fill>
+    <fill><patternFill patternType="gray125"/></fill>
+    <fill><patternFill patternType="solid"><fgColor rgb="FF8DB4E2"/><bgColor indexed="64"/></patternFill></fill>
+    <fill><patternFill patternType="solid"><fgColor rgb="FFDDEBF7"/><bgColor indexed="64"/></patternFill></fill>
+    <fill><patternFill patternType="solid"><fgColor rgb="FFFFFFFF"/><bgColor indexed="64"/></patternFill></fill>
+  </fills>
+  <borders count="2">
+    <border><left/><right/><top/><bottom/><diagonal/></border>
+    <border>
+      <left style="thin"><color rgb="FF000000"/></left>
+      <right style="thin"><color rgb="FF000000"/></right>
+      <top style="thin"><color rgb="FF000000"/></top>
+      <bottom style="thin"><color rgb="FF000000"/></bottom>
+      <diagonal/>
+    </border>
+  </borders>
+  <cellStyleXfs count="1">
+    <xf numFmtId="0" fontId="0" fillId="0" borderId="0"/>
+  </cellStyleXfs>
+  <cellXfs count="6">
+    <xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>
+    <xf numFmtId="0" fontId="1" fillId="2" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1">
+      <alignment horizontal="center" vertical="center"/>
+    </xf>
+    <xf numFmtId="0" fontId="0" fillId="3" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1">
+      <alignment horizontal="left" vertical="center"/>
+    </xf>
+    <xf numFmtId="0" fontId="0" fillId="4" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1">
+      <alignment horizontal="left" vertical="center"/>
+    </xf>
+    <xf numFmtId="0" fontId="0" fillId="3" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1">
+      <alignment horizontal="right" vertical="center"/>
+    </xf>
+    <xf numFmtId="0" fontId="0" fillId="4" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1">
+      <alignment horizontal="right" vertical="center"/>
+    </xf>
+  </cellXfs>
+</styleSheet>`;
+
+            const sharedStringsXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="${sharedStrings.length}" uniqueCount="${sharedStrings.length}">
+  ${sharedStrings.map(s => `<si><t xml:space="preserve">${escapeXml(s)}</t></si>`).join('')}
+</sst>`;
+
+            const sheetXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+  <dimension ref="${tableRef}"/>
+  <sheetViews>
+    <sheetView tabSelected="1" workbookViewId="0"/>
+  </sheetViews>
+  <cols>${colsXml}</cols>
+  <sheetData>${sheetRowsXml}</sheetData>
+  <tableParts count="1">
+    <tablePart r:id="rId1"/>
+  </tableParts>
+</worksheet>`;
+
+            const sheetRelsXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/table" Target="../tables/table1.xml"/>
+</Relationships>`;
+
+            const tableColumnsXml = headers.map((h, i) =>
+                `<tableColumn id="${i + 1}" name="${escapeXml(h)}"/>`
+            ).join('');
+
+            const tableXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<table xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" id="1" name="TablaReporteForense" displayName="TablaReporteForense" ref="${tableRef}" totalsRowShown="0">
+  <autoFilter ref="${tableRef}"/>
+  <tableColumns count="${headers.length}">${tableColumnsXml}</tableColumns>
+  <tableStyleInfo name="TableStyleMedium2" showFirstColumn="0" showLastColumn="0" showRowStripes="1" showColumnStripes="0"/>
+</table>`;
+
+            const xlsxBlob = createZipBlob([
+                { name: '[Content_Types].xml', content: contentTypesXml },
+                { name: '_rels/.rels', content: rootRelsXml },
+                { name: 'xl/workbook.xml', content: workbookXml },
+                { name: 'xl/_rels/workbook.xml.rels', content: workbookRelsXml },
+                { name: 'xl/styles.xml', content: stylesXml },
+                { name: 'xl/sharedStrings.xml', content: sharedStringsXml },
+                { name: 'xl/worksheets/sheet1.xml', content: sheetXml },
+                { name: 'xl/worksheets/_rels/sheet1.xml.rels', content: sheetRelsXml },
+                { name: 'xl/tables/table1.xml', content: tableXml }
+            ]);
+
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(xlsxBlob);
+            link.download = `Reporte_Forense_${Date.now()}.xlsx`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+</body>
+</html>

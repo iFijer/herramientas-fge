@@ -1,0 +1,1536 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Isaí Figueroa J.">
+    <title>Analizador Forense de WhatsApp - Creado por Isaí Figueroa J.</title>
+    <link rel="icon" type="image/x-icon" href="https://isaifijer.com.mx/imagenes/favicon.ico">
+
+    <style>
+        *, ::before, ::after {
+            box-sizing: border-box;
+            border-width: 0;
+            border-style: solid;
+            border-color: #334155;
+        }
+
+        body {
+            font-family: 'Rajdhani', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #050505;
+            color: #ffffff;
+            margin: 0;
+            overflow-x: hidden;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        button, input, textarea {
+            font-family: inherit;
+            font-size: 100%;
+            margin: 0;
+            color: inherit;
+            background: none;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        .font-cyber {
+            font-family: 'Rajdhani', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        .font-mono {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        }
+
+        /* Fondo de Red Interactiva con partículas (mismo estilo que index.html) */
+        #network-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            background: radial-gradient(circle at center, #1e293b 0%, #020617 100%);
+            opacity: 0.95;
+            pointer-events: none;
+        }
+
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.55);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 30px rgba(59, 130, 246, 0.12);
+            border-radius: 0.75rem;
+        }
+
+        .header-icon-box {
+            background: linear-gradient(135deg, #2563eb 0%, #3b82f6 50%, #06b6d4 100%);
+            box-shadow: 0 0 25px rgba(59, 130, 246, 0.65);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 1.15rem;
+        }
+
+        .title-gradient {
+            background: linear-gradient(to right, #ffffff, #bfdbfe);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        /* Homologación exacta de alturas y márgenes con Calculadora Forense de DVR */
+        .header-title-sync {
+            margin-top: 0.67em !important;
+            margin-bottom: 0.67em !important;
+        }
+
+        .header-subtitle-sync {
+            margin-top: 0.375rem !important;
+            margin-bottom: 0.83em !important;
+        }
+
+        .u-link {
+            text-decoration: none;
+        }
+        .u-link:hover {
+            color: #93c5fd;
+            text-decoration: underline;
+        }
+
+        .svg-icon {
+            display: inline-block;
+            width: 1.1em;
+            height: 1.1em;
+            vertical-align: -0.15em;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            flex-shrink: 0;
+        }
+
+        /* Utilidades de Layout 100% Offline */
+        .hidden { display: none !important; }
+        .block { display: block; }
+        .flex { display: flex; }
+        .grid { display: grid; }
+        .flex-col { flex-direction: column; }
+        .flex-wrap { flex-wrap: wrap; }
+        .flex-1 { flex: 1 1 0%; }
+        .shrink-0 { flex-shrink: 0; }
+        .items-center { align-items: center; }
+        .justify-center { justify-content: center; }
+        .justify-between { justify-content: space-between; }
+        .grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+        .relative { position: relative; }
+        .absolute { position: absolute; }
+        .fixed { position: fixed; }
+        .bottom-6 { bottom: 1.5rem; }
+        .right-6 { right: 1.5rem; }
+        .z-10 { z-index: 10; }
+        .z-40 { z-index: 40; }
+        .z-50 { z-index: 50; }
+
+        /* Dimensiones y Espaciados Offline */
+        .min-h-screen { min-height: 100vh; }
+        .w-full { width: 100%; }
+        .w-16 { width: 4rem; }
+        .h-16 { height: 4rem; }
+        .w-14 { width: 3.5rem; }
+        .h-14 { height: 3.5rem; }
+        .w-9 { width: 2.25rem; }
+        .h-9 { height: 2.25rem; }
+        .w-7 { width: 1.75rem; }
+        .h-7 { height: 1.75rem; }
+        .w-4 { width: 1rem; }
+        .h-4 { height: 1rem; }
+        .w-2\.5 { width: 0.625rem; }
+        .h-2\.5 { height: 0.625rem; }
+        .h-full { height: 100%; }
+        .max-w-\[1700px\] { max-width: 1700px; }
+        .mx-auto { margin-left: auto; margin-right: auto; }
+
+        .mt-1 { margin-top: 0.25rem; }
+        .mt-1\.5 { margin-top: 0.375rem; }
+        .mt-6 { margin-top: 1.5rem; }
+        .mb-2 { margin-bottom: 0.5rem; }
+        .mb-6 { margin-bottom: 1.5rem; }
+
+        .p-2\.5 { padding: 0.625rem; }
+        .p-3\.5 { padding: 0.875rem; }
+        .p-4 { padding: 1rem; }
+        .p-5 { padding: 1.25rem; }
+        .p-6 { padding: 1.5rem; }
+        .pt-2 { padding-top: 0.5rem; }
+        .pb-3 { padding-bottom: 0.75rem; }
+        .py-0\.5 { padding-top: 0.125rem; padding-bottom: 0.125rem; }
+        .py-1 { padding-top: 0.25rem; padding-bottom: 0.25rem; }
+        .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+        .py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
+        .py-3\.5 { padding-top: 0.875rem; padding-bottom: 0.875rem; }
+        .py-8 { padding-top: 2rem; padding-bottom: 2rem; }
+        .py-28 { padding-top: 7rem; padding-bottom: 7rem; }
+        .px-2 { padding-left: 0.5rem; padding-right: 0.5rem; }
+        .px-2\.5 { padding-left: 0.625rem; padding-right: 0.625rem; }
+        .px-3\.5 { padding-left: 0.875rem; padding-right: 0.875rem; }
+        .px-4 { padding-left: 1rem; padding-right: 1rem; }
+        .px-5 { padding-left: 1.25rem; padding-right: 1.25rem; }
+
+        .gap-1\.5 { gap: 0.375rem; }
+        .gap-2 { gap: 0.5rem; }
+        .gap-2\.5 { gap: 0.625rem; }
+        .gap-3 { gap: 0.75rem; }
+        .gap-4 { gap: 1rem; }
+        .gap-6 { gap: 1.5rem; }
+
+        /* Tipografía y Colores Offline */
+        .text-\[10px\] { font-size: 10px; line-height: 14px; }
+        .text-\[11px\] { font-size: 11px; line-height: 16px; }
+        .text-xs { font-size: 0.75rem; line-height: 1rem; }
+        .text-sm { font-size: 0.875rem; line-height: 1.25rem; }
+        .text-base { font-size: 1rem; line-height: 1.5rem; }
+        .text-xl { font-size: 1.25rem; line-height: 1.75rem; }
+        .text-2xl { font-size: 1.5rem; line-height: 2rem; }
+        .text-3xl { font-size: 1.875rem; line-height: 2.25rem; }
+        .text-4xl { font-size: 2.25rem; line-height: 2.5rem; }
+
+        .font-medium { font-weight: 500; }
+        .font-semibold { font-weight: 600; }
+        .font-bold { font-weight: 700; }
+        .italic { font-style: italic; }
+        .uppercase { text-transform: uppercase; }
+        .text-center { text-align: center; }
+        .tracking-wide { letter-spacing: 0.025em; }
+        .tracking-wider { letter-spacing: 0.05em; }
+        .tracking-widest { letter-spacing: 0.1em; }
+        .leading-relaxed { line-height: 1.625; }
+        .truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+        .text-white { color: #ffffff; }
+        .text-slate-200 { color: #e2e8f0; }
+        .text-slate-300 { color: #cbd5e1; }
+        .text-slate-400 { color: #94a3b8; }
+        .text-slate-500 { color: #64748b; }
+        .text-slate-700 { color: #334155; }
+        .text-blue-400 { color: #60a5fa; }
+        .hover\:text-blue-300:hover { color: #93c5fd; }
+        .text-cyan-300 { color: #67e8f9; }
+        .text-cyan-400 { color: #22d3ee; }
+        .text-emerald-400 { color: #34d399; }
+        .text-amber-400 { color: #fbbf24; }
+        .hover\:text-rose-300:hover { color: #fda4af; }
+
+        /* Fondos, Bordes y Sombras Offline */
+        .bg-slate-100 { background-color: #f1f5f9; }
+        .bg-slate-800 { background-color: #1e293b; }
+        .bg-slate-800\/70 { background-color: rgba(30, 41, 59, 0.7); }
+        .hover\:bg-slate-700:hover { background-color: #334155; }
+        .hover\:bg-rose-950\/70:hover { background-color: rgba(76, 5, 25, 0.7); }
+        .bg-slate-900 { background-color: #0f172a; }
+        .bg-slate-900\/50 { background-color: rgba(15, 23, 42, 0.5); }
+        .bg-slate-900\/60 { background-color: rgba(15, 23, 42, 0.6); }
+        .bg-slate-900\/70 { background-color: rgba(15, 23, 42, 0.7); }
+        .bg-slate-900\/85 { background-color: rgba(15, 23, 42, 0.85); }
+        .bg-slate-900\/90 { background-color: rgba(15, 23, 42, 0.9); }
+        .bg-slate-950\/90 { background-color: rgba(2, 6, 23, 0.9); }
+
+        .bg-gradient-whatsapp {
+            background: linear-gradient(135deg, #10b981 0%, #0891b2 100%);
+            box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.25);
+        }
+
+        .bg-gradient-progress {
+            background: linear-gradient(to right, #10b981, #22d3ee, #3b82f6);
+        }
+
+        .border { border-width: 1px; }
+        .border-2 { border-width: 2px; }
+        .border-b { border-bottom-width: 1px; }
+        .border-t { border-top-width: 1px; }
+        .border-dashed { border-style: dashed; }
+
+        .border-slate-200 { border-color: #e2e8f0; }
+        .border-slate-700 { border-color: #334155; }
+        .border-slate-700\/70 { border-color: rgba(51, 65, 85, 0.7); }
+        .border-slate-700\/80 { border-color: rgba(51, 65, 85, 0.8); }
+        .border-emerald-400 { border-color: #34d399; }
+        .border-emerald-500\/50 { border-color: rgba(16, 185, 129, 0.5); }
+        .hover\:border-emerald-400:hover { border-color: #34d399; }
+        .border-cyan-500\/40 { border-color: rgba(6, 182, 212, 0.4); }
+        .border-cyan-500\/50 { border-color: rgba(6, 182, 212, 0.5); }
+        .focus\:border-cyan-400:focus { border-color: #22d3ee; }
+
+        .rounded { border-radius: 0.25rem; }
+        .rounded-lg { border-radius: 0.5rem; }
+        .rounded-xl { border-radius: 0.75rem; }
+        .rounded-2xl { border-radius: 1rem; }
+        .rounded-full { border-radius: 9999px; }
+
+        .shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4); }
+        .shadow-2xl { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.75); }
+
+        .cursor-pointer { cursor: pointer; }
+        .select-none { user-select: none; }
+        .pointer-events-none { pointer-events: none; }
+        .outline-none { outline: none; }
+        .resize-y { resize: vertical; }
+        .overflow-hidden { overflow: hidden; }
+        .accent-cyan-500 { accent-color: #06b6d4; }
+        .opacity-0 { opacity: 0; }
+        .opacity-100 { opacity: 1; }
+
+        .transition { transition: all 0.2s ease-in-out; }
+        .transition-all { transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
+        .transition-colors { transition: color 0.2s ease-in-out; }
+        .transition-opacity { transition: opacity 0.3s ease-in-out; }
+        .transition-transform { transition: transform 0.2s ease-in-out; }
+        .group:hover .group-hover\:scale-105 { transform: scale(1.05); }
+
+        @keyframes ping {
+            75%, 100% { transform: scale(2); opacity: 0; }
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .animate-ping { animation: ping 1.2s cubic-bezier(0, 0, 0.2, 1) infinite; }
+        .animate-spin { animation: spin 1s linear infinite; }
+
+        @media (min-width: 640px) {
+            .sm\:text-base { font-size: 1rem; line-height: 1.5rem; }
+        }
+        @media (min-width: 768px) {
+            .md\:px-8 { padding-left: 2rem; padding-right: 2rem; }
+            .md\:text-3xl { font-size: 1.875rem; line-height: 2.25rem; }
+        }
+        @media (min-width: 1024px) {
+            .lg\:flex-row { flex-direction: row; }
+            .lg\:w-1\/3 { width: 33.333333%; }
+            .lg\:w-2\/3 { width: 66.666667%; }
+            .lg\:sticky { position: sticky; }
+            .lg\:top-6 { top: 1.5rem; }
+        }
+        @media (min-width: 1280px) {
+            .xl\:w-1\/4 { width: 25%; }
+            .xl\:w-3\/4 { width: 75%; }
+        }
+
+        .btn-inicio {
+            position: fixed;
+            top: 1.25rem;
+            left: 1.25rem;
+            z-index: 40;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.55rem 1rem;
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(59, 130, 246, 0.4);
+            border-radius: 0.65rem;
+            color: #bfdbfe;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            text-decoration: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4), 0 0 12px rgba(59, 130, 246, 0.15);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .btn-inicio:hover {
+            background: rgba(37, 99, 235, 0.25);
+            border-color: #22d3ee;
+            color: #ffffff;
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.45);
+            transform: translateY(-1px);
+        }
+
+        .logo-fge {
+            position: fixed;
+            top: 0.9rem;
+            right: 1.25rem;
+            z-index: 40;
+            width: 5.75rem;
+            height: 5.75rem;
+            background: transparent;
+            filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.75));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.25s ease, filter 0.25s ease;
+            user-select: none;
+        }
+        .logo-fge:hover {
+            transform: scale(1.05);
+            filter: drop-shadow(0 0 14px rgba(148, 163, 184, 0.45));
+        }
+
+        @media (max-width: 639px) {
+            .btn-inicio {
+                top: 0.85rem;
+                left: 0.85rem;
+                padding: 0.45rem 0.75rem;
+                font-size: 0.72rem;
+            }
+            .logo-fge {
+                top: 0.65rem;
+                right: 0.75rem;
+                width: 4.1rem;
+                height: 4.1rem;
+            }
+        }
+
+        .btn-action-word {
+            background: linear-gradient(to right, #2563eb, #0891b2);
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.35);
+            transition: all 0.25s ease;
+        }
+        .btn-action-word:hover {
+            background: linear-gradient(to right, #3b82f6, #06b6d4);
+            box-shadow: 0 0 28px rgba(6, 182, 212, 0.55);
+            transform: translateY(-1px);
+        }
+
+        /* Hoja Blanca de Vista Previa con fondo blanco sólido */
+        .word-sheet {
+            background-color: #ffffff;
+            color: #000000;
+            font-family: 'Calibri', 'Arial', sans-serif;
+            font-size: 11pt;
+            line-height: 1.5;
+            width: 100%;
+            max-width: 920px;
+            min-height: 74vh;
+            height: auto;
+            padding: 2.75rem 3.25rem;
+            margin: 0 auto 3rem auto;
+            border-radius: 0.75rem;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.75);
+            overflow-wrap: break-word;
+        }
+
+        @media (max-width: 640px) {
+            .word-sheet {
+                padding: 1.5rem 1.25rem;
+                font-size: 10pt;
+            }
+        }
+
+        /* Estilos de viñetas multinivel idénticos a Word */
+        .doc-list-container ul {
+            list-style-type: disc;
+            margin-left: 1.75rem;
+            margin-top: 0.25rem;
+            margin-bottom: 0.25rem;
+            padding-left: 0.5rem;
+        }
+        .doc-list-container ul ul {
+            list-style-type: circle;
+        }
+        .doc-list-container ul ul ul {
+            list-style-type: square;
+        }
+        .doc-list-container li {
+            margin-bottom: 0.3rem;
+            color: #000000;
+        }
+
+        /* Scrollbars personalizados */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.8);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #38bdf8;
+        }
+    </style>
+</head>
+<body class="relative min-h-screen flex flex-col py-8 px-4 md:px-8">
+
+    <!-- Fondo animado de partículas -->
+    <canvas id="network-canvas"></canvas>
+
+    <!-- BOTÓN SUPERIOR IZQUIERDO: REGRESAR AL MENÚ PRINCIPAL (../index.html) -->
+    <a href="../index.html" class="btn-inicio" title="Volver al Menú Principal">
+        <svg class="svg-icon text-cyan-400" style="width: 1.25em; height: 1.25em;" viewBox="0 0 24 24">
+            <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+            <polyline points="9 22 9 12 15 12 15 22"/>
+        </svg>
+        <span>Inicio</span>
+    </a>
+
+    <!-- LOGO SUPERIOR DERECHO: FISCALÍA GENERAL DEL ESTADO DE MORELOS (100% OFFLINE SVG SIN FONDO BLANCO) -->
+    <div class="logo-fge" title="Fiscalía General del Estado de Morelos">
+        <svg viewBox="0 0 240 240" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <!-- Arco superior para "MORELOS" -->
+                <path id="fge-arc-top" d="M 31,120 A 89,89 0 1,1 209,120" />
+                <!-- Arco inferior para "FISCALÍA GENERAL DEL ESTADO" -->
+                <path id="fge-arc-bottom" d="M 19.3,98.6 A 103,103 0 1,0 220.7,98.6" />
+                <!-- Máscara para recortar los anillos detrás del escudo manteniendo el fondo 100% transparente -->
+                <mask id="fge-shield-cutout">
+                    <rect x="0" y="0" width="240" height="240" fill="#ffffff" />
+                    <path d="M 71,67 Q 120,51 169,67 L 169,128 C 169,157 146.5,174 120,185 C 93.5,174 71,157 71,128 Z" fill="#000000" />
+                </mask>
+            </defs>
+
+            <!-- Círculo Exterior Transparente con Línea Plata/Acero (#94a3b8) -->
+            <circle cx="120" cy="120" r="115" fill="none" stroke="#94a3b8" stroke-width="4.5"/>
+
+            <!-- Tres Anillos Concéntricos Centrales en Línea Plata/Acero (Recortados al borde del escudo) -->
+            <g mask="url(#fge-shield-cutout)" fill="none" stroke="#94a3b8" stroke-width="3.6">
+                <circle cx="120" cy="120" r="78"/>
+                <circle cx="120" cy="120" r="70"/>
+                <circle cx="120" cy="120" r="62"/>
+            </g>
+
+            <!-- Líneas diagonales laterales separadoras -->
+            <line x1="34" y1="81" x2="49" y2="62" stroke="#94a3b8" stroke-width="4.5" stroke-linecap="round"/>
+            <line x1="206" y1="81" x2="191" y2="62" stroke="#94a3b8" stroke-width="4.5" stroke-linecap="round"/>
+
+            <!-- Texto Curvo Superior en Blanco de Alto Contraste: MORELOS -->
+            <text fill="#ffffff" font-family="system-ui, -apple-system, 'Segoe UI', Arial, sans-serif" font-size="21" font-weight="900" letter-spacing="3.5">
+                <textPath href="#fge-arc-top" startOffset="50%" text-anchor="middle">MORELOS</textPath>
+            </text>
+
+            <!-- Texto Curvo Inferior en Blanco de Alto Contraste: FISCALÍA GENERAL DEL ESTADO -->
+            <text fill="#ffffff" font-family="system-ui, -apple-system, 'Segoe UI', Arial, sans-serif" font-size="18" font-weight="900" letter-spacing="1.6">
+                <textPath href="#fge-arc-bottom" startOffset="50%" text-anchor="middle">FISCALÍA GENERAL DEL ESTADO</textPath>
+            </text>
+
+            <!-- Doble Contorno del Escudo Central y Divisiones Internas en Plata/Acero (#94a3b8) -->
+            <path d="M 72,68 Q 120,52 168,68 L 168,128 C 168,156 146,173 120,184 C 94,173 72,156 72,128 Z" fill="none" stroke="#94a3b8" stroke-width="3.5" stroke-linejoin="round"/>
+            <path d="M 78,73 Q 120,58.5 162,73 L 162,128 C 162,152 143,167 120,177 C 97,167 78,152 78,128 Z" fill="none" stroke="#94a3b8" stroke-width="3" stroke-linejoin="round"/>
+            <!-- División vertical central y horizontal derecha -->
+            <line x1="120" y1="64" x2="120" y2="177" stroke="#94a3b8" stroke-width="3.2"/>
+            <line x1="120" y1="123" x2="162" y2="123" stroke="#94a3b8" stroke-width="3.2"/>
+
+            <!-- Siglas F G E en Blanco de Alto Contraste (#ffffff) -->
+            <text x="100" y="103" fill="#ffffff" font-family="system-ui, -apple-system, 'Segoe UI', Arial, sans-serif" font-size="26" font-weight="900" text-anchor="middle">F</text>
+            <text x="100" y="131" fill="#ffffff" font-family="system-ui, -apple-system, 'Segoe UI', Arial, sans-serif" font-size="26" font-weight="900" text-anchor="middle">G</text>
+            <text x="100" y="158" fill="#ffffff" font-family="system-ui, -apple-system, 'Segoe UI', Arial, sans-serif" font-size="26" font-weight="900" text-anchor="middle">E</text>
+
+            <!-- Símbolo Superior Derecho: Balanza de la Justicia y Ojo Visor en Línea Plata/Acero (#94a3b8) -->
+            <g stroke="#94a3b8" fill="none">
+                <!-- Base escalonada y mástil de la balanza -->
+                <line x1="128" y1="100" x2="150" y2="100" stroke-width="3" stroke-linecap="round"/>
+                <line x1="131" y1="95.5" x2="147" y2="95.5" stroke-width="2.8" stroke-linecap="round"/>
+                <line x1="139" y1="80" x2="139" y2="95.5" stroke-width="2.8" stroke-linecap="round"/>
+                <!-- Brazo superior y platillos -->
+                <path d="M 130,82.5 L 136,82.5 L 139,80.5 L 142,82.5 L 148,82.5" stroke-width="2.4" stroke-linejoin="round"/>
+                <line x1="130.5" y1="82.5" x2="130.5" y2="88.5" stroke-width="2"/>
+                <path d="M 126.5,88.5 A 4,4 0 0,0 134.5,88.5 Z" fill="#94a3b8" stroke="none"/>
+                <line x1="147.5" y1="82.5" x2="147.5" y2="88.5" stroke-width="2"/>
+                <path d="M 143.5,88.5 A 4,4 0 0,0 151.5,88.5 Z" fill="#94a3b8" stroke="none"/>
+                <!-- Ojo visor inferior -->
+                <path d="M 127.5,113.5 Q 139,104 150.5,113.5" stroke-width="3" stroke-linecap="round"/>
+                <circle cx="139" cy="113.5" r="4.5" stroke-width="2.8"/>
+            </g>
+
+            <!-- Símbolo Inferior Derecho: Silueta del Estado de Morelos trazada en Línea (#94a3b8) -->
+            <path d="M 131.5,128.5 L 136.5,129.5 L 138.5,132 L 142,131.5 L 145,133.5 L 151.5,132 L 150,136.5 L 148,141 L 150.5,145.5 L 146.5,150.5 L 144.5,158 L 141.5,156 L 138,156 L 135,160 L 131,154 L 125.5,149.5 L 124.5,145 L 127.5,141.5 L 127,136.5 L 131,133.5 Z" fill="none" stroke="#94a3b8" stroke-width="2.3" stroke-linejoin="round"/>
+        </svg>
+    </div>
+
+    <!-- ENCABEZADO CENTRADO (Idéntico a Calculadora Forense de DVR) -->
+    <header class="relative z-10 flex flex-col items-center justify-center mb-2">
+        <div class="flex flex-col items-center justify-center gap-3">
+            <div class="w-16 h-16 rounded-2xl header-icon-box flex items-center justify-center relative">
+                <!-- Ícono Principal de WhatsApp (100% Offline SVG) -->
+                <svg class="w-9 h-9 text-white" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12.031 2c-5.506 0-9.989 4.478-9.99 9.984a9.964 9.964 0 0 0 1.333 4.993L2 22l5.233-1.237a9.994 9.994 0 0 0 4.779 1.217h.004c5.505 0 9.988-4.478 9.989-9.984 0-2.669-1.037-5.176-2.922-7.062A9.935 9.935 0 0 0 12.031 2zm0 18.295h-.003a8.29 8.29 0 0 1-4.228-1.157l-.303-.18-3.146.744.764-3.068-.197-.314a8.277 8.277 0 0 1-1.27-4.426c.002-4.578 3.726-8.303 8.307-8.303 2.218 0 4.303.865 5.871 2.434a8.25 8.25 0 0 1 2.43 5.873c-.002 4.58-3.726 8.305-8.305 8.305zm4.555-6.218c-.25-.125-1.477-.729-1.706-.812-.229-.083-.395-.125-.562.125-.166.25-.645.812-.791.979-.146.166-.291.187-.541.062-.25-.125-1.055-.389-2.01-1.24-.743-.662-1.244-1.481-1.39-1.731-.146-.25-.015-.385.11-.51.112-.112.25-.291.375-.437.125-.146.166-.25.25-.416.083-.166.042-.312-.021-.437-.062-.125-.562-1.354-.77-1.854-.203-.486-.409-.42-.562-.428l-.479-.008c-.166 0-.437.062-.666.312-.229.25-.874.854-.874 2.083s.895 2.416 1.02 2.583c.125.166 1.761 2.689 4.267 3.77.596.257 1.061.411 1.424.526.598.19 1.143.163 1.573.099.48-.072 1.477-.604 1.685-1.187.208-.583.208-1.083.146-1.187-.062-.104-.229-.166-.479-.291z"/>
+                </svg>
+                <!-- Indicador REC parpadeante -->
+                <span class="absolute w-2.5 h-2.5 rounded-full animate-ping" style="top: 6px; right: 6px; background-color: #f87171;"></span>
+                <span class="absolute w-2.5 h-2.5 rounded-full" style="top: 6px; right: 6px; background-color: #ef4444; border: 1px solid rgba(255,255,255,0.6);"></span>
+            </div>
+            <h1 class="header-title-sync text-2xl md:text-3xl font-bold uppercase tracking-wide title-gradient text-center">
+                ANALIZADOR FORENSE DE WHATSAPP
+            </h1>
+        </div>
+        <h2 class="header-subtitle-sync text-sm font-medium mt-1.5 tracking-wider uppercase text-center" style="color: rgba(147, 197, 253, 0.85);">
+            Creado por <a class="u-link font-bold text-blue-400 hover:text-blue-300 transition-colors" href="http://www.isaifijer.com.mx" target="_blank" rel="noopener noreferrer">Isaí Figueroa J.</a>
+        </h2>
+    </header>
+
+    <!-- CONTENEDOR PRINCIPAL -->
+    <div class="relative z-10 flex flex-col lg:flex-row w-full flex-1 gap-6 mt-6 max-w-[1700px] mx-auto">
+
+        <!-- PANEL IZQUIERDO: CONTROLES DE ESCANEO DE WHATSAPP -->
+        <aside class="w-full lg:w-1/3 xl:w-1/4 shrink-0">
+            <div class="glass-panel p-6 lg:sticky lg:top-6 flex flex-col gap-4">
+
+                <!-- Botón para subir o arrastrar archivo .TXT de WhatsApp -->
+                <div id="dropZone"
+                     ondragover="handleDragOver(event)"
+                     ondragleave="handleDragLeave(event)"
+                     ondrop="handleDropTxtFile(event)"
+                     onclick="document.getElementById('whatsappFileInput').click()"
+                     class="cursor-pointer bg-slate-900/60 border-2 border-dashed border-emerald-500/50 hover:border-emerald-400 rounded-xl p-5 transition-all group text-center select-none">
+                    <div class="flex flex-col items-center justify-center gap-2.5">
+                        <div class="w-14 h-14 rounded-2xl bg-gradient-whatsapp text-white flex items-center justify-center group-hover:scale-105 transition-transform">
+                            <svg class="w-7 h-7 text-white" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12.031 2c-5.506 0-9.989 4.478-9.99 9.984a9.964 9.964 0 0 0 1.333 4.993L2 22l5.233-1.237a9.994 9.994 0 0 0 4.779 1.217h.004c5.505 0 9.988-4.478 9.989-9.984 0-2.669-1.037-5.176-2.922-7.062A9.935 9.935 0 0 0 12.031 2zm0 18.295h-.003a8.29 8.29 0 0 1-4.228-1.157l-.303-.18-3.146.744.764-3.068-.197-.314a8.277 8.277 0 0 1-1.27-4.426c.002-4.578 3.726-8.303 8.307-8.303 2.218 0 4.303.865 5.871 2.434a8.25 8.25 0 0 1 2.43 5.873c-.002 4.58-3.726 8.305-8.305 8.305zm4.555-6.218c-.25-.125-1.477-.729-1.706-.812-.229-.083-.395-.125-.562.125-.166.25-.645.812-.791.979-.146.166-.291.187-.541.062-.25-.125-1.055-.389-2.01-1.24-.743-.662-1.244-1.481-1.39-1.731-.146-.25-.015-.385.11-.51.112-.112.25-.291.375-.437.125-.146.166-.25.25-.416.083-.166.042-.312-.021-.437-.062-.125-.562-1.354-.77-1.854-.203-.486-.409-.42-.562-.428l-.479-.008c-.166 0-.437.062-.666.312-.229.25-.874.854-.874 2.083s.895 2.416 1.02 2.583c.125.166 1.761 2.689 4.267 3.77.596.257 1.061.411 1.424.526.598.19 1.143.163 1.573.099.48-.072 1.477-.604 1.685-1.187.208-.583.208-1.083.146-1.187-.062-.104-.229-.166-.479-.291z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <span class="block font-bold text-white text-sm sm:text-base tracking-wide">
+                                Selecciona/Arrastra archivo .TXT de WhatsApp
+                            </span>
+                            <span class="block text-xs text-slate-300 mt-1 leading-relaxed">
+                                Carga la exportación de chat (.txt) o pega abajo el texto marcado
+                            </span>
+                        </div>
+                        <input type="file" id="whatsappFileInput" accept=".txt,text/plain" onchange="handleWhatsappFileSelect(event)" onclick="event.stopPropagation()" class="hidden">
+                    </div>
+                </div>
+
+                <!-- Área para pegar directamente el texto marcado de la conversación -->
+                <div class="flex flex-col gap-2 bg-slate-900/70 border border-slate-700/80 rounded-xl p-3.5">
+                    <div class="flex items-center justify-between">
+                        <label for="whatsappRawInput" class="text-xs font-bold uppercase tracking-wider text-cyan-300 flex items-center gap-1.5">
+                            <svg class="svg-icon text-cyan-400" viewBox="0 0 24 24">
+                                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+                                <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
+                            </svg>
+                            Pegar Conversación en Texto
+                        </label>
+                        <div class="flex items-center gap-1.5">
+                            <button type="button" onclick="clearChatInput()" class="text-[11px] bg-slate-800 hover:bg-rose-950/70 text-slate-300 hover:text-rose-300 border border-slate-700 px-2 py-0.5 rounded transition">
+                                Limpiar
+                            </button>
+                        </div>
+                    </div>
+                    <textarea id="whatsappRawInput"
+                              rows="6"
+                              oninput="processWhatsappText(this.value, 'Texto pegado manualmente')"
+                              placeholder="Pega aquí la conversación de Whatsapp."
+                              class="w-full bg-slate-950/90 border border-slate-700 focus:border-cyan-400 rounded-lg p-2.5 text-xs font-mono text-slate-200 outline-none transition resize-y"></textarea>
+                </div>
+
+                <!-- Lector de Porcentaje y Contador de Progreso en Tiempo Real -->
+                <div id="scanProgressContainer" class="hidden bg-slate-900/85 border border-cyan-500/40 rounded-xl p-4 flex-col gap-2.5 shadow-lg">
+                    <div class="flex items-center justify-between gap-2">
+                        <span class="text-xs font-bold uppercase tracking-wider text-cyan-300 flex items-center gap-2 truncate">
+                            <span id="scanSpinnerIcon" class="shrink-0 flex items-center text-emerald-400">
+                                <svg class="svg-icon" viewBox="0 0 24 24">
+                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                                    <polyline points="22 4 12 14.01 9 11.01"/>
+                                </svg>
+                            </span>
+                            <span id="scanStatusLabel" class="truncate">Analizando conversación...</span>
+                        </span>
+                        <span id="scanPercentText" class="font-cyber font-bold text-xl text-emerald-400 shrink-0">0%</span>
+                    </div>
+                    <div class="w-full bg-slate-800 rounded-full h-2.5 overflow-hidden border border-slate-700">
+                        <div id="scanProgressBar" class="bg-gradient-progress h-full rounded-full transition-all" style="width: 0%"></div>
+                    </div>
+                    <div class="flex justify-between items-center text-[11px] font-mono text-slate-300">
+                        <span id="scanCounterDetail">0 mensajes analizados</span>
+                        <span id="scanVisibleDetail" class="text-cyan-300">0 adjuntos</span>
+                    </div>
+                </div>
+
+                <!-- Opciones de visualización para el dictamen -->
+                <div class="flex flex-col gap-2">
+                    <div class="bg-slate-900/50 border border-slate-700/70 rounded-lg px-3.5 py-2 flex items-center justify-between">
+                        <label for="showByParticipantToggle" class="text-xs text-slate-200 font-medium cursor-pointer select-none">
+                            Incluir conteo por participante
+                        </label>
+                        <input type="checkbox" id="showByParticipantToggle" checked onchange="reRenderWhatsappReport()" class="w-4 h-4 accent-cyan-500 rounded cursor-pointer">
+                    </div>
+                </div>
+
+                <!-- Panel de Estadísticas y Botones de Exportación -->
+                <div id="statsPanel" class="hidden flex-col gap-4 pt-2 border-t border-slate-700/70">
+                    
+                    <div class="grid grid-cols-3 gap-2">
+                        <div class="bg-slate-900/90 border border-slate-700/80 rounded-lg p-2.5 text-center">
+                            <span class="block text-[10px] uppercase tracking-wider text-slate-400">Mensajes</span>
+                            <span id="totalMsgCount" class="font-mono font-bold text-cyan-400 text-base">0</span>
+                        </div>
+                        <div class="bg-slate-900/90 border border-slate-700/80 rounded-lg p-2.5 text-center">
+                            <span class="block text-[10px] uppercase tracking-wider text-slate-400">Adjuntos</span>
+                            <span id="fileCount" class="font-mono font-bold text-emerald-400 text-base">0</span>
+                        </div>
+                        <div class="bg-slate-900/90 border border-slate-700/80 rounded-lg p-2.5 text-center">
+                            <span class="block text-[10px] uppercase tracking-wider text-slate-400">Textos</span>
+                            <span id="textMsgCount" class="font-mono font-bold text-amber-400 text-base">0</span>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col gap-3">
+                        <!-- Copiar directamente con formato para pegar en Word -->
+                        <button type="button" onclick="copyToClipboard()" class="w-full py-3.5 px-4 bg-slate-800 hover:bg-slate-700 border border-cyan-500/40 text-white text-sm font-bold rounded-lg shadow-lg transition flex justify-center items-center gap-2 uppercase tracking-wider">
+                            <svg class="svg-icon text-cyan-400" viewBox="0 0 24 24">
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                            </svg>
+                            Copiar con Viñetas para Word
+                        </button>
+
+                        <!-- Descargar archivo Word (.doc) -->
+                        <button type="button" onclick="exportToWord()" class="w-full py-3.5 px-4 btn-action-word text-white text-sm font-bold rounded-lg flex justify-center items-center gap-2 uppercase tracking-wider">
+                            <svg class="svg-icon text-white" viewBox="0 0 24 24">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                <polyline points="14 2 14 8 20 8"/>
+                                <path d="M9 13l1.5 5 1.5-5 1.5 5 1.5-5"/>
+                            </svg>
+                            Descargar en Word (.doc)
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </aside>
+
+        <!-- PANEL DERECHO: VISTA PREVIA EN HOJA BLANCA EXPANDIBLE -->
+        <main class="w-full lg:w-2/3 xl:w-3/4 flex-1">
+            <div class="word-sheet">
+                <div class="border-b border-slate-200 pb-3 mb-6 flex flex-wrap justify-between items-center gap-2">
+                    <span class="text-xs font-bold text-slate-500 uppercase tracking-widest">
+                        Vista Previa de Análisis Forense de Conversación
+                    </span>
+                    <span id="unitBadge" class="text-xs bg-slate-100 text-slate-700 border border-slate-200 px-2.5 py-1 rounded font-mono font-semibold">
+                        Sin conversación cargada
+                    </span>
+                </div>
+
+                <!-- Contenido dinámico de viñetas -->
+                <div id="previewContent" class="doc-list-container">
+                    <div class="text-center text-slate-400 py-28 italic flex flex-col items-center gap-3">
+                        <svg class="w-14 h-14 text-slate-300" style="color: #cbd5e1;" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12.031 2c-5.506 0-9.989 4.478-9.99 9.984a9.964 9.964 0 0 0 1.333 4.993L2 22l5.233-1.237a9.994 9.994 0 0 0 4.779 1.217h.004c5.505 0 9.988-4.478 9.989-9.984 0-2.669-1.037-5.176-2.922-7.062A9.935 9.935 0 0 0 12.031 2zm0 18.295h-.003a8.29 8.29 0 0 1-4.228-1.157l-.303-.18-3.146.744.764-3.068-.197-.314a8.277 8.277 0 0 1-1.27-4.426c.002-4.578 3.726-8.303 8.307-8.303 2.218 0 4.303.865 5.871 2.434a8.25 8.25 0 0 1 2.43 5.873c-.002 4.58-3.726 8.305-8.305 8.305zm4.555-6.218c-.25-.125-1.477-.729-1.706-.812-.229-.083-.395-.125-.562.125-.166.25-.645.812-.791.979-.146.166-.291.187-.541.062-.25-.125-1.055-.389-2.01-1.24-.743-.662-1.244-1.481-1.39-1.731-.146-.25-.015-.385.11-.51.112-.112.25-.291.375-.437.125-.146.166-.25.25-.416.083-.166.042-.312-.021-.437-.062-.125-.562-1.354-.77-1.854-.203-.486-.409-.42-.562-.428l-.479-.008c-.166 0-.437.062-.666.312-.229.25-.874.854-.874 2.083s.895 2.416 1.02 2.583c.125.166 1.761 2.689 4.267 3.77.596.257 1.061.411 1.424.526.598.19 1.143.163 1.573.099.48-.072 1.477-.604 1.685-1.187.208-.583.208-1.083.146-1.187-.062-.104-.229-.166-.479-.291z"/>
+                        </svg>
+                        <span>Selecciona un archivo .TXT o pega el texto de la conversación de WhatsApp para generar el desglose pericial...</span>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+    </div>
+
+    <!-- Notificación Toast -->
+    <div id="toast" class="fixed bottom-6 right-6 bg-slate-900 border border-cyan-500/50 text-white px-5 py-3 rounded-xl shadow-2xl transition-opacity opacity-0 pointer-events-none z-50 flex items-center gap-3">
+        <svg class="svg-icon text-cyan-400" viewBox="0 0 24 24">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+            <polyline points="22 4 12 14.01 9 11.01"/>
+        </svg>
+        <span id="toastMsg" class="text-sm font-medium"></span>
+    </div>
+
+    <script>
+        // =========================================================
+        // 1. FONDO DE PARTÍCULAS INTERACTIVO (Mismo de index.html)
+        // =========================================================
+        const canvas = document.getElementById('network-canvas');
+        const ctx = canvas.getContext('2d');
+        let particlesArray = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor(x, y, directionX, directionY, size, color) {
+                this.x = x;
+                this.y = y;
+                this.directionX = directionX;
+                this.directionY = directionY;
+                this.size = size;
+                this.color = color;
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+            }
+            update() {
+                if (this.x > canvas.width || this.x < 0) this.directionX = -this.directionX;
+                if (this.y > canvas.height || this.y < 0) this.directionY = -this.directionY;
+                this.x += this.directionX;
+                this.y += this.directionY;
+                this.draw();
+            }
+        }
+
+        function initParticles() {
+            particlesArray = [];
+            let numberOfParticles = (canvas.height * canvas.width) / 18000;
+            for (let i = 0; i < numberOfParticles; i++) {
+                let size = (Math.random() * 2) + 1;
+                let x = (Math.random() * ((canvas.width - size * 2) - (size * 2)) + size * 2);
+                let y = (Math.random() * ((canvas.height - size * 2) - (size * 2)) + size * 2);
+                let directionX = (Math.random() * 1) - 0.5;
+                let directionY = (Math.random() * 1) - 0.5;
+
+                let colors = ['#5dff00', '#bc13fe', '#00f3ff', '#3b82f6'];
+                let color = colors[Math.floor(Math.random() * colors.length)];
+
+                particlesArray.push(new Particle(x, y, directionX, directionY, size, color));
+            }
+        }
+
+        function connectParticles() {
+            for (let a = 0; a < particlesArray.length; a++) {
+                for (let b = a; b < particlesArray.length; b++) {
+                    let distance = ((particlesArray[a].x - particlesArray[b].x) * (particlesArray[a].x - particlesArray[b].x)) +
+                                   ((particlesArray[a].y - particlesArray[b].y) * (particlesArray[a].y - particlesArray[b].y));
+
+                    if (distance < (canvas.width / 10) * (canvas.height / 10)) {
+                        let opacityValue = 1 - (distance / 20000);
+                        ctx.strokeStyle = 'rgba(93, 255, 0,' + (opacityValue * 0.3) + ')';
+                        ctx.lineWidth = 1;
+                        ctx.beginPath();
+                        ctx.moveTo(particlesArray[a].x, particlesArray[a].y);
+                        ctx.lineTo(particlesArray[b].x, particlesArray[b].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+
+        function animateParticles() {
+            requestAnimationFrame(animateParticles);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particlesArray.length; i++) {
+                particlesArray[i].update();
+            }
+            connectParticles();
+        }
+
+        initParticles();
+        animateParticles();
+
+        // =========================================================
+        // 2. CONVERSOR DE NÚMEROS A LETRAS Y CLASIFICADOR FORENSE
+        // =========================================================
+        function numToWords(n) {
+            n = parseInt(n, 10);
+            if (isNaN(n) || n < 0) return "cero";
+            if (n === 0) return "cero";
+
+            function unidades(num) {
+                switch (num) {
+                    case 1: return "un";
+                    case 2: return "dos";
+                    case 3: return "tres";
+                    case 4: return "cuatro";
+                    case 5: return "cinco";
+                    case 6: return "seis";
+                    case 7: return "siete";
+                    case 8: return "ocho";
+                    case 9: return "nueve";
+                    default: return "";
+                }
+            }
+
+            function decenas(num) {
+                const decena = Math.floor(num / 10);
+                const unidad = num % 10;
+                switch (decena) {
+                    case 1:
+                        switch (unidad) {
+                            case 0: return "diez";
+                            case 1: return "once";
+                            case 2: return "doce";
+                            case 3: return "trece";
+                            case 4: return "catorce";
+                            case 5: return "quince";
+                            case 6: return "dieciséis";
+                            default: return "dieci" + unidades(unidad);
+                        }
+                    case 2:
+                        if (unidad === 0) return "veinte";
+                        if (unidad === 1) return "veintiún";
+                        if (unidad === 2) return "veintidós";
+                        if (unidad === 3) return "veintitrés";
+                        if (unidad === 6) return "veintiséis";
+                        return "veinti" + unidades(unidad);
+                    case 3: return unidad === 0 ? "treinta" : "treinta y " + unidades(unidad);
+                    case 4: return unidad === 0 ? "cuarenta" : "cuarenta y " + unidades(unidad);
+                    case 5: return unidad === 0 ? "cincuenta" : "cincuenta y " + unidades(unidad);
+                    case 6: return unidad === 0 ? "sesenta" : "sesenta y " + unidades(unidad);
+                    case 7: return unidad === 0 ? "setenta" : "setenta y " + unidades(unidad);
+                    case 8: return unidad === 0 ? "ochenta" : "ochenta y " + unidades(unidad);
+                    case 9: return unidad === 0 ? "noventa" : "noventa y " + unidades(unidad);
+                    case 0: return unidades(unidad);
+                    default: return "";
+                }
+            }
+
+            function centenas(num) {
+                const centena = Math.floor(num / 100);
+                const resto = num % 100;
+                let prefijo = "";
+                switch (centena) {
+                    case 1:
+                        if (resto === 0) return "cien";
+                        prefijo = "ciento";
+                        break;
+                    case 2: prefijo = "doscientos"; break;
+                    case 3: prefijo = "trescientos"; break;
+                    case 4: prefijo = "cuatrocientos"; break;
+                    case 5: prefijo = "quinientos"; break;
+                    case 6: prefijo = "seiscientos"; break;
+                    case 7: prefijo = "setecientos"; break;
+                    case 8: prefijo = "ochocientos"; break;
+                    case 9: prefijo = "novecientos"; break;
+                    case 0: return decenas(resto);
+                }
+                return resto === 0 ? prefijo : prefijo + " " + decenas(resto);
+            }
+
+            function miles(num) {
+                const mil = Math.floor(num / 1000);
+                const resto = num % 1000;
+                let strMil = "";
+                if (mil === 1) {
+                    strMil = "mil";
+                } else if (mil > 1) {
+                    strMil = centenas(mil) + " mil";
+                }
+                const strResto = resto > 0 ? centenas(resto) : "";
+                return (strMil + " " + strResto).trim();
+            }
+
+            function millones(num) {
+                const millon = Math.floor(num / 1000000);
+                const resto = num % 1000000;
+                let strMillon = "";
+                if (millon === 1) {
+                    strMillon = "un millón";
+                } else if (millon > 1) {
+                    strMillon = miles(millon) + " millones";
+                }
+                const strResto = resto > 0 ? miles(resto) : "";
+                return (strMillon + " " + strResto).trim();
+            }
+
+            return millones(n);
+        }
+
+        function capitalizeFirstLetter(str) {
+            if (!str) return "";
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+
+        function getFileTypeString(ext) {
+            const types = {
+                // Video
+                'MP4': 'de video', 'AVI': 'de video', 'MOV': 'de video', 'MKV': 'de video',
+                'WMV': 'de video', 'FLV': 'de video', '3GP': 'de video', 'DAV': 'de video', 'TS': 'de video',
+                // Imagen / Stickers
+                'JPG': 'de imagen', 'JPEG': 'de imagen', 'PNG': 'de imagen', 'WEBP': 'de imagen (sticker)',
+                'GIF': 'de imagen', 'BMP': 'de imagen', 'PIC': 'de imagen', 'HEIC': 'de imagen', 'TIFF': 'de imagen',
+                // Audio / Notas de voz de WhatsApp
+                'MP3': 'de audio', 'WAV': 'de audio', 'OGG': 'de audio', 'OPUS': 'de audio (nota de voz)',
+                'M4A': 'de audio', 'AAC': 'de audio', 'WMA': 'de audio', 'AMR': 'de audio',
+                // Texto / Documentos
+                'TXT': 'de texto', 'LOG': 'de texto',
+                'PDF': 'de documento', 'DOC': 'de documento', 'DOCX': 'de documento', 'RTF': 'de documento',
+                'XLS': 'de hoja de cálculo', 'XLSX': 'de hoja de cálculo', 'CSV': 'de datos',
+                'PPT': 'de presentación', 'PPTX': 'de presentación',
+                // Contactos / Comprimidos / Sistema
+                'VCF': 'de contacto',
+                'ZIP': 'comprimido', 'RAR': 'comprimido', '7Z': 'comprimido', 'TAR': 'comprimido', 'GZ': 'comprimido',
+                'BIN': 'de sistema', 'DAT': 'de datos', 'DB': 'de base de datos', 'SQL': 'de base de datos',
+                'HTML': 'web', 'HTM': 'web', 'XML': 'de datos', 'JSON': 'de datos', 'EXE': 'ejecutable'
+            };
+            return types[ext] || '';
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toastMsg');
+            toastMsg.innerText = msg;
+            toast.classList.remove('opacity-0');
+            toast.classList.add('opacity-100');
+            setTimeout(() => {
+                toast.classList.remove('opacity-100');
+                toast.classList.add('opacity-0');
+            }, 3200);
+        }
+
+        // =========================================================
+        // 3. ANALIZADOR FORENSE DE CONVERSACIONES DE WHATSAPP
+        // =========================================================
+        let currentWhatsappData = null;
+        let currentSourceName = "Conversacion_WhatsApp";
+
+        function sortAlpha(keysArray) {
+            return keysArray.sort((a, b) => a.localeCompare(b, 'es', { numeric: true, sensitivity: 'base' }));
+        }
+
+        function escapeHTML(str) {
+            if (!str) return '';
+            return str
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        // Manejo de Drag & Drop y selección de archivo .txt
+        function handleDragOver(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            document.getElementById('dropZone').classList.add('border-emerald-400', 'bg-slate-800/70');
+        }
+
+        function handleDragLeave(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            document.getElementById('dropZone').classList.remove('border-emerald-400', 'bg-slate-800/70');
+        }
+
+        function handleDropTxtFile(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            document.getElementById('dropZone').classList.remove('border-emerald-400', 'bg-slate-800/70');
+
+            const files = event.dataTransfer ? event.dataTransfer.files : null;
+            if (!files || files.length === 0) return;
+            readWhatsappFile(files[0]);
+        }
+
+        function handleWhatsappFileSelect(event) {
+            const files = event.target.files;
+            if (!files || files.length === 0) return;
+            readWhatsappFile(files[0]);
+        }
+
+        function readWhatsappFile(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const text = e.target.result || '';
+                document.getElementById('whatsappRawInput').value = text;
+                processWhatsappText(text, file.name.replace(/\.[^.]+$/, ''));
+            };
+            reader.readAsText(file, 'UTF-8');
+        }
+
+        function clearChatInput() {
+            document.getElementById('whatsappRawInput').value = '';
+            document.getElementById('whatsappFileInput').value = '';
+            currentWhatsappData = null;
+            document.getElementById('statsPanel').classList.add('hidden');
+            document.getElementById('scanProgressContainer').classList.add('hidden');
+            document.getElementById('unitBadge').innerText = 'Sin conversación cargada';
+            document.getElementById('previewContent').innerHTML = `
+                <div class="text-center text-slate-400 py-28 italic flex flex-col items-center gap-3">
+                    <svg class="w-14 h-14" style="color: #cbd5e1;" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12.031 2c-5.506 0-9.989 4.478-9.99 9.984a9.964 9.964 0 0 0 1.333 4.993L2 22l5.233-1.237a9.994 9.994 0 0 0 4.779 1.217h.004c5.505 0 9.988-4.478 9.989-9.984 0-2.669-1.037-5.176-2.922-7.062A9.935 9.935 0 0 0 12.031 2zm0 18.295h-.003a8.29 8.29 0 0 1-4.228-1.157l-.303-.18-3.146.744.764-3.068-.197-.314a8.277 8.277 0 0 1-1.27-4.426c.002-4.578 3.726-8.303 8.307-8.303 2.218 0 4.303.865 5.871 2.434a8.25 8.25 0 0 1 2.43 5.873c-.002 4.58-3.726 8.305-8.305 8.305zm4.555-6.218c-.25-.125-1.477-.729-1.706-.812-.229-.083-.395-.125-.562.125-.166.25-.645.812-.791.979-.146.166-.291.187-.541.062-.25-.125-1.055-.389-2.01-1.24-.743-.662-1.244-1.481-1.39-1.731-.146-.25-.015-.385.11-.51.112-.112.25-.291.375-.437.125-.146.166-.25.25-.416.083-.166.042-.312-.021-.437-.062-.125-.562-1.354-.77-1.854-.203-.486-.409-.42-.562-.428l-.479-.008c-.166 0-.437.062-.666.312-.229.25-.874.854-.874 2.083s.895 2.416 1.02 2.583c.125.166 1.761 2.689 4.267 3.77.596.257 1.061.411 1.424.526.598.19 1.143.163 1.573.099.48-.072 1.477-.604 1.685-1.187.208-.583.208-1.083.146-1.187-.062-.104-.229-.166-.479-.291z"/>
+                    </svg>
+                    <span>Selecciona un archivo .TXT o pega el texto de la conversación de WhatsApp para generar el desglose pericial...</span>
+                </div>
+            `;
+        }
+
+        // Conjunto de extensiones válidas para detección forense exhaustiva
+        const VALID_FORENSIC_EXTENSIONS = new Set([
+            // Imagen / Stickers
+            'JPG', 'JPEG', 'PNG', 'WEBP', 'GIF', 'BMP', 'PIC', 'HEIC', 'HEIF', 'TIFF', 'TIF', 'SVG', 'RAW',
+            // Video
+            'MP4', 'AVI', 'MOV', 'MKV', 'WMV', 'FLV', '3GP', 'WEBM', 'M4V', 'DAV', 'TS', 'MPEG', 'MPG',
+            // Audio / Notas de voz
+            'OPUS', 'MP3', 'WAV', 'OGG', 'OGA', 'M4A', 'AAC', 'WMA', 'AMR', 'FLAC',
+            // Documentos / Texto / Hojas de cálculo
+            'PDF', 'DOC', 'DOCX', 'XLS', 'XLSX', 'PPT', 'PPTX', 'TXT', 'RTF', 'CSV', 'LOG', 'ODT', 'ODS', 'XML', 'JSON', 'HTML', 'HTM',
+            // Contactos / Comprimidos / Otros
+            'VCF', 'ZIP', 'RAR', '7Z', 'TAR', 'GZ', 'APK', 'EXE', 'BIN', 'DAT', 'DB', 'SQL'
+        ]);
+
+        // Limpia caracteres invisibles de control bidireccional que WhatsApp inserta en Android/iOS
+        function cleanInvisibleChars(str) {
+            if (!str) return '';
+            return str
+                .replace(/[\u200B-\u200F\u202A-\u202E\u2060-\u206F\uFEFF]/g, '')
+                .replace(/\u00A0/g, ' ');
+        }
+
+        // Extrae TODOS los archivos adjuntos presentes en un mensaje (incluso si tienen pie de foto en líneas siguientes)
+        function extractAttachmentsFromMessage(bodyText) {
+            if (!bodyText) return [];
+            const cleanBody = cleanInvisibleChars(bodyText);
+            const lines = cleanBody.split('\n');
+            const foundAttachments = [];
+
+            for (let rawLine of lines) {
+                const line = rawLine.trim();
+                if (!line) continue;
+
+                let matchedInLine = false;
+
+                // Caso 1: Formato con indicador "(archivo adjunto)" o "(file attached)" en cualquier parte de la línea
+                const attachMarkerRegex = /([^\r\n<>:"/\\|?*]+?\.([a-zA-Z0-9]{2,5}))\s*\((?:archivo\s+adjunto|file\s+attached|adjunto)\)/gi;
+                let m;
+                while ((m = attachMarkerRegex.exec(line)) !== null) {
+                    const ext = m[2].toUpperCase();
+                    if (VALID_FORENSIC_EXTENSIONS.has(ext)) {
+                        foundAttachments.push({
+                            fileName: m[1].trim(),
+                            ext: ext
+                        });
+                        matchedInLine = true;
+                    }
+                }
+                if (matchedInLine) continue;
+
+                // Caso 2: Formato iOS "<adjunto: nombre.jpg>" o "<attached: nombre.jpg>"
+                const iosRegex = /<(?:adjunto|attached|archivo\s+adjunto):\s*([^>]+?\.([a-zA-Z0-9]{2,5}))\s*>/gi;
+                while ((m = iosRegex.exec(line)) !== null) {
+                    const ext = m[2].toUpperCase();
+                    if (VALID_FORENSIC_EXTENSIONS.has(ext)) {
+                        foundAttachments.push({
+                            fileName: m[1].trim(),
+                            ext: ext
+                        });
+                        matchedInLine = true;
+                    }
+                }
+                if (matchedInLine) continue;
+
+                // Caso 3: Nombres de archivo estándar de WhatsApp (IMG-, VID-, PTT-, AUD-, STK-, DOC-, PHOTO-, VIDEO-, AUDIO-)
+                const waPrefixRegex = /\b((?:IMG|VID|PTT|AUD|STK|DOC|PHOTO|VIDEO|AUDIO)[-_][^\s<>:"/\\|?*()]+\.([a-zA-Z0-9]{2,5}))\b/gi;
+                while ((m = waPrefixRegex.exec(line)) !== null) {
+                    const ext = m[2].toUpperCase();
+                    if (VALID_FORENSIC_EXTENSIONS.has(ext)) {
+                        foundAttachments.push({
+                            fileName: m[1].trim(),
+                            ext: ext
+                        });
+                        matchedInLine = true;
+                    }
+                }
+                if (matchedInLine) continue;
+
+                // Caso 4: La línea es directamente un nombre de archivo con extensión conocida (ej. " Captura_1.jpg" o "estado_cuenta.pdf")
+                const standaloneFileMatch = line.match(/^([\w\-. ()[\]\u00C0-\u017F]+?\.([a-zA-Z0-9]{2,5}))(?:\s*\((?:archivo\s+adjunto|file\s+attached|adjunto)\))?$/i);
+                if (standaloneFileMatch) {
+                    const candidateName = standaloneFileMatch[1].trim();
+                    const ext = standaloneFileMatch[2].toUpperCase();
+                    if (VALID_FORENSIC_EXTENSIONS.has(ext) && !/^https?:\/\//i.test(candidateName)) {
+                        foundAttachments.push({
+                            fileName: candidateName,
+                            ext: ext
+                        });
+                        matchedInLine = true;
+                    }
+                }
+            }
+
+            return foundAttachments;
+        }
+
+        // Verifica si una línea sin archivos adjuntos es texto real (o pie de foto) y no solo el nombre del archivo
+        function hasAdditionalTextCaption(bodyText, attachments) {
+            if (!bodyText) return false;
+            if (!attachments || attachments.length === 0) return true;
+
+            let remaining = cleanInvisibleChars(bodyText);
+            // Remover patrones de adjuntos para ver si además había un mensaje/pie de foto adicional
+            remaining = remaining
+                .replace(/<(?:adjunto|attached|archivo\s+adjunto):\s*[^>]+>/gi, '')
+                .replace(/[^\r\n<>:"/\\|?*]+?\.[a-zA-Z0-9]{2,5}\s*\((?:archivo\s+adjunto|file\s+attached|adjunto)\)/gi, '');
+
+            for (const att of attachments) {
+                const escapedName = att.fileName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                remaining = remaining.replace(new RegExp(escapedName, 'gi'), '');
+            }
+
+            return remaining.trim().length > 0;
+        }
+
+        // Parser principal de conversación de WhatsApp (soporta iOS, Android, saltos de línea y fotos con pie de texto)
+        function parseWhatsappConversation(rawText) {
+            const cleanedText = cleanInvisibleChars(rawText).replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+            const lines = cleanedText.split('\n');
+            const messages = [];
+
+            // Regex flexible para encabezados de WhatsApp (Android y iOS, 12h/24h, con o sin segundos, a.m./p.m.)
+            const msgHeaderRegex = /^\[?(\d{1,2}[\/.-]\d{1,2}[\/.-]\d{2,4}),?\s+(\d{1,2}:\d{2}(?::\d{2})?(?:\s*[ap]\.?\s*m\.?|\s*[AP]M)?)\]?(?:\s*[-–—]\s*|\s+)([^:]+?):\s*(.*)$/i;
+
+            let currentMsg = null;
+
+            for (let i = 0; i < lines.length; i++) {
+                const rawLine = lines[i];
+                const trimmedLine = rawLine.trim();
+
+                if (!trimmedLine) continue;
+
+                const match = trimmedLine.match(msgHeaderRegex);
+                if (match) {
+                    if (currentMsg) {
+                        finalizeMessageObject(currentMsg);
+                        messages.push(currentMsg);
+                    }
+                    currentMsg = {
+                        date: match[1].trim(),
+                        time: match[2].trim(),
+                        sender: match[3].trim(),
+                        body: match[4]
+                    };
+                } else if (currentMsg) {
+                    // Continuación de un mensaje multilínea o pie de foto debajo de un .jpg/.mp4/.pdf
+                    currentMsg.body += '\n' + trimmedLine;
+                } else {
+                    // Si pegan líneas sueltas de archivos sin encabezado de fecha
+                    currentMsg = {
+                        date: 'Sin fecha especificada',
+                        time: '--:--',
+                        sender: 'Participante',
+                        body: trimmedLine
+                    };
+                }
+            }
+
+            if (currentMsg) {
+                finalizeMessageObject(currentMsg);
+                messages.push(currentMsg);
+            }
+
+            // Construir estadísticas globales y por participante asegurando el conteo exacto de cada archivo
+            const globalExtensions = {};
+            const participants = {};
+            const datesMap = {};
+            let totalAttachments = 0;
+            let totalTextMessages = 0;
+            let totalOmittedMedia = 0;
+
+            for (const msg of messages) {
+                if (!participants[msg.sender]) {
+                    participants[msg.sender] = {
+                        name: msg.sender,
+                        totalMessages: 0,
+                        textMessages: 0,
+                        omittedMedia: 0,
+                        filesByExt: {},
+                        messagesList: []
+                    };
+                }
+                if (!datesMap[msg.date]) {
+                    datesMap[msg.date] = [];
+                }
+
+                const p = participants[msg.sender];
+                p.messagesList.push(msg);
+                datesMap[msg.date].push(msg);
+
+                if (msg.attachments && msg.attachments.length > 0) {
+                    for (const att of msg.attachments) {
+                        const ext = att.ext;
+                        globalExtensions[ext] = (globalExtensions[ext] || 0) + 1;
+                        p.filesByExt[ext] = (p.filesByExt[ext] || 0) + 1;
+                        totalAttachments++;
+                        p.totalMessages++;
+                    }
+                } else if (msg.isOmittedMedia) {
+                    totalOmittedMedia++;
+                    p.omittedMedia++;
+                    p.totalMessages++;
+                } else {
+                    totalTextMessages++;
+                    p.textMessages++;
+                    p.totalMessages++;
+                }
+            }
+
+            const totalEventsCount = totalAttachments + totalTextMessages + totalOmittedMedia;
+
+            return {
+                messages,
+                participants,
+                datesMap,
+                globalExtensions,
+                totalMessages: totalEventsCount,
+                totalAttachments,
+                totalTextMessages,
+                totalOmittedMedia
+            };
+        }
+
+        function finalizeMessageObject(msg) {
+            const cleanBody = cleanInvisibleChars(msg.body || '').trim();
+            msg.body = cleanBody;
+            const attachments = extractAttachmentsFromMessage(cleanBody);
+            if (attachments.length > 0) {
+                msg.attachments = attachments;
+                msg.attachment = attachments[0];
+                msg.hasCaption = hasAdditionalTextCaption(cleanBody, attachments);
+                msg.isOmittedMedia = false;
+            } else if (/^<?(?:multimedia\s+omitido|media\s+omitted|imagen\s+omitida|audio\s+omitido|video\s+omitido|sticker\s+omitido|documento\s+omitido)>?$/i.test(cleanBody)) {
+                msg.attachments = [];
+                msg.attachment = null;
+                msg.isOmittedMedia = true;
+            } else {
+                msg.attachments = [];
+                msg.attachment = null;
+                msg.isOmittedMedia = false;
+            }
+        }
+
+        function processWhatsappText(rawText, sourceLabel = 'Conversación WhatsApp') {
+            const trimmed = (rawText || '').trim();
+            if (!trimmed) {
+                clearChatInput();
+                return;
+            }
+
+            currentSourceName = sourceLabel;
+            const parsed = parseWhatsappConversation(trimmed);
+            currentWhatsappData = parsed;
+
+            // Actualizar barra de progreso e indicadores laterales
+            const progressContainer = document.getElementById('scanProgressContainer');
+            const progressBar = document.getElementById('scanProgressBar');
+            const percentText = document.getElementById('scanPercentText');
+            const counterDetail = document.getElementById('scanCounterDetail');
+            const visibleDetail = document.getElementById('scanVisibleDetail');
+            const statusLabel = document.getElementById('scanStatusLabel');
+            const spinnerIcon = document.getElementById('scanSpinnerIcon');
+            const statsPanel = document.getElementById('statsPanel');
+
+            progressContainer.classList.remove('hidden');
+            progressContainer.classList.add('flex');
+            statsPanel.classList.remove('hidden');
+            statsPanel.classList.add('flex');
+
+            progressBar.style.width = '100%';
+            percentText.innerText = '100%';
+            spinnerIcon.className = 'shrink-0 flex items-center text-emerald-400';
+            spinnerIcon.innerHTML = `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`;
+            statusLabel.innerText = 'ANÁLISIS COMPLETADO (100%)';
+            counterDetail.innerText = `${parsed.totalMessages.toLocaleString('es-MX')} mensajes leídos`;
+            visibleDetail.innerText = `${parsed.totalAttachments.toLocaleString('es-MX')} adjuntos | ${parsed.totalTextMessages.toLocaleString('es-MX')} textos`;
+
+            document.getElementById('totalMsgCount').innerText = parsed.totalMessages.toLocaleString('es-MX');
+            document.getElementById('fileCount').innerText = parsed.totalAttachments.toLocaleString('es-MX');
+            document.getElementById('textMsgCount').innerText = parsed.totalTextMessages.toLocaleString('es-MX');
+            document.getElementById('unitBadge').innerText = `Origen: ${sourceLabel}`;
+
+            reRenderWhatsappReport();
+        }
+
+        function renderFileItem(count, ext) {
+            const typeStr = getFileTypeString(ext);
+            const numLetters = capitalizeFirstLetter(numToWords(count));
+            const numDigits = count.toString().padStart(2, '0');
+            const word = count === 1 ? "archivo" : "archivos";
+            const typePhrase = typeStr ? ` ${typeStr}` : '';
+
+            return `<li>${numLetters} (${numDigits}) ${word}${typePhrase} en formato *.${ext}.</li>`;
+        }
+
+        function renderTextCountItem(count) {
+            const numLetters = capitalizeFirstLetter(numToWords(count));
+            const numDigits = count.toString().padStart(2, '0');
+            const word = count === 1 ? "mensaje" : "mensajes";
+            return `<li>${numLetters} (${numDigits}) ${word} de texto.</li>`;
+        }
+
+        function reRenderWhatsappReport() {
+            if (!currentWhatsappData || currentWhatsappData.totalMessages === 0) return;
+
+            const showByParticipant = document.getElementById('showByParticipantToggle').checked;
+
+            const data = currentWhatsappData;
+            const participantNames = sortAlpha(Object.keys(data.participants));
+            const sortedGlobalExts = sortAlpha(Object.keys(data.globalExtensions));
+
+            let html = '';
+
+            // 1. PARTE SUPERIOR: PERIODO, INTERLOCUTORES Y CONTEO TOTAL GLOBAL
+            const firstMsg = data.messages[0];
+            const lastMsg = data.messages[data.messages.length - 1];
+            const rangoFechas = (firstMsg.date === lastMsg.date)
+                ? `${firstMsg.date} (de las ${firstMsg.time} a las ${lastMsg.time})`
+                : `Del ${firstMsg.date} (${firstMsg.time}) al ${lastMsg.date} (${lastMsg.time})`;
+
+            const numPartLetters = capitalizeFirstLetter(numToWords(participantNames.length));
+            const numPartDigits = participantNames.length.toString().padStart(2, '0');
+
+            const totalAttachLetters = capitalizeFirstLetter(numToWords(data.totalAttachments));
+            const totalAttachDigits = data.totalAttachments.toString().padStart(2, '0');
+            const attachWord = data.totalAttachments === 1 ? 'archivo adjunto' : 'archivos adjuntos';
+
+            const totalMsgLetters = capitalizeFirstLetter(numToWords(data.totalMessages));
+            const totalMsgDigits = data.totalMessages.toString().padStart(2, '0');
+            const msgWord = data.totalMessages === 1 ? 'registro analizado' : 'registros analizados';
+
+            html += `<ul>`;
+            html += `<li><strong>Periodo de conversación analizado:</strong> ${escapeHTML(rangoFechas)}.</li>`;
+            html += `<li><strong>Interlocutores identificados (${numPartDigits}):</strong> ${numPartLetters} (${numPartDigits}) participantes: ${participantNames.map(n => `<strong>${escapeHTML(n)}</strong>`).join(', ')}.</li>`;
+            html += `<li><strong>Conteo total global de la conversación (por formato y tipo):</strong><ul>`;
+
+            for (const ext of sortedGlobalExts) {
+                html += renderFileItem(data.globalExtensions[ext], ext);
+            }
+            if (data.totalTextMessages > 0) {
+                html += renderTextCountItem(data.totalTextMessages);
+            }
+            if (data.totalOmittedMedia > 0) {
+                const omLetters = capitalizeFirstLetter(numToWords(data.totalOmittedMedia));
+                const omDigits = data.totalOmittedMedia.toString().padStart(2, '0');
+                html += `<li>${omLetters} (${omDigits}) elementos marcados como multimedia omitido.</li>`;
+            }
+
+            html += `<li><strong>Total de archivos multimedia adjuntos:</strong> ${totalAttachLetters} (${totalAttachDigits}) ${attachWord}.</li>`;
+            html += `<li><strong>Total general de eventos en la conversación:</strong> ${totalMsgLetters} (${totalMsgDigits}) ${msgWord}.</li>`;
+            html += `</ul></li>`;
+            html += `</ul>`;
+
+            // 2. RECUADRO AZUL RESALTADO: CONTEO POR PARTICIPANTE
+            if (showByParticipant) {
+                html += renderParticipantBreakdownBox(data, participantNames);
+            }
+
+            document.getElementById('previewContent').innerHTML = html;
+        }
+
+        function renderParticipantBreakdownBox(data, participantNames) {
+            let participantsHTML = '';
+
+            for (const pName of participantNames) {
+                const p = data.participants[pName];
+                const pExts = sortAlpha(Object.keys(p.filesByExt));
+                const totalPLetters = capitalizeFirstLetter(numToWords(p.totalMessages));
+                const totalPDigits = p.totalMessages.toString().padStart(2, '0');
+                const regWord = p.totalMessages === 1 ? 'registro' : 'registros';
+
+                participantsHTML += `<li><strong>Participante:</strong> ${escapeHTML(p.name)} <em>(${totalPLetters} [${totalPDigits}] ${regWord} en total)</em><ul>`;
+                for (const ext of pExts) {
+                    participantsHTML += renderFileItem(p.filesByExt[ext], ext);
+                }
+                if (p.textMessages > 0) {
+                    participantsHTML += renderTextCountItem(p.textMessages);
+                }
+                if (p.omittedMedia > 0) {
+                    const omLetters = capitalizeFirstLetter(numToWords(p.omittedMedia));
+                    const omDigits = p.omittedMedia.toString().padStart(2, '0');
+                    participantsHTML += `<li>${omLetters} (${omDigits}) archivos multimedia omitidos.</li>`;
+                }
+                participantsHTML += `</ul></li>`;
+            }
+
+            return `
+                <div style="margin-top: 28px; padding: 16px 22px; background-color: #f0f9ff; border: 2px solid #0284c7; border-left: 6px solid #0284c7; border-radius: 8px;">
+                    <p style="margin: 0 0 8px 0; font-weight: bold; color: #0369a1; text-transform: uppercase; font-size: 10.5pt; letter-spacing: 0.03em;">
+                        DESGLOSE DE CONTENIDO POR PARTICIPANTE:
+                    </p>
+                    <ul style="margin-top: 4px; margin-bottom: 4px;">
+                        ${participantsHTML}
+                    </ul>
+                </div>
+            `;
+        }
+
+        // =========================================================
+        // 4. COPIAR Y DESCARGAR EN WORD (.DOC)
+        // =========================================================
+        function copyToClipboard() {
+            const content = document.getElementById('previewContent');
+            if (!currentWhatsappData || currentWhatsappData.totalMessages === 0) {
+                showToast("Primero carga un archivo .TXT o pega una conversación de WhatsApp.");
+                return;
+            }
+
+            const selection = window.getSelection();
+            const range = document.createRange();
+            range.selectNodeContents(content);
+            selection.removeAllRanges();
+            selection.addRange(range);
+
+            try {
+                document.execCommand('copy');
+                showToast("¡Copiado con viñetas y negritas! Pégalo en tu Word (Ctrl + V).");
+            } catch (e) {
+                showToast("No se pudo copiar automáticamente.");
+            }
+
+            selection.removeAllRanges();
+        }
+
+        function exportToWord() {
+            if (!currentWhatsappData || currentWhatsappData.totalMessages === 0) {
+                showToast("Primero carga un archivo .TXT o pega una conversación de WhatsApp.");
+                return;
+            }
+
+            const htmlContent = document.getElementById('previewContent').innerHTML;
+
+            const wordDocument = `
+                <html xmlns:o="urn:schemas-microsoft-com:office:office"
+                      xmlns:w="urn:schemas-microsoft-com:office:word"
+                      xmlns="http://www.w3.org/TR/REC-html40">
+                <head>
+                    <meta charset="utf-8">
+                    <title>Análisis Forense de Conversación de WhatsApp</title>
+                    <style>
+                        body {
+                            font-family: 'Arial', sans-serif;
+                            font-size: 11pt;
+                            color: #000000;
+                        }
+                        ul {
+                            margin-top: 2pt;
+                            margin-bottom: 2pt;
+                            list-style-type: disc;
+                        }
+                        ul ul {
+                            list-style-type: circle;
+                        }
+                        ul ul ul {
+                            list-style-type: square;
+                        }
+                        li {
+                            margin-bottom: 3pt;
+                            line-height: 1.35;
+                        }
+                        strong {
+                            font-weight: bold;
+                        }
+                    </style>
+                </head>
+                <body>
+                    ${htmlContent}
+                </body>
+                </html>
+            `;
+
+            const blob = new Blob(['\ufeff', wordDocument], {
+                type: 'application/msword;charset=utf-8'
+            });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            const safeName = (currentSourceName || 'Conversacion_WhatsApp').replace(/[^a-zA-Z0-9_-]/g, '_');
+            a.download = `Dictamen_WhatsApp_${safeName}.doc`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            showToast("Descargando archivo de Word (.doc)");
+        }
+    </script>
+</body>
+</html>

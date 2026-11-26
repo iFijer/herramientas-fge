@@ -1,0 +1,2521 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Generador de Capturas y Sábanas de Indicios Forenses 100% Offline.">
+    <meta name="author" content="Isaí Figueroa J.">
+    <title>Generador de Capturas y Sábanas - Creado por Isaí Figueroa J.</title>
+    <link rel="icon" type="image/x-icon" href="https://isaifijer.com.mx/imagenes/favicon.ico">
+
+    <style>
+        /* =========================================================
+           ESTILOS BASE 100% OFFLINE (IDENTIDAD FORENSE FGE MORELOS)
+           ========================================================= */
+        *, ::before, ::after {
+            box-sizing: border-box;
+            border-width: 0;
+            border-style: solid;
+            border-color: #334155;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #050505;
+            color: #ffffff;
+            margin: 0;
+            padding: 2rem 1rem;
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        @media (min-width: 768px) {
+            body {
+                padding-left: 2rem;
+                padding-right: 2rem;
+            }
+        }
+
+        button, input, select {
+            font-family: inherit;
+            font-size: 100%;
+            margin: 0;
+            color: inherit;
+        }
+
+        button {
+            cursor: pointer;
+            background: none;
+        }
+
+        .hidden { display: none !important; }
+        .flex { display: flex; }
+        .flex-col { flex-direction: column; }
+        .flex-wrap { flex-wrap: wrap; }
+        .items-center { align-items: center; }
+        .justify-center { justify-content: center; }
+        .justify-between { justify-content: space-between; }
+        .relative { position: relative; }
+        .absolute { position: absolute; }
+        .w-full { width: 100%; }
+        .text-center { text-align: center; }
+        .uppercase { text-transform: uppercase; }
+        .font-mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+
+        /* Íconos SVG en línea (Reemplazo 100% offline de FontAwesome) */
+        .svg-icon {
+            display: inline-block;
+            width: 1.1em;
+            height: 1.1em;
+            vertical-align: -0.15em;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            flex-shrink: 0;
+        }
+
+        /* Fondo de Red Interactiva con tonos neón */
+        #network-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at center, #1e293b 0%, #020617 100%);
+            opacity: 0.65;
+            pointer-events: none;
+        }
+
+        /* Botón Inicio fijo superior izquierdo */
+        .btn-inicio {
+            position: fixed;
+            top: 1.25rem;
+            left: 1.25rem;
+            z-index: 40;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.55rem 1rem;
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(59, 130, 246, 0.4);
+            border-radius: 0.65rem;
+            color: #bfdbfe;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            text-decoration: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4), 0 0 12px rgba(59, 130, 246, 0.15);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .btn-inicio:hover {
+            background: rgba(37, 99, 235, 0.25);
+            border-color: #22d3ee;
+            color: #ffffff;
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.45);
+            transform: translateY(-1px);
+        }
+
+        /* Logo FGE Morelos fijo superior derecho */
+        .logo-fge {
+            position: fixed;
+            top: 0.9rem;
+            right: 1.25rem;
+            z-index: 40;
+            width: 5.75rem;
+            height: 5.75rem;
+            background: transparent;
+            filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.75));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.25s ease, filter 0.25s ease;
+            user-select: none;
+        }
+        .logo-fge:hover {
+            transform: scale(1.05);
+            filter: drop-shadow(0 0 14px rgba(148, 163, 184, 0.45));
+        }
+
+        @media (max-width: 639px) {
+            .btn-inicio {
+                top: 0.85rem;
+                left: 0.85rem;
+                padding: 0.45rem 0.75rem;
+                font-size: 0.72rem;
+            }
+            .logo-fge {
+                top: 0.65rem;
+                right: 0.75rem;
+                width: 4.1rem;
+                height: 4.1rem;
+            }
+        }
+
+        /* Contenedor Principal */
+        .main-wrapper {
+            flex-grow: 1;
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        /* Encabezado Central (Misma tipografía, tamaño y separación exacta) */
+        .forense-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .header-top-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+        }
+
+        .header-icon-box {
+            width: 4rem;
+            height: 4rem;
+            background: linear-gradient(135deg, #2563eb 0%, #3b82f6 50%, #06b6d4 100%);
+            box-shadow: 0 0 25px rgba(59, 130, 246, 0.65);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 1.15rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .header-icon-svg {
+            width: 2.25rem;
+            height: 2.25rem;
+            color: #ffffff;
+        }
+
+        .dot-ping {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            width: 0.625rem;
+            height: 0.625rem;
+            border-radius: 9999px;
+            background-color: #34d399;
+            animation: ping 1.2s cubic-bezier(0, 0, 0.2, 1) infinite;
+        }
+
+        .dot-solid {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            width: 0.625rem;
+            height: 0.625rem;
+            border-radius: 9999px;
+            background-color: #10b981;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+        }
+
+        @keyframes ping {
+            75%, 100% { transform: scale(2); opacity: 0; }
+        }
+
+        .forense-header h1 {
+            margin-top: 0.67em;
+            margin-bottom: 0.67em;
+            font-size: 1.5rem;
+            line-height: 2rem;
+            font-weight: 700;
+            letter-spacing: 0.025em;
+            text-transform: uppercase;
+            text-align: center;
+            background: linear-gradient(to right, #ffffff, #bfdbfe);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        @media (min-width: 768px) {
+            .forense-header h1 {
+                font-size: 1.875rem;
+                line-height: 2.25rem;
+            }
+        }
+
+        .forense-header h2 {
+            margin-top: 0.375rem;
+            margin-bottom: 0.83em;
+            font-size: 0.875rem;
+            line-height: 1.25rem;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            text-align: center;
+            color: rgba(147, 197, 253, 0.85);
+        }
+
+        .u-link {
+            font-weight: 700;
+            color: #60a5fa;
+            text-decoration: none;
+            transition: color 0.2s ease-in-out;
+        }
+        .u-link:hover {
+            color: #93c5fd;
+            text-decoration: underline;
+        }
+
+        /* Paneles Glassmorphism */
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.15), 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+        }
+
+        /* Distribución de Controles */
+        .controls-row {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        @media (min-width: 1024px) {
+            .controls-row {
+                flex-direction: row;
+            }
+        }
+
+        .upload-group {
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .upload-hint {
+            font-size: 0.75rem;
+            color: rgba(191, 219, 254, 0.75);
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            margin: 0;
+            text-align: center;
+        }
+
+        /* Botones Temáticos */
+        .btn-forense {
+            padding: 0.65rem 1.25rem;
+            border-radius: 0.5rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            font-size: 0.875rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            white-space: nowrap;
+        }
+
+        .btn-archivos {
+            border: 1px solid #3b82f6;
+            color: #93c5fd;
+            background-color: rgba(59, 130, 246, 0.15);
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.2);
+        }
+        .btn-archivos:hover {
+            background-color: rgba(59, 130, 246, 0.3);
+            color: #ffffff;
+            transform: translateY(-1px);
+        }
+
+        .btn-carpeta {
+            border: 1px solid #f59e0b;
+            color: #fcd34d;
+            background-color: rgba(245, 158, 11, 0.15);
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.2);
+        }
+        .btn-carpeta:hover {
+            background-color: rgba(245, 158, 11, 0.3);
+            color: #ffffff;
+            transform: translateY(-1px);
+        }
+
+        .btn-calcular {
+            background: linear-gradient(to right, #2563eb, #0891b2);
+            color: #ffffff;
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.4);
+            letter-spacing: 0.08em;
+        }
+        .btn-calcular:hover {
+            background: linear-gradient(to right, #3b82f6, #06b6d4);
+            box-shadow: 0 0 30px rgba(6, 182, 212, 0.6);
+            transform: translateY(-2px);
+        }
+
+        .btn-word {
+            border: 1px solid #10b981;
+            color: #6ee7b7;
+            background-color: rgba(16, 185, 129, 0.15);
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.2);
+            flex-grow: 1;
+        }
+        .btn-word:hover {
+            background-color: rgba(16, 185, 129, 0.3);
+            color: #ffffff;
+            transform: translateY(-1px);
+        }
+
+        .btn-limpiar {
+            background: rgba(239, 68, 68, 0.14);
+            border: 1px solid rgba(239, 68, 68, 0.45);
+            color: #fca5a5;
+            padding: 0.65rem 1rem;
+        }
+        .btn-limpiar:hover {
+            background: rgba(239, 68, 68, 0.28);
+            border-color: rgba(248, 113, 113, 0.8);
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.3);
+            color: #ffffff;
+        }
+
+        /* Bloque Slider */
+        .slider-box {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            max-width: 36rem;
+            width: 100%;
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid rgba(59, 130, 246, 0.35);
+        }
+
+        .slider-label {
+            font-size: 0.875rem;
+            color: #bfdbfe;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 0.75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .size-badge {
+            color: #67e8f9;
+            font-size: 0.75rem;
+            padding: 0.15rem 0.6rem;
+            border-radius: 0.25rem;
+            background: rgba(6, 182, 212, 0.15);
+            border: 1px solid rgba(34, 211, 238, 0.4);
+        }
+
+        .slider-track-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .custom-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        .custom-slider::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 6px;
+            cursor: pointer;
+            background: rgba(30, 41, 59, 0.9);
+            border-radius: 3px;
+            border: 1px solid rgba(59, 130, 246, 0.4);
+        }
+        .custom-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            background: #22d3ee;
+            border: 2px solid #0f172a;
+            cursor: pointer;
+            margin-top: -8px;
+            box-shadow: 0 0 12px rgba(34, 211, 238, 0.85);
+        }
+        .custom-slider::-moz-range-track {
+            width: 100%;
+            height: 6px;
+            cursor: pointer;
+            background: rgba(30, 41, 59, 0.9);
+            border-radius: 3px;
+            border: 1px solid rgba(59, 130, 246, 0.4);
+        }
+        .custom-slider::-moz-range-thumb {
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            background: #22d3ee;
+            border: 2px solid #0f172a;
+            cursor: pointer;
+            box-shadow: 0 0 12px rgba(34, 211, 238, 0.85);
+        }
+        .custom-slider:focus {
+            outline: none;
+        }
+
+        /* Bloque Acciones */
+        .actions-col {
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.65rem;
+            width: 100%;
+        }
+        @media (min-width: 640px) {
+            .actions-col {
+                width: auto;
+            }
+        }
+        .actions-subrow {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        /* Barra Inferior: Filtros Dinámicos y Lotes */
+        .filters-bar {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(51, 65, 85, 0.6);
+            width: 100%;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+        @media (min-width: 768px) {
+            .filters-bar {
+                flex-direction: row;
+                align-items: center;
+            }
+        }
+
+        .filters-box {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            padding: 0.65rem 0.75rem;
+            border-radius: 0.5rem;
+            flex-grow: 1;
+            width: 100%;
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid rgba(51, 65, 85, 0.7);
+            overflow-x: auto;
+        }
+        @media (min-width: 768px) {
+            .filters-box {
+                flex-direction: row;
+                align-items: center;
+                width: auto;
+            }
+        }
+
+        .filters-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #22d3ee;
+            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .filters-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .filters-placeholder {
+            font-size: 0.75rem;
+            color: #9ca3af;
+            font-style: italic;
+        }
+
+        .filter-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #bfdbfe;
+            cursor: pointer;
+            background: rgba(15, 23, 42, 0.95);
+            padding: 0.3rem 0.65rem;
+            border-radius: 0.35rem;
+            border: 1px solid rgba(59, 130, 246, 0.4);
+            transition: all 0.2s;
+            user-select: none;
+        }
+        .filter-chip:hover {
+            color: #67e8f9;
+            border-color: #22d3ee;
+        }
+        .filter-chip input[type="checkbox"] {
+            accent-color: #22d3ee;
+            width: 0.875rem;
+            height: 0.875rem;
+            cursor: pointer;
+        }
+
+        .btn-toggle-filters {
+            font-size: 0.75rem;
+            background: rgba(37, 99, 235, 0.2);
+            color: #67e8f9;
+            padding: 0.3rem 0.65rem;
+            border-radius: 0.35rem;
+            border: 1px solid rgba(6, 182, 212, 0.4);
+            margin-left: 0.35rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            transition: all 0.2s;
+        }
+        .btn-toggle-filters:hover {
+            background: rgba(37, 99, 235, 0.4);
+            color: #ffffff;
+        }
+
+        .batch-box {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.65rem 0.75rem;
+            border-radius: 0.5rem;
+            white-space: nowrap;
+            flex-shrink: 0;
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid rgba(51, 65, 85, 0.7);
+        }
+
+        .batch-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #fbbf24;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .batch-select {
+            background-color: #0f172a;
+            border: 1px solid rgba(59, 130, 246, 0.45);
+            color: #bfdbfe;
+            font-size: 0.75rem;
+            border-radius: 0.4rem;
+            padding: 0.35rem 0.6rem;
+            outline: none;
+            cursor: pointer;
+        }
+        .batch-select:focus {
+            border-color: #22d3ee;
+        }
+
+        /* Barra de Progreso */
+        .progress-wrapper {
+            background-color: #0f172a;
+            border-radius: 9999px;
+            height: 0.625rem;
+            overflow: hidden;
+            border: 1px solid rgba(59, 130, 246, 0.4);
+        }
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            transition: width 0.25s ease;
+            background: linear-gradient(to right, #2563eb, #22d3ee);
+        }
+
+        /* Panel Galería y Estado Vacío */
+        .gallery-panel {
+            min-height: 400px;
+        }
+
+        .empty-state {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 5rem 1rem;
+            text-align: center;
+        }
+
+        .empty-icon {
+            width: 4rem;
+            height: 4rem;
+            color: rgba(34, 211, 238, 0.45);
+            margin-bottom: 1rem;
+        }
+
+        .empty-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #bfdbfe;
+            margin: 0;
+        }
+
+        .empty-subtitle {
+            font-size: 0.875rem;
+            color: #9ca3af;
+            margin-top: 0.35rem;
+        }
+
+        /* Cuadrícula Dinámica de Miniaturas */
+        #thumbnailGrid {
+            display: grid;
+            gap: 1rem;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        }
+
+        .thumb-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            break-inside: avoid;
+        }
+
+        .img-container {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            background-color: rgba(15, 23, 42, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border: 1px solid rgba(59, 130, 246, 0.45);
+            border-radius: 0.5rem;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.12);
+            transition: all 0.25s ease;
+            position: relative;
+        }
+
+        .thumb-card:hover .img-container {
+            border-color: #22d3ee;
+            box-shadow: 0 0 18px rgba(6, 182, 212, 0.35);
+        }
+
+        .img-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain !important;
+            background-color: #0f172a;
+            display: block;
+        }
+
+        .video-thumb-wrap {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #000000;
+        }
+        .video-thumb-wrap img {
+            background-color: #000000;
+        }
+        .video-ext-badge {
+            position: absolute;
+            bottom: 0.35rem;
+            right: 0.35rem;
+            background: rgba(0, 0, 0, 0.78);
+            color: #ffffff;
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 0.15rem 0.4rem;
+            border-radius: 0.25rem;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+        }
+
+        /* Placeholder Vectorial (Sin superposición) */
+        .placeholder-box {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            background-color: #1e293b;
+            border: 4px solid #334155;
+            overflow: hidden;
+        }
+
+        .placeholder-svg {
+            width: 40%;
+            height: 40%;
+            max-width: 56px;
+            max-height: 56px;
+            min-width: 30px;
+            min-height: 30px;
+            flex-shrink: 0;
+            filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.35));
+        }
+
+        .placeholder-badge {
+            font-size: 9px;
+            line-height: 1.2;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: #94a3b8;
+            background-color: #0f172a;
+            padding: 0.2rem 0.5rem;
+            border-radius: 0.25rem;
+            text-align: center;
+            flex-shrink: 0;
+            max-width: 95%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .thumb-label {
+            margin-top: 0.5rem;
+            font-size: 0.72rem;
+            line-height: 1.25;
+            text-align: center;
+            word-break: break-word;
+            overflow-wrap: anywhere;
+            width: 100%;
+            color: #e5e7eb;
+        }
+
+        /* Notificación Toast */
+        .forense-toast {
+            position: fixed;
+            bottom: 1.25rem;
+            right: 1.25rem;
+            background-color: #0f172a;
+            color: #67e8f9;
+            padding: 1rem 1.5rem;
+            border-radius: 0.75rem;
+            border: 1px solid rgba(34, 211, 238, 0.6);
+            box-shadow: 0 0 25px rgba(6, 182, 212, 0.35), 0 10px 25px rgba(0, 0, 0, 0.6);
+            z-index: 50;
+            font-weight: 700;
+            font-size: 0.875rem;
+            letter-spacing: 0.025em;
+            transition: opacity 0.45s ease;
+            max-width: 90vw;
+        }
+
+        /* Scrollbar personalizada */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #2563eb; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #22d3ee; }
+
+        /* Colores utilitarios para íconos */
+        .c-cyan { color: #22d3ee; }
+        .c-blue { color: #60a5fa; }
+        .c-amber { color: #fbbf24; }
+        .c-emerald { color: #34d399; }
+        .c-red { color: #f87171; }
+        .c-purple { color: #c084fc; }
+        .c-pink { color: #f472b6; }
+        .c-sky { color: #38bdf8; }
+        .c-orange { color: #fb923c; }
+        .c-slate { color: #cbd5e1; }
+        .c-muted { color: rgba(147, 197, 253, 0.6); }
+
+        /* --- ESTILOS EXCLUSIVOS PARA IMPRESIÓN / PDF --- */
+        .print-title {
+            display: none;
+            font-size: 14pt;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #000000;
+            font-family: Arial, Helvetica, sans-serif;
+            padding: 1rem 2rem 0 2rem;
+        }
+
+        @media print {
+            @page { margin: 1cm; }
+            body {
+                background: #ffffff !important;
+                color: #000000 !important;
+                display: block;
+                padding: 0 !important;
+            }
+            #network-canvas, .no-print {
+                display: none !important;
+            }
+            .main-wrapper {
+                max-width: 100% !important;
+            }
+            .glass-panel {
+                background: #ffffff !important;
+                border: none !important;
+                box-shadow: none !important;
+                padding: 0 !important;
+                backdrop-filter: none !important;
+            }
+            .img-container, .img-container img, .placeholder-box {
+                background-color: #ffffff !important;
+                border: 1px solid #cccccc !important;
+                box-shadow: none !important;
+            }
+            .placeholder-badge {
+                background-color: #f3f4f6 !important;
+                color: #4b5563 !important;
+                border: 1px solid #e5e7eb !important;
+            }
+            .thumb-label {
+                color: #000000 !important;
+                font-size: 8pt !important;
+                font-family: Arial, Helvetica, sans-serif !important;
+            }
+            .print-title {
+                display: block !important;
+            }
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Fondo de Red Interactiva (100% Offline) -->
+    <canvas id="network-canvas"></canvas>
+
+    <!-- BOTÓN SUPERIOR IZQUIERDO: REGRESAR AL MENÚ PRINCIPAL (../index.html) -->
+    <a href="../index.html" class="btn-inicio no-print" title="Volver al Menú Principal">
+        <svg class="svg-icon c-cyan" style="width: 1.25em; height: 1.25em;" viewBox="0 0 24 24">
+            <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+            <polyline points="9 22 9 12 15 12 15 22"/>
+        </svg>
+        <span>Inicio</span>
+    </a>
+
+    <!-- LOGO SUPERIOR DERECHO: FISCALÍA GENERAL DEL ESTADO DE MORELOS (100% OFFLINE SVG) -->
+    <div class="logo-fge no-print" title="Fiscalía General del Estado de Morelos">
+        <svg viewBox="0 0 240 240" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <path id="fge-arc-top" d="M 31,120 A 89,89 0 1,1 209,120" />
+                <path id="fge-arc-bottom" d="M 19.3,98.6 A 103,103 0 1,0 220.7,98.6" />
+                <mask id="fge-shield-cutout">
+                    <rect x="0" y="0" width="240" height="240" fill="#ffffff" />
+                    <path d="M 71,67 Q 120,51 169,67 L 169,128 C 169,157 146.5,174 120,185 C 93.5,174 71,157 71,128 Z" fill="#000000" />
+                </mask>
+            </defs>
+            <circle cx="120" cy="120" r="115" fill="none" stroke="#94a3b8" stroke-width="4.5"/>
+            <g mask="url(#fge-shield-cutout)" fill="none" stroke="#94a3b8" stroke-width="3.6">
+                <circle cx="120" cy="120" r="78"/>
+                <circle cx="120" cy="120" r="70"/>
+                <circle cx="120" cy="120" r="62"/>
+            </g>
+            <line x1="34" y1="81" x2="49" y2="62" stroke="#94a3b8" stroke-width="4.5" stroke-linecap="round"/>
+            <line x1="206" y1="81" x2="191" y2="62" stroke="#94a3b8" stroke-width="4.5" stroke-linecap="round"/>
+            <text fill="#ffffff" font-family="system-ui, -apple-system, 'Segoe UI', Arial, sans-serif" font-size="21" font-weight="900" letter-spacing="3.5">
+                <textPath href="#fge-arc-top" startOffset="50%" text-anchor="middle">MORELOS</textPath>
+            </text>
+            <text fill="#ffffff" font-family="system-ui, -apple-system, 'Segoe UI', Arial, sans-serif" font-size="18" font-weight="900" letter-spacing="1.6">
+                <textPath href="#fge-arc-bottom" startOffset="50%" text-anchor="middle">FISCALÍA GENERAL DEL ESTADO</textPath>
+            </text>
+            <path d="M 72,68 Q 120,52 168,68 L 168,128 C 168,156 146,173 120,184 C 94,173 72,156 72,128 Z" fill="none" stroke="#94a3b8" stroke-width="3.5" stroke-linejoin="round"/>
+            <path d="M 78,73 Q 120,58.5 162,73 L 162,128 C 162,152 143,167 120,177 C 97,167 78,152 78,128 Z" fill="none" stroke="#94a3b8" stroke-width="3" stroke-linejoin="round"/>
+            <line x1="120" y1="64" x2="120" y2="177" stroke="#94a3b8" stroke-width="3.2"/>
+            <line x1="120" y1="123" x2="162" y2="123" stroke="#94a3b8" stroke-width="3.2"/>
+            <text x="100" y="103" fill="#ffffff" font-family="system-ui, -apple-system, 'Segoe UI', Arial, sans-serif" font-size="26" font-weight="900" text-anchor="middle">F</text>
+            <text x="100" y="131" fill="#ffffff" font-family="system-ui, -apple-system, 'Segoe UI', Arial, sans-serif" font-size="26" font-weight="900" text-anchor="middle">G</text>
+            <text x="100" y="158" fill="#ffffff" font-family="system-ui, -apple-system, 'Segoe UI', Arial, sans-serif" font-size="26" font-weight="900" text-anchor="middle">E</text>
+            <g stroke="#94a3b8" fill="none">
+                <line x1="128" y1="100" x2="150" y2="100" stroke-width="3" stroke-linecap="round"/>
+                <line x1="131" y1="95.5" x2="147" y2="95.5" stroke-width="2.8" stroke-linecap="round"/>
+                <line x1="139" y1="80" x2="139" y2="95.5" stroke-width="2.8" stroke-linecap="round"/>
+                <path d="M 130,82.5 L 136,82.5 L 139,80.5 L 142,82.5 L 148,82.5" stroke-width="2.4" stroke-linejoin="round"/>
+                <line x1="130.5" y1="82.5" x2="130.5" y2="88.5" stroke-width="2"/>
+                <path d="M 126.5,88.5 A 4,4 0 0,0 134.5,88.5 Z" fill="#94a3b8" stroke="none"/>
+                <line x1="147.5" y1="82.5" x2="147.5" y2="88.5" stroke-width="2"/>
+                <path d="M 143.5,88.5 A 4,4 0 0,0 151.5,88.5 Z" fill="#94a3b8" stroke="none"/>
+                <path d="M 127.5,113.5 Q 139,104 150.5,113.5" stroke-width="3" stroke-linecap="round"/>
+                <circle cx="139" cy="113.5" r="4.5" stroke-width="2.8"/>
+            </g>
+            <path d="M 131.5,128.5 L 136.5,129.5 L 138.5,132 L 142,131.5 L 145,133.5 L 151.5,132 L 150,136.5 L 148,141 L 150.5,145.5 L 146.5,150.5 L 144.5,158 L 141.5,156 L 138,156 L 135,160 L 131,154 L 125.5,149.5 L 124.5,145 L 127.5,141.5 L 127,136.5 L 131,133.5 Z" fill="none" stroke="#94a3b8" stroke-width="2.3" stroke-linejoin="round"/>
+        </svg>
+    </div>
+
+    <!-- Título exclusivo para cuando se imprime el dictamen -->
+    <div class="print-title">Anexo Fotográfico / Relación de Archivos:</div>
+
+    <!-- Contenido Principal -->
+    <main class="main-wrapper">
+        
+        <!-- ENCABEZADO CENTRAL -->
+        <header class="forense-header no-print">
+            <div class="header-top-group">
+                <div class="header-icon-box">
+                    <!-- Ícono de Sábana de Miniaturas / Cuadrícula de Evidencia -->
+                    <svg class="header-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="7.5" height="7.5" rx="1.8" fill="rgba(255,255,255,0.18)"/>
+                        <circle cx="5.5" cy="5.5" r="0.8" fill="#67e8f9" stroke="none"/>
+                        <path d="m3.5 9.5 2.2-2.2 1.8 1.5 1.5-1.3 1 1" stroke-width="1.3"/>
+                        <rect x="13.5" y="3" width="7.5" height="7.5" rx="1.8" fill="rgba(15,23,42,0.35)"/>
+                        <line x1="15.5" y1="5.5" x2="19" y2="5.5" stroke-width="1.4"/>
+                        <line x1="15.5" y1="8" x2="18" y2="8" stroke-width="1.4"/>
+                        <rect x="3" y="13.5" width="7.5" height="7.5" rx="1.8" fill="rgba(15,23,42,0.35)"/>
+                        <line x1="5" y1="16" x2="8.5" y2="16" stroke-width="1.4"/>
+                        <line x1="5" y1="18.5" x2="7.5" y2="18.5" stroke-width="1.4"/>
+                        <rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.8" fill="rgba(103,232,249,0.22)"/>
+                        <path d="m15.5 17.3 1.3 1.3 2.7-2.7" stroke="#67e8f9" stroke-width="1.8"/>
+                    </svg>
+                    <span class="dot-ping"></span>
+                    <span class="dot-solid"></span>
+                </div>
+                <h1>GENERADOR DE CAPTURAS Y SÁBANAS</h1>
+            </div>
+            <h2>
+                Creado por <a class="u-link" href="http://www.isaifijer.com.mx" target="_blank">Isaí Figueroa J.</a>
+            </h2>
+        </header>
+
+        <!-- Panel de Controles (No se imprime) -->
+        <section class="glass-panel no-print">
+            <div class="controls-row">
+                
+                <!-- Botones de Carga -->
+                <div class="upload-group">
+                    <input type="file" id="fileInput" multiple class="hidden">
+                    <input type="file" id="folderInput" webkitdirectory directory multiple class="hidden">
+                    <div class="btn-row">
+                        <button type="button" onclick="document.getElementById('fileInput').click()" class="btn-forense btn-archivos">
+                            <svg class="svg-icon c-cyan" viewBox="0 0 24 24">
+                                <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+                                <polyline points="14 2 14 8 20 8"/>
+                                <line x1="12" y1="18" x2="12" y2="12"/>
+                                <line x1="9" y1="15" x2="15" y2="15"/>
+                            </svg>
+                            Archivos
+                        </button>
+                        <button type="button" onclick="document.getElementById('folderInput').click()" class="btn-forense btn-carpeta">
+                            <svg class="svg-icon c-amber" viewBox="0 0 24 24">
+                                <path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/>
+                            </svg>
+                            Carpeta
+                        </button>
+                    </div>
+                    <p class="upload-hint font-mono">Todos los formatos visibles (omite ocultos)</p>
+                </div>
+
+                <!-- Control de Tamaño de Miniaturas -->
+                <div class="slider-box">
+                    <label for="sizeSlider" class="slider-label">
+                        <span style="display:inline-flex;align-items:center;gap:0.4rem;">
+                            <svg class="svg-icon c-cyan" viewBox="0 0 24 24">
+                                <polyline points="15 3 21 3 21 9"/>
+                                <polyline points="9 21 3 21 3 15"/>
+                                <line x1="21" y1="3" x2="14" y2="10"/>
+                                <line x1="3" y1="21" x2="10" y2="14"/>
+                            </svg>
+                            Tamaño de Miniaturas
+                        </span>
+                        <span id="sizeValue" class="size-badge font-mono">180px</span>
+                    </label>
+                    <div class="slider-track-row">
+                        <svg class="svg-icon c-muted" style="width:0.95rem;height:0.95rem;" viewBox="0 0 24 24">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                            <circle cx="8.5" cy="8.5" r="1.5"/>
+                            <polyline points="21 15 16 10 5 21"/>
+                        </svg>
+                        <input type="range" id="sizeSlider" min="80" max="350" value="180" class="custom-slider">
+                        <svg class="svg-icon c-cyan" style="width:1.25rem;height:1.25rem;" viewBox="0 0 24 24">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                            <circle cx="8.5" cy="8.5" r="1.5"/>
+                            <polyline points="21 15 16 10 5 21"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Botones de Exportación y Limpieza -->
+                <div class="actions-col">
+                    <button type="button" onclick="exportarCaptura()" class="btn-forense btn-calcular">
+                        <svg class="svg-icon" viewBox="0 0 24 24">
+                            <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/>
+                            <circle cx="12" cy="13" r="3"/>
+                        </svg>
+                        Guardar Captura PNG
+                    </button>
+                    <div class="actions-subrow">
+                        <button type="button" onclick="exportarWord()" class="btn-forense btn-word">
+                            <svg class="svg-icon c-emerald" viewBox="0 0 24 24">
+                                <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+                                <polyline points="14 2 14 8 20 8"/>
+                                <path d="M8 13l1.5 5 2.5-4 2.5 4 1.5-5"/>
+                            </svg>
+                            Exportar Capturas a Word
+                        </button>
+                        <button type="button" onclick="clearGrid()" class="btn-forense btn-limpiar" title="Limpiar todo">
+                            <svg class="svg-icon" viewBox="0 0 24 24">
+                                <polyline points="3 6 5 6 21 6"/>
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Filtros Dinámicos y Paginación de Capturas -->
+            <div class="filters-bar">
+                <div class="filters-box">
+                    <span class="filters-title">
+                        <svg class="svg-icon" viewBox="0 0 24 24">
+                            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+                        </svg>
+                        Extensiones:
+                    </span>
+                    <div id="dynamicFiltersContainer" class="filters-list">
+                        <span class="filters-placeholder">Cargue archivos para ver los filtros...</span>
+                    </div>
+                </div>
+                
+                <div class="batch-box">
+                    <span class="batch-label">
+                        <svg class="svg-icon" viewBox="0 0 24 24">
+                            <polygon points="12 2 2 7 12 12 22 7 12 2"/>
+                            <polyline points="2 17 12 22 22 17"/>
+                            <polyline points="2 12 12 17 22 12"/>
+                        </svg>
+                        Lote por captura:
+                    </span>
+                    <select id="batchSize" class="batch-select font-mono">
+                        <option value="all">Todas en 1 sola imagen</option>
+                        <option value="12">12 miniaturas</option>
+                        <option value="16">16 miniaturas</option>
+                        <option value="20" selected>20 miniaturas</option>
+                        <option value="24">24 miniaturas</option>
+                        <option value="30">30 miniaturas</option>
+                    </select>
+                </div>
+            </div>
+        </section>
+
+        <!-- Barra de Progreso (Oculta por defecto) -->
+        <div id="progressContainer" class="progress-wrapper hidden no-print">
+            <div id="progressBar" class="progress-bar"></div>
+        </div>
+
+        <!-- Contenedor de Miniaturas -->
+        <section id="galleryPanel" class="glass-panel gallery-panel">
+            <!-- Estado Vacío -->
+            <div id="emptyState" class="empty-state no-print">
+                <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                    <circle cx="8.5" cy="8.5" r="1.5"/>
+                    <polyline points="21 15 16 10 5 21"/>
+                </svg>
+                <p id="emptyStateTitle" class="empty-title">No hay archivos cargados</p>
+                <p id="emptyStateSubtitle" class="empty-subtitle">Seleccione "Archivos" o "Carpeta" para generar la sábana de indicios.</p>
+            </div>
+
+            <!-- Cuadrícula de Evidencias -->
+            <div id="thumbnailGrid" class="hidden"></div>
+        </section>
+
+    </main>
+
+    <!-- Canvas Oculto para renderizado opcional de PDF cuando haya motor disponible -->
+    <canvas id="pdfCanvas" class="hidden"></canvas>
+
+    <!-- LÓGICA 100% OFFLINE (SIN DEPENDENCIAS DE INTERNET) -->
+    <script>
+        // =========================================================
+        // 1. FONDO DE PARTÍCULAS INTERACTIVO (100% OFFLINE)
+        // =========================================================
+        const canvasBg = document.getElementById('network-canvas');
+        const ctxBg = canvasBg.getContext('2d');
+        let particlesArray = [];
+
+        function resizeCanvas() {
+            canvasBg.width = window.innerWidth;
+            canvasBg.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor(x, y, directionX, directionY, size, color) {
+                this.x = x;
+                this.y = y;
+                this.directionX = directionX;
+                this.directionY = directionY;
+                this.size = size;
+                this.color = color;
+            }
+            draw() {
+                ctxBg.beginPath();
+                ctxBg.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
+                ctxBg.fillStyle = this.color;
+                ctxBg.fill();
+            }
+            update() {
+                if (this.x > canvasBg.width || this.x < 0) this.directionX = -this.directionX;
+                if (this.y > canvasBg.height || this.y < 0) this.directionY = -this.directionY;
+                this.x += this.directionX;
+                this.y += this.directionY;
+                this.draw();
+            }
+        }
+
+        function initParticles() {
+            particlesArray = [];
+            const numberOfParticles = (canvasBg.height * canvasBg.width) / 18000;
+            const colors = ['#5dff00', '#bc13fe', '#00f3ff', '#3b82f6'];
+            for (let i = 0; i < numberOfParticles; i++) {
+                const size = (Math.random() * 2) + 1;
+                const x = (Math.random() * ((canvasBg.width - size * 2) - (size * 2)) + size * 2);
+                const y = (Math.random() * ((canvasBg.height - size * 2) - (size * 2)) + size * 2);
+                const directionX = (Math.random() * 1) - 0.5;
+                const directionY = (Math.random() * 1) - 0.5;
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                particlesArray.push(new Particle(x, y, directionX, directionY, size, color));
+            }
+        }
+
+        function connectParticles() {
+            for (let a = 0; a < particlesArray.length; a++) {
+                for (let b = a; b < particlesArray.length; b++) {
+                    const dx = particlesArray[a].x - particlesArray[b].x;
+                    const dy = particlesArray[a].y - particlesArray[b].y;
+                    const distance = (dx * dx) + (dy * dy);
+                    if (distance < (canvasBg.width / 10) * (canvasBg.height / 10)) {
+                        const opacityValue = 1 - (distance / 20000);
+                        ctxBg.strokeStyle = 'rgba(93, 255, 0,' + (opacityValue * 0.3) + ')';
+                        ctxBg.lineWidth = 1;
+                        ctxBg.beginPath();
+                        ctxBg.moveTo(particlesArray[a].x, particlesArray[a].y);
+                        ctxBg.lineTo(particlesArray[b].x, particlesArray[b].y);
+                        ctxBg.stroke();
+                    }
+                }
+            }
+        }
+
+        function animateParticles() {
+            requestAnimationFrame(animateParticles);
+            ctxBg.clearRect(0, 0, canvasBg.width, canvasBg.height);
+            for (let i = 0; i < particlesArray.length; i++) {
+                particlesArray[i].update();
+            }
+            connectParticles();
+        }
+        initParticles();
+        animateParticles();
+
+        // =========================================================
+        // 2. CARGA OPCIONAL NO-BLOQUEANTE DE PDF.JS (SOLO SI HAY RED)
+        //    - Sin internet: 0 peticiones, usa extractor nativo offline.
+        //    - Con internet: habilita miniatura visual de página 1 de PDF.
+        // =========================================================
+        let pdfJsListo = false;
+        (function intentarCargarPdfJsOpcional() {
+            if (!navigator.onLine) return;
+            try {
+                const script = document.createElement('script');
+                script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js';
+                script.async = true;
+                script.onload = () => {
+                    if (window.pdfjsLib) {
+                        window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+                        pdfJsListo = true;
+                    }
+                };
+                script.onerror = () => { pdfJsListo = false; };
+                document.head.appendChild(script);
+            } catch {
+                pdfJsListo = false;
+            }
+        })();
+
+        // =========================================================
+        // 3. ESTADO Y UTILIDADES PRINCIPALES DE LA APLICACIÓN
+        // =========================================================
+        const fileInput = document.getElementById('fileInput');
+        const folderInput = document.getElementById('folderInput');
+        const thumbnailGrid = document.getElementById('thumbnailGrid');
+        const emptyState = document.getElementById('emptyState');
+        const sizeSlider = document.getElementById('sizeSlider');
+        const sizeValue = document.getElementById('sizeValue');
+        const progContainer = document.getElementById('progressContainer');
+        const progBar = document.getElementById('progressBar');
+
+        const extensionesEncontradas = new Set();
+        // Registro estructurado de cada archivo para exportación nativa offline a Canvas y Word
+        const itemsCargados = [];
+
+        // Ajuste de tamaño de cuadrícula en tiempo real
+        sizeSlider.addEventListener('input', (e) => {
+            const size = e.target.value;
+            sizeValue.textContent = `${size}px`;
+            thumbnailGrid.style.gridTemplateColumns = `repeat(auto-fill, minmax(${size}px, 1fr))`;
+        });
+        thumbnailGrid.style.gridTemplateColumns = `repeat(auto-fill, minmax(${sizeSlider.value}px, 1fr))`;
+
+        // Categorías de extensiones
+        const IMG_EXTS = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg', 'ico', 'tif', 'tiff', 'avif', 'heic', 'heif'];
+        const VID_EXTS = ['mp4', 'webm', 'ogv', 'mov', 'avi', 'mkv', 'wmv', 'flv', 'm4v', '3gp', 'mpeg', 'mpg', 'dav', 'ts', 'mts'];
+        const AUD_EXTS = ['mp3', 'wav', 'ogg', 'opus', 'aac', 'm4a', 'flac', 'wma', 'amr', 'mid', 'midi', 'aiff'];
+        const WEB_EXTS = ['html', 'htm', 'xhtml', 'mht', 'mhtml', 'css', 'js', 'json', 'xml', 'php', 'asp', 'aspx', 'url'];
+        const WORD_EXTS = ['doc', 'docx', 'docm', 'odt', 'rtf'];
+        const EXCEL_EXTS = ['xls', 'xlsx', 'xlsm', 'xlsb', 'csv', 'ods'];
+        const PPT_EXTS = ['ppt', 'pptx', 'pps', 'ppsx', 'odp'];
+        const ARCHIVE_EXTS = ['zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'iso', 'cab'];
+        const TEXT_EXTS = ['txt', 'log', 'md', 'ini', 'cfg', 'conf', 'bat', 'ps1', 'sh', 'sql', 'eml', 'msg', 'vcf', 'ics'];
+        const EXEC_EXTS = ['exe', 'msi', 'apk', 'dll', 'bin', 'app', 'dmg'];
+
+        // Archivos y carpetas ocultas/sistema que deben omitirse
+        const HIDDEN_SYSTEM_NAMES = new Set([
+            'thumbs.db', 'ehthumbs.db', 'ehthumbs_vista.db', 'desktop.ini', 'icon\r',
+            '.ds_store', 'system volume information', '$recycle.bin', 'recycler',
+            'recycled', '__macosx', 'pagefile.sys', 'hiberfil.sys', 'swapfile.sys',
+            'bootmgr', 'ntuser.dat'
+        ]);
+
+        function esArchivoOcultoOSistema(file) {
+            const nombre = (file.name || '').trim();
+            if (!nombre) return true;
+            const nombreLower = nombre.toLowerCase();
+
+            if (nombre.startsWith('.') || nombre.startsWith('~$') || nombre.startsWith('$')) {
+                return true;
+            }
+            if (HIDDEN_SYSTEM_NAMES.has(nombreLower) || nombreLower.endsWith('.tmp') || nombreLower.endsWith('.lnk')) {
+                return true;
+            }
+            if (file.webkitRelativePath) {
+                const segmentos = file.webkitRelativePath.split('/');
+                for (let i = 0; i < segmentos.length; i++) {
+                    const seg = segmentos[i].trim();
+                    if (!seg) continue;
+                    const segLower = seg.toLowerCase();
+                    if (seg.startsWith('.') || seg.startsWith('$') || seg.startsWith('~$') || HIDDEN_SYSTEM_NAMES.has(segLower)) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        // Procesador unificado de archivos/carpetas
+        async function handleFiles(filesArray) {
+            if (filesArray.length === 0) return;
+
+            const files = filesArray.filter(file => !esArchivoOcultoOSistema(file));
+            const omitidos = filesArray.length - files.length;
+
+            if (files.length === 0) {
+                mostrarMensaje("No se encontraron archivos visibles en la selección.");
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            thumbnailGrid.classList.remove('hidden');
+            progContainer.classList.remove('hidden');
+
+            files.sort((a, b) => a.name.localeCompare(b.name));
+
+            for (let i = 0; i < files.length; i++) {
+                await procesarArchivo(files[i]);
+                const percent = ((i + 1) / files.length) * 100;
+                progBar.style.width = `${percent}%`;
+            }
+
+            generarFiltrosHTML();
+
+            if (omitidos > 0) {
+                mostrarMensaje(`Se cargaron ${files.length} archivos visibles (${omitidos} archivos ocultos/sistema omitidos).`);
+            }
+
+            setTimeout(() => {
+                progContainer.classList.add('hidden');
+                progBar.style.width = '0%';
+            }, 800);
+
+            fileInput.value = '';
+            folderInput.value = '';
+        }
+
+        fileInput.addEventListener('change', (e) => handleFiles(Array.from(e.target.files)));
+        folderInput.addEventListener('change', (e) => handleFiles(Array.from(e.target.files)));
+
+        // Configuración visual por tipo de formato (compartida entre vista DOM y exportación Canvas)
+        function obtenerEstiloPlaceholder(tipo, extension, customBadge) {
+            let fillHex = '#64748b';
+            let badgeText = customBadge || 'VISTA NO DISPONIBLE';
+            const extClean = (extension === 'sin_ext' ? 'FILE' : extension).toUpperCase().slice(0, 5);
+            let labelDoc = extClean;
+
+            switch (tipo) {
+                case 'word': fillHex = '#2563eb'; labelDoc = 'W'; break;
+                case 'excel': fillHex = '#16a34a'; labelDoc = 'X'; break;
+                case 'ppt': fillHex = '#ea580c'; labelDoc = 'P'; break;
+                case 'pdf': fillHex = '#dc2626'; labelDoc = 'PDF'; break;
+                case 'video': fillHex = '#9333ea'; if (!customBadge) badgeText = 'ARCHIVO DE VIDEO'; break;
+                case 'audio': fillHex = '#db2777'; if (!customBadge) badgeText = 'ARCHIVO DE AUDIO'; break;
+                case 'web': fillHex = '#0891b2'; if (!customBadge) badgeText = 'DOCUMENTO WEB'; break;
+                case 'archive': fillHex = '#d97706'; if (!customBadge) badgeText = 'COMPRIMIDO'; break;
+                case 'text': fillHex = '#475569'; if (!customBadge) badgeText = 'ARCHIVO DE TEXTO'; break;
+                case 'exec': fillHex = '#be123c'; if (!customBadge) badgeText = 'APLICACIÓN'; break;
+                case 'image': fillHex = '#0284c7'; if (!customBadge) badgeText = 'IMAGEN SIN PREVIEW'; break;
+                default: fillHex = '#64748b'; break;
+            }
+
+            return { fillHex, badgeText, labelDoc, tipo };
+        }
+
+        // Procesar un archivo individual
+        async function procesarArchivo(file) {
+            const fileType = (file.type || '').toLowerCase();
+            const fileName = file.name;
+            const extParts = fileName.split('.');
+            const extension = extParts.length > 1 ? extParts.pop().toLowerCase() : 'sin_ext';
+
+            extensionesEncontradas.add(extension);
+
+            const itemData = {
+                id: 'item_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8),
+                fileName,
+                extension,
+                tipo: 'generic',
+                imgSrc: null,
+                isVideoFrame: false,
+                isPdfPreview: false,
+                badgeOverride: null,
+                cardEl: null
+            };
+
+            let htmlContent = '';
+
+            // 1. Imágenes
+            if (fileType.startsWith('image/') || IMG_EXTS.includes(extension)) {
+                itemData.tipo = 'image';
+                try {
+                    const imgDataUrl = await leerArchivoComoDataURL(file);
+                    const esRenderizable = await verificarImagenCargable(imgDataUrl);
+                    if (esRenderizable) {
+                        itemData.imgSrc = imgDataUrl;
+                        htmlContent = `<img src="${imgDataUrl}" alt="${escapeHtml(fileName)}">`;
+                    } else {
+                        htmlContent = generarIconoPlaceholderDOM('image', extension);
+                    }
+                } catch {
+                    htmlContent = generarIconoPlaceholderDOM('image', extension);
+                }
+            }
+            // 2. Documentos PDF
+            else if (fileType === 'application/pdf' || extension === 'pdf') {
+                itemData.tipo = 'pdf';
+                let renderizadoOk = false;
+                if (pdfJsListo && window.pdfjsLib) {
+                    try {
+                        const pdfDataUrl = await renderizarPrimeraPaginaPDF(file);
+                        itemData.imgSrc = pdfDataUrl;
+                        itemData.isPdfPreview = true;
+                        htmlContent = `<img src="${pdfDataUrl}" alt="${escapeHtml(fileName)}" style="background:#ffffff;">`;
+                        renderizadoOk = true;
+                    } catch {
+                        renderizadoOk = false;
+                    }
+                }
+                if (!renderizadoOk) {
+                    // Modo 100% offline: cuenta las páginas del PDF nativamente
+                    const paginas = await estimarPaginasPdfOffline(file);
+                    itemData.badgeOverride = paginas > 0 ? `PDF • ${paginas} PÁG.` : 'DOCUMENTO PDF';
+                    htmlContent = generarIconoPlaceholderDOM('pdf', extension, itemData.badgeOverride);
+                }
+            }
+            // 3. Videos
+            else if (fileType.startsWith('video/') || VID_EXTS.includes(extension)) {
+                itemData.tipo = 'video';
+                try {
+                    const frameUrl = await renderizarMiniaturaVideo(file);
+                    itemData.imgSrc = frameUrl;
+                    itemData.isVideoFrame = true;
+                    htmlContent = `
+                        <div class="video-thumb-wrap">
+                            <img src="${frameUrl}" alt="${escapeHtml(fileName)}">
+                            <span class="video-ext-badge font-mono">▶ ${escapeHtml(extension)}</span>
+                        </div>
+                    `;
+                } catch {
+                    htmlContent = generarIconoPlaceholderDOM('video', extension);
+                }
+            }
+            // 4. Otros formatos
+            else if (fileType.startsWith('audio/') || AUD_EXTS.includes(extension)) {
+                itemData.tipo = 'audio';
+                htmlContent = generarIconoPlaceholderDOM('audio', extension);
+            }
+            else if (fileType === 'text/html' || WEB_EXTS.includes(extension)) {
+                itemData.tipo = 'web';
+                htmlContent = generarIconoPlaceholderDOM('web', extension);
+            }
+            else if (WORD_EXTS.includes(extension)) {
+                itemData.tipo = 'word';
+                htmlContent = generarIconoPlaceholderDOM('word', extension);
+            }
+            else if (EXCEL_EXTS.includes(extension)) {
+                itemData.tipo = 'excel';
+                htmlContent = generarIconoPlaceholderDOM('excel', extension);
+            }
+            else if (PPT_EXTS.includes(extension)) {
+                itemData.tipo = 'ppt';
+                htmlContent = generarIconoPlaceholderDOM('ppt', extension);
+            }
+            else if (ARCHIVE_EXTS.includes(extension)) {
+                itemData.tipo = 'archive';
+                htmlContent = generarIconoPlaceholderDOM('archive', extension);
+            }
+            else if (fileType.startsWith('text/') || TEXT_EXTS.includes(extension)) {
+                itemData.tipo = 'text';
+                htmlContent = generarIconoPlaceholderDOM('text', extension);
+            }
+            else if (EXEC_EXTS.includes(extension)) {
+                itemData.tipo = 'exec';
+                htmlContent = generarIconoPlaceholderDOM('exec', extension);
+            }
+            else {
+                itemData.tipo = 'generic';
+                htmlContent = generarIconoPlaceholderDOM('generic', extension);
+            }
+
+            crearTarjeta(htmlContent, itemData);
+        }
+
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        function verificarImagenCargable(dataUrl) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.onload = () => resolve(true);
+                img.onerror = () => resolve(false);
+                img.src = dataUrl;
+            });
+        }
+
+        function cargarImagenDesdeDataUrl(dataUrl) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.onload = () => resolve(img);
+                img.onerror = reject;
+                img.src = dataUrl;
+            });
+        }
+
+        function leerArchivoComoDataURL(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = e => resolve(e.target.result);
+                reader.onerror = e => reject(e);
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function leerArchivoComoArrayBuffer(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = e => resolve(e.target.result);
+                reader.onerror = e => reject(e);
+                reader.readAsArrayBuffer(file);
+            });
+        }
+
+        // Extractor nativo offline de conteo de páginas PDF (sin librerías externas)
+        async function estimarPaginasPdfOffline(file) {
+            try {
+                // Leer hasta 4 MB para mantener el análisis instantáneo
+                const slice = file.size > 4 * 1024 * 1024 ? file.slice(0, 4 * 1024 * 1024) : file;
+                const buffer = await leerArchivoComoArrayBuffer(slice);
+                const text = new TextDecoder('latin1').decode(buffer);
+                const matches = text.match(/\/Type\s*\/Page\b(?!s)/g);
+                if (matches && matches.length > 0) return matches.length;
+                const countMatch = text.match(/\/Count\s+(\d+)/);
+                return countMatch ? parseInt(countMatch[1], 10) : 0;
+            } catch {
+                return 0;
+            }
+        }
+
+        // Renderizado de PDF cuando pdf.js está disponible
+        async function renderizarPrimeraPaginaPDF(file) {
+            const arrayBuffer = await leerArchivoComoArrayBuffer(file);
+            const pdf = await window.pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+            const page = await pdf.getPage(1);
+            const viewport = page.getViewport({ scale: 1.5 });
+            const canvas = document.getElementById('pdfCanvas');
+            const context = canvas.getContext('2d');
+            canvas.height = viewport.height;
+            canvas.width = viewport.width;
+            await page.render({ canvasContext: context, viewport }).promise;
+            return canvas.toDataURL('image/png');
+        }
+
+        // Extracción 100% offline del fotograma de video compatible
+        function renderizarMiniaturaVideo(file) {
+            return new Promise((resolve, reject) => {
+                const video = document.createElement('video');
+                const objectUrl = URL.createObjectURL(file);
+                let terminado = false;
+
+                const limpiar = () => {
+                    video.removeAttribute('src');
+                    video.load();
+                    URL.revokeObjectURL(objectUrl);
+                };
+
+                const timeoutId = setTimeout(() => {
+                    if (!terminado) {
+                        terminado = true;
+                        limpiar();
+                        reject(new Error('Tiempo agotado'));
+                    }
+                }, 2500);
+
+                video.preload = 'metadata';
+                video.muted = true;
+                video.playsInline = true;
+
+                video.onloadedmetadata = () => {
+                    const objetivo = video.duration && video.duration > 1 ? Math.min(1, video.duration * 0.1) : 0;
+                    video.currentTime = objetivo;
+                };
+
+                video.onseeked = () => {
+                    if (terminado) return;
+                    terminado = true;
+                    clearTimeout(timeoutId);
+                    try {
+                        if (!video.videoWidth || !video.videoHeight) {
+                            limpiar();
+                            reject(new Error('Sin pista de video'));
+                            return;
+                        }
+                        const canvas = document.createElement('canvas');
+                        const maxDim = 480;
+                        const escala = Math.min(1, maxDim / Math.max(video.videoWidth, video.videoHeight));
+                        canvas.width = Math.max(1, Math.round(video.videoWidth * escala));
+                        canvas.height = Math.max(1, Math.round(video.videoHeight * escala));
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                        const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+                        limpiar();
+                        resolve(dataUrl);
+                    } catch (err) {
+                        limpiar();
+                        reject(err);
+                    }
+                };
+
+                video.onerror = () => {
+                    if (!terminado) {
+                        terminado = true;
+                        clearTimeout(timeoutId);
+                        limpiar();
+                        reject(new Error('Códec no soportado'));
+                    }
+                };
+
+                video.src = objectUrl;
+            });
+        }
+
+        // Generar tarjeta SVG placeholder en el DOM
+        function generarIconoPlaceholderDOM(tipo, extension, customBadge) {
+            const { fillHex, badgeText, labelDoc } = obtenerEstiloPlaceholder(tipo, extension, customBadge);
+            let fontSize = '16';
+            if (labelDoc.length === 2) fontSize = '13';
+            else if (labelDoc.length === 3) fontSize = '11';
+            else if (labelDoc.length === 4) fontSize = '9.5';
+            else if (labelDoc.length >= 5) fontSize = '8';
+
+            let decoracionSvg = '';
+            if (tipo === 'video') {
+                decoracionSvg = `<polygon points="18,16 18,27 28,21.5" fill="rgba(255,255,255,0.92)"/>`;
+            } else if (tipo === 'audio') {
+                decoracionSvg = `
+                    <path d="M19 25v-8l8-2v8" fill="none" stroke="rgba(255,255,255,0.92)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <circle cx="17" cy="25" r="2.2" fill="rgba(255,255,255,0.92)"/>
+                    <circle cx="25" cy="23" r="2.2" fill="rgba(255,255,255,0.92)"/>
+                `;
+            } else if (tipo === 'web') {
+                decoracionSvg = `
+                    <polyline points="16,18 12,21.5 16,25" fill="none" stroke="rgba(255,255,255,0.92)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <polyline points="28,18 32,21.5 28,25" fill="none" stroke="rgba(255,255,255,0.92)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <line x1="23.5" y1="16.5" x2="20.5" y2="26.5" stroke="rgba(255,255,255,0.92)" stroke-width="2" stroke-linecap="round"/>
+                `;
+            }
+
+            const textoY = decoracionSvg ? '44' : '40';
+
+            return `
+                <div class="placeholder-box">
+                    <svg viewBox="0 0 48 56" class="placeholder-svg" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M6 0h24l14 14v36c0 3.3-2.7 6-6 6H6c-3.3 0-6-2.7-6-6V6c0-3.3 2.7-6 6-6z" fill="${fillHex}"/>
+                        <path d="M30 0v10c0 2.2 1.8 4 4 4h10L30 0z" fill="rgba(255,255,255,0.35)"/>
+                        ${decoracionSvg}
+                        <text x="22" y="${textoY}" text-anchor="middle" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" font-weight="900" font-size="${fontSize}">${escapeHtml(labelDoc)}</text>
+                    </svg>
+                    <span class="placeholder-badge">${escapeHtml(badgeText)}</span>
+                </div>
+            `;
+        }
+
+        function crearTarjeta(htmlContenidoMedia, itemData) {
+            const card = document.createElement('div');
+            card.className = 'thumb-card';
+            card.dataset.ext = itemData.extension;
+            card.dataset.id = itemData.id;
+            card.innerHTML = `
+                <div class="img-container">
+                    ${htmlContenidoMedia}
+                </div>
+                <span class="thumb-label font-mono">${escapeHtml(itemData.fileName)}</span>
+            `;
+            itemData.cardEl = card;
+            itemsCargados.push(itemData);
+            thumbnailGrid.appendChild(card);
+        }
+
+        window.clearGrid = function() {
+            thumbnailGrid.innerHTML = '';
+            thumbnailGrid.classList.add('hidden');
+            emptyState.classList.remove('hidden');
+            document.getElementById('emptyStateTitle').textContent = 'No hay archivos cargados';
+            document.getElementById('emptyStateSubtitle').textContent = 'Seleccione "Archivos" o "Carpeta" para generar la sábana de indicios.';
+            document.getElementById('dynamicFiltersContainer').innerHTML = '<span class="filters-placeholder">Cargue archivos para ver los filtros...</span>';
+            extensionesEncontradas.clear();
+            itemsCargados.length = 0;
+        };
+
+        // =========================================================
+        // 4. FILTROS DINÁMICOS CON ÍCONOS SVG OFFLINE
+        // =========================================================
+        function obtenerSvgFiltro(ext) {
+            if (IMG_EXTS.includes(ext)) {
+                return `<svg class="svg-icon c-cyan" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>`;
+            }
+            if (ext === 'pdf') {
+                return `<svg class="svg-icon c-red" viewBox="0 0 24 24"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>`;
+            }
+            if (VID_EXTS.includes(ext)) {
+                return `<svg class="svg-icon c-purple" viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>`;
+            }
+            if (AUD_EXTS.includes(ext)) {
+                return `<svg class="svg-icon c-pink" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>`;
+            }
+            if (WEB_EXTS.includes(ext)) {
+                return `<svg class="svg-icon c-sky" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>`;
+            }
+            if (WORD_EXTS.includes(ext)) {
+                return `<svg class="svg-icon c-blue" viewBox="0 0 24 24"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/></svg>`;
+            }
+            if (EXCEL_EXTS.includes(ext)) {
+                return `<svg class="svg-icon c-emerald" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/></svg>`;
+            }
+            if (PPT_EXTS.includes(ext)) {
+                return `<svg class="svg-icon c-orange" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>`;
+            }
+            if (ARCHIVE_EXTS.includes(ext)) {
+                return `<svg class="svg-icon c-amber" viewBox="0 0 24 24"><path d="M21 8v13H3V8"/><path d="M1 3h22v5H1z"/><path d="M10 12h4"/></svg>`;
+            }
+            if (TEXT_EXTS.includes(ext)) {
+                return `<svg class="svg-icon c-slate" viewBox="0 0 24 24"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/></svg>`;
+            }
+            return `<svg class="svg-icon c-slate" viewBox="0 0 24 24"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>`;
+        }
+
+        function generarFiltrosHTML() {
+            const container = document.getElementById('dynamicFiltersContainer');
+            container.innerHTML = '';
+            const extArray = Array.from(extensionesEncontradas).sort();
+
+            extArray.forEach(ext => {
+                const label = document.createElement('label');
+                label.className = 'filter-chip font-mono';
+                const etiquetaExt = ext === 'sin_ext' ? 'SIN EXT.' : `.${ext.toUpperCase()}`;
+
+                label.innerHTML = `
+                    <input type="checkbox" checked class="ext-filter" value="${escapeHtml(ext)}" onchange="aplicarFiltros()">
+                    ${obtenerSvgFiltro(ext)}
+                    <span>${escapeHtml(etiquetaExt)}</span>
+                `;
+                container.appendChild(label);
+            });
+
+            if (extArray.length > 1) {
+                const toggleBtn = document.createElement('button');
+                toggleBtn.type = 'button';
+                toggleBtn.className = 'btn-toggle-filters';
+                toggleBtn.innerHTML = `
+                    <svg class="svg-icon c-cyan" viewBox="0 0 24 24">
+                        <path d="M18 6 7 17l-5-5"/>
+                        <path d="m22 10-7.5 7.5L13 16"/>
+                    </svg>
+                    Alternar
+                `;
+                toggleBtn.onclick = () => {
+                    const checkboxes = document.querySelectorAll('.ext-filter');
+                    const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+                    checkboxes.forEach(cb => cb.checked = !allChecked);
+                    aplicarFiltros();
+                };
+                container.appendChild(toggleBtn);
+            }
+        }
+
+        window.aplicarFiltros = function() {
+            const checkboxes = document.querySelectorAll('.ext-filter');
+            const allowedExts = Array.from(checkboxes).filter(cb => cb.checked).map(cb => cb.value);
+
+            let visibles = 0;
+            itemsCargados.forEach(item => {
+                if (!item.cardEl) return;
+                if (allowedExts.includes(item.extension)) {
+                    item.cardEl.style.display = '';
+                    visibles++;
+                } else {
+                    item.cardEl.style.display = 'none';
+                }
+            });
+
+            if (itemsCargados.length > 0) {
+                if (visibles === 0) {
+                    thumbnailGrid.classList.add('hidden');
+                    emptyState.classList.remove('hidden');
+                    document.getElementById('emptyStateTitle').textContent = 'Ningún archivo coincide con los filtros';
+                    document.getElementById('emptyStateSubtitle').textContent = 'Active al menos una extensión en la barra de filtros.';
+                } else {
+                    thumbnailGrid.classList.remove('hidden');
+                    emptyState.classList.add('hidden');
+                }
+            }
+        };
+
+        // Toast de mensajes sin usar alert()
+        function mostrarMensaje(texto) {
+            const toast = document.createElement('div');
+            toast.className = 'forense-toast';
+            toast.textContent = texto;
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 450);
+            }, 3800);
+        }
+
+        // =========================================================
+        // 5. MOTOR NATIVO DE CAPTURAS EN CANVAS (100% OFFLINE)
+        //    Reemplaza a html2canvas con mayor nitidez y cero solapamientos
+        // =========================================================
+        function obtenerItemsVisibles() {
+            return itemsCargados.filter(item => item.cardEl && item.cardEl.style.display !== 'none');
+        }
+
+        function obtenerColumnasActualesGrid() {
+            const styleCols = window.getComputedStyle(thumbnailGrid).gridTemplateColumns;
+            if (styleCols && styleCols !== 'none') {
+                const count = styleCols.trim().split(/\s+/).length;
+                if (count >= 1) return count;
+            }
+            const gridW = thumbnailGrid.clientWidth || 1000;
+            const thumbW = parseInt(sizeSlider.value, 10) || 180;
+            return Math.max(1, Math.floor((gridW + 16) / (thumbW + 16)));
+        }
+
+        function dividirTextoEnLineas(ctx, text, maxWidth) {
+            const lineas = [];
+            let lineaActual = '';
+
+            for (let i = 0; i < text.length; i++) {
+                const ch = text[i];
+                const prueba = lineaActual + ch;
+                if (ctx.measureText(prueba).width > maxWidth && lineaActual.length > 0) {
+                    // Intentar cortar en el último espacio o guion si existe en la segunda mitad
+                    const ultimoEspacio = Math.max(lineaActual.lastIndexOf(' '), lineaActual.lastIndexOf('-'), lineaActual.lastIndexOf('_'));
+                    if (ultimoEspacio > Math.floor(lineaActual.length * 0.45)) {
+                        lineas.push(lineaActual.slice(0, ultimoEspacio + 1).trimEnd());
+                        lineaActual = lineaActual.slice(ultimoEspacio + 1) + ch;
+                    } else {
+                        lineas.push(lineaActual);
+                        lineaActual = ch;
+                    }
+                } else {
+                    lineaActual = prueba;
+                }
+            }
+            if (lineaActual) lineas.push(lineaActual);
+            return lineas;
+        }
+
+        function trazarRectanguloRedondeado(ctx, x, y, w, h, r) {
+            const radius = Math.min(r, w / 2, h / 2);
+            ctx.beginPath();
+            ctx.moveTo(x + radius, y);
+            ctx.arcTo(x + w, y, x + w, y + h, radius);
+            ctx.arcTo(x + w, y + h, x, y + h, radius);
+            ctx.arcTo(x, y + h, x, y, radius);
+            ctx.arcTo(x, y, x + w, y, radius);
+            ctx.closePath();
+        }
+
+        // Dibuja el ícono vectorial y su etiqueta en Canvas (100% alineado, sin encimarse)
+        function dibujarPlaceholderEnCanvas(ctx, x, y, size, item) {
+            const { fillHex, badgeText, labelDoc, tipo } = obtenerEstiloPlaceholder(item.tipo, item.extension, item.badgeOverride);
+
+            // Fondo interior blanco del cuadro en modo reporte
+            ctx.save();
+            trazarRectanguloRedondeado(ctx, x, y, size, size, 8);
+            ctx.fillStyle = '#ffffff';
+            ctx.fill();
+            ctx.strokeStyle = '#d1d5db';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+
+            // Dimensiones proporcionales del ícono documento
+            const docH = Math.min(size * 0.44, 72);
+            const docW = docH * (44 / 56);
+            const gap = Math.max(8, size * 0.06);
+            const badgeH = Math.max(16, Math.min(22, size * 0.13));
+            const totalH = docH + gap + badgeH;
+
+            const docX = x + (size - docW) / 2;
+            const docY = y + (size - totalH) / 2;
+            const fold = docW * 0.31;
+            const cornerR = Math.max(3, docW * 0.12);
+
+            // Cuerpo principal del documento con esquina doblada
+            ctx.beginPath();
+            ctx.moveTo(docX + cornerR, docY);
+            ctx.lineTo(docX + docW - fold, docY);
+            ctx.lineTo(docX + docW, docY + fold);
+            ctx.lineTo(docX + docW, docY + docH - cornerR);
+            ctx.quadraticCurveTo(docX + docW, docY + docH, docX + docW - cornerR, docY + docH);
+            ctx.lineTo(docX + cornerR, docY + docH);
+            ctx.quadraticCurveTo(docX, docY + docH, docX, docY + docH - cornerR);
+            ctx.lineTo(docX, docY + cornerR);
+            ctx.quadraticCurveTo(docX, docY, docX + cornerR, docY);
+            ctx.closePath();
+            ctx.fillStyle = fillHex;
+            ctx.fill();
+
+            // Pestaña doblada superior derecha
+            ctx.beginPath();
+            ctx.moveTo(docX + docW - fold, docY);
+            ctx.lineTo(docX + docW - fold, docY + fold - 2);
+            ctx.quadraticCurveTo(docX + docW - fold, docY + fold, docX + docW - fold + 2, docY + fold);
+            ctx.lineTo(docX + docW, docY + fold);
+            ctx.closePath();
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
+            ctx.fill();
+
+            // Decoración superior opcional (video/audio/web)
+            let hasDeco = false;
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.92)';
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.92)';
+            if (tipo === 'video') {
+                hasDeco = true;
+                const cx = docX + docW * 0.5;
+                const cy = docY + docH * 0.40;
+                const r = docW * 0.16;
+                ctx.beginPath();
+                ctx.moveTo(cx - r * 0.65, cy - r);
+                ctx.lineTo(cx + r, cy);
+                ctx.lineTo(cx - r * 0.65, cy + r);
+                ctx.closePath();
+                ctx.fill();
+            } else if (tipo === 'audio') {
+                hasDeco = true;
+                const sx = docW / 44;
+                const sy = docH / 56;
+                ctx.lineWidth = Math.max(1.5, 2 * sx);
+                ctx.beginPath();
+                ctx.moveTo(docX + 19 * sx, docY + 25 * sy);
+                ctx.lineTo(docX + 19 * sx, docY + 17 * sy);
+                ctx.lineTo(docX + 27 * sx, docY + 15 * sy);
+                ctx.lineTo(docX + 27 * sx, docY + 23 * sy);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.arc(docX + 17 * sx, docY + 25 * sy, 2.2 * sx, 0, Math.PI * 2);
+                ctx.arc(docX + 25 * sx, docY + 23 * sy, 2.2 * sx, 0, Math.PI * 2);
+                ctx.fill();
+            } else if (tipo === 'web') {
+                hasDeco = true;
+                const sx = docW / 44;
+                const sy = docH / 56;
+                ctx.lineWidth = Math.max(1.5, 2 * sx);
+                ctx.beginPath();
+                ctx.moveTo(docX + 16 * sx, docY + 18 * sy);
+                ctx.lineTo(docX + 12 * sx, docY + 21.5 * sy);
+                ctx.lineTo(docX + 16 * sx, docY + 25 * sy);
+                ctx.moveTo(docX + 28 * sx, docY + 18 * sy);
+                ctx.lineTo(docX + 32 * sx, docY + 21.5 * sy);
+                ctx.lineTo(docX + 28 * sx, docY + 25 * sy);
+                ctx.moveTo(docX + 23.5 * sx, docY + 16.5 * sy);
+                ctx.lineTo(docX + 20.5 * sx, docY + 26.5 * sy);
+                ctx.stroke();
+            }
+
+            // Etiqueta principal dentro del documento (W, X, PDF, etc.)
+            let baseFont = docH * 0.29;
+            if (labelDoc.length === 2) baseFont = docH * 0.24;
+            else if (labelDoc.length === 3) baseFont = docH * 0.20;
+            else if (labelDoc.length === 4) baseFont = docH * 0.17;
+            else if (labelDoc.length >= 5) baseFont = docH * 0.14;
+
+            ctx.fillStyle = '#ffffff';
+            ctx.font = `900 ${Math.round(baseFont)}px Arial, Helvetica, sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            const textCenterY = docY + docH * (hasDeco ? 0.77 : 0.66);
+            ctx.fillText(labelDoc, docX + docW / 2, textCenterY);
+
+            // Etiqueta inferior ("VISTA NO DISPONIBLE", "PDF • X PÁG.", etc.)
+            const badgeFontSize = Math.max(7.5, Math.min(10, size * 0.058));
+            ctx.font = `700 ${badgeFontSize}px Arial, Helvetica, sans-serif`;
+            const badgeTextW = ctx.measureText(badgeText).width;
+            const badgeW = Math.min(size - 16, badgeTextW + 14);
+            const badgeX = x + (size - badgeW) / 2;
+            const badgeY = docY + docH + gap;
+
+            trazarRectanguloRedondeado(ctx, badgeX, badgeY, badgeW, badgeH, 4);
+            ctx.fillStyle = '#f3f4f6';
+            ctx.fill();
+            ctx.strokeStyle = '#e5e7eb';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+
+            ctx.fillStyle = '#4b5563';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(badgeText, x + size / 2, badgeY + badgeH / 2, badgeW - 6);
+            ctx.restore();
+        }
+
+        // Genera un Canvas de alta resolución (2x) en formato Reporte para un lote de archivos
+        async function renderizarLoteEnCanvas(batchItems, columnas) {
+            const scale = 2; // Alta resolución para dictámenes y Word
+            const thumbSize = parseInt(sizeSlider.value, 10) || 180;
+            const padding = 24;
+            const gapX = 16;
+            const gapY = 20;
+            const labelFontSize = Math.max(10, Math.min(12.5, Math.round(thumbSize * 0.068)));
+            const lineHeight = Math.round(labelFontSize * 1.32);
+            const labelTopGap = 8;
+
+            // Medición previa de líneas de texto por fila para calcular altura exacta
+            const measureCanvas = document.createElement('canvas');
+            const mCtx = measureCanvas.getContext('2d');
+            mCtx.font = `400 ${labelFontSize}px Arial, Helvetica, sans-serif`;
+
+            const rows = Math.ceil(batchItems.length / columnas);
+            const wrappedLabels = batchItems.map(item => dividirTextoEnLineas(mCtx, item.fileName, thumbSize));
+            const rowHeights = [];
+
+            for (let r = 0; r < rows; r++) {
+                let maxLines = 1;
+                for (let c = 0; c < columnas; c++) {
+                    const idx = r * columnas + c;
+                    if (idx < batchItems.length) {
+                        maxLines = Math.max(maxLines, wrappedLabels[idx].length);
+                    }
+                }
+                rowHeights.push(thumbSize + labelTopGap + (maxLines * lineHeight));
+            }
+
+            const totalWidth = (padding * 2) + (columnas * thumbSize) + ((columnas - 1) * gapX);
+            const totalHeight = (padding * 2) + rowHeights.reduce((acc, h) => acc + h, 0) + ((rows - 1) * gapY);
+
+            const canvas = document.createElement('canvas');
+            canvas.width = Math.round(totalWidth * scale);
+            canvas.height = Math.round(totalHeight * scale);
+
+            const ctx = canvas.getContext('2d');
+            ctx.scale(scale, scale);
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
+
+            // Fondo blanco puro para el reporte
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, totalWidth, totalHeight);
+
+            let currentY = padding;
+
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < columnas; c++) {
+                    const idx = r * columnas + c;
+                    if (idx >= batchItems.length) break;
+
+                    const item = batchItems[idx];
+                    const cellX = padding + c * (thumbSize + gapX);
+                    const cellY = currentY;
+
+                    // 1. Dibujar contenido de la miniatura (Imagen, Video o Placeholder SVG)
+                    if (item.imgSrc) {
+                        try {
+                            const img = await cargarImagenDesdeDataUrl(item.imgSrc);
+                            ctx.save();
+                            trazarRectanguloRedondeado(ctx, cellX, cellY, thumbSize, thumbSize, 8);
+                            ctx.fillStyle = item.isVideoFrame ? '#000000' : '#ffffff';
+                            ctx.fill();
+                            ctx.clip();
+
+                            // Ajuste object-fit: contain (sin deformar ni recortar)
+                            const innerPad = 2;
+                            const avail = thumbSize - (innerPad * 2);
+                            const ratio = Math.min(avail / img.naturalWidth, avail / img.naturalHeight);
+                            const drawW = img.naturalWidth * ratio;
+                            const drawH = img.naturalHeight * ratio;
+                            const drawX = cellX + (thumbSize - drawW) / 2;
+                            const drawY = cellY + (thumbSize - drawH) / 2;
+
+                            ctx.drawImage(img, drawX, drawY, drawW, drawH);
+
+                            // Etiqueta de video en esquina inferior derecha
+                            if (item.isVideoFrame) {
+                                const tag = `▶ ${item.extension.toUpperCase()}`;
+                                ctx.font = '700 9px monospace';
+                                const tagW = ctx.measureText(tag).width + 10;
+                                const tagH = 16;
+                                trazarRectanguloRedondeado(ctx, cellX + thumbSize - tagW - 5, cellY + thumbSize - tagH - 5, tagW, tagH, 4);
+                                ctx.fillStyle = 'rgba(0, 0, 0, 0.78)';
+                                ctx.fill();
+                                ctx.fillStyle = '#ffffff';
+                                ctx.textAlign = 'center';
+                                ctx.textBaseline = 'middle';
+                                ctx.fillText(tag, cellX + thumbSize - tagW / 2 - 5, cellY + thumbSize - tagH / 2 - 5);
+                            }
+
+                            ctx.restore();
+
+                            // Borde limpio del recuadro
+                            trazarRectanguloRedondeado(ctx, cellX, cellY, thumbSize, thumbSize, 8);
+                            ctx.strokeStyle = '#d1d5db';
+                            ctx.lineWidth = 1.5;
+                            ctx.stroke();
+                        } catch {
+                            dibujarPlaceholderEnCanvas(ctx, cellX, cellY, thumbSize, item);
+                        }
+                    } else {
+                        dibujarPlaceholderEnCanvas(ctx, cellX, cellY, thumbSize, item);
+                    }
+
+                    // 2. Dibujar nombre completo del archivo con extensión
+                    const lines = wrappedLabels[idx];
+                    ctx.fillStyle = '#111827';
+                    ctx.font = `400 ${labelFontSize}px Arial, Helvetica, sans-serif`;
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'top';
+
+                    const textStartY = cellY + thumbSize + labelTopGap;
+                    for (let l = 0; l < lines.length; l++) {
+                        ctx.fillText(lines[l], cellX + thumbSize / 2, textStartY + (l * lineHeight));
+                    }
+                }
+
+                currentY += rowHeights[r] + gapY;
+            }
+
+            return canvas;
+        }
+
+        // Exportar a PNG (100% Offline)
+        window.exportarCaptura = async function() {
+            const visibleItems = obtenerItemsVisibles();
+            if (visibleItems.length === 0) {
+                mostrarMensaje("No hay miniaturas visibles para capturar. Revise los archivos o filtros.");
+                return;
+            }
+
+            const batchSizeVal = document.getElementById('batchSize').value;
+            const columnas = obtenerColumnasActualesGrid();
+
+            try {
+                if (batchSizeVal === 'all') {
+                    mostrarMensaje(`Generando captura completa con ${visibleItems.length} miniaturas...`);
+                    const canvas = await renderizarLoteEnCanvas(visibleItems, columnas);
+                    descargarCanvasComoPng(canvas, 'SABANA_COMPLETA');
+                    mostrarMensaje('Captura PNG guardada correctamente.');
+                } else {
+                    const batchSize = parseInt(batchSizeVal, 10);
+                    const totalPages = Math.ceil(visibleItems.length / batchSize);
+                    mostrarMensaje(`Generando ${totalPages} capturas (lotes de ${batchSize} miniaturas)...`);
+
+                    for (let i = 0; i < totalPages; i++) {
+                        const batch = visibleItems.slice(i * batchSize, (i + 1) * batchSize);
+                        const canvas = await renderizarLoteEnCanvas(batch, columnas);
+                        descargarCanvasComoPng(canvas, `SABANA_PARTE_${i + 1}_DE_${totalPages}`);
+                        await new Promise(resolve => setTimeout(resolve, 250));
+                    }
+                    mostrarMensaje(`Se guardaron exitosamente las ${totalPages} capturas PNG.`);
+                }
+            } catch (error) {
+                console.error("Error al generar captura:", error);
+                mostrarMensaje("Hubo un error al generar la imagen PNG.");
+            }
+        };
+
+        function descargarCanvasComoPng(canvas, prefijoNombre) {
+            const link = document.createElement('a');
+            link.download = `${prefijoNombre}_${Date.now()}.png`;
+            link.href = canvas.toDataURL('image/png');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // =========================================================
+        // 6. EMPAQUETADOR ZIP NATIVO Y EXPORTADOR .DOCX (100% OFFLINE)
+        //    Reemplaza a JSZip sin requerir conexión a internet
+        // =========================================================
+        const CRC32_TABLE = (() => {
+            const table = new Uint32Array(256);
+            for (let i = 0; i < 256; i++) {
+                let c = i;
+                for (let j = 0; j < 8; j++) {
+                    c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+                }
+                table[i] = c >>> 0;
+            }
+            return table;
+        })();
+
+        function calcularCrc32(bytes) {
+            let crc = 0xFFFFFFFF;
+            for (let i = 0; i < bytes.length; i++) {
+                crc = CRC32_TABLE[(crc ^ bytes[i]) & 0xFF] ^ (crc >>> 8);
+            }
+            return (crc ^ 0xFFFFFFFF) >>> 0;
+        }
+
+        function base64AUint8Array(base64) {
+            const binaryStr = atob(base64);
+            const len = binaryStr.length;
+            const bytes = new Uint8Array(len);
+            for (let i = 0; i < len; i++) {
+                bytes[i] = binaryStr.charCodeAt(i);
+            }
+            return bytes;
+        }
+
+        class NativeZipBuilder {
+            constructor() {
+                this.files = [];
+                this.encoder = new TextEncoder();
+            }
+
+            addText(path, content) {
+                this.files.push({
+                    nameBytes: this.encoder.encode(path),
+                    data: this.encoder.encode(content)
+                });
+            }
+
+            addBase64(path, base64Content) {
+                this.files.push({
+                    nameBytes: this.encoder.encode(path),
+                    data: base64AUint8Array(base64Content)
+                });
+            }
+
+            buildBlob(mimeType) {
+                const now = new Date();
+                const dosTime = ((now.getHours() & 0x1F) << 11) | ((now.getMinutes() & 0x3F) << 5) | ((now.getSeconds() >> 1) & 0x1F);
+                const dosDate = (((Math.max(1980, now.getFullYear()) - 1980) & 0x7F) << 9) | (((now.getMonth() + 1) & 0x0F) << 5) | (now.getDate() & 0x1F);
+
+                const localParts = [];
+                const centralParts = [];
+                let offset = 0;
+
+                for (const file of this.files) {
+                    const crc = calcularCrc32(file.data);
+                    const size = file.data.length;
+                    const nameLen = file.nameBytes.length;
+
+                    // Local File Header (30 bytes)
+                    const localHeader = new Uint8Array(30);
+                    const lv = new DataView(localHeader.buffer);
+                    lv.setUint32(0, 0x04034b50, true);
+                    lv.setUint16(4, 20, true);
+                    lv.setUint16(6, 0x0800, true); // UTF-8
+                    lv.setUint16(8, 0, true);      // STORE (sin compresión, 100% compatible con Word)
+                    lv.setUint16(10, dosTime, true);
+                    lv.setUint16(12, dosDate, true);
+                    lv.setUint32(14, crc, true);
+                    lv.setUint32(18, size, true);
+                    lv.setUint32(22, size, true);
+                    lv.setUint16(26, nameLen, true);
+                    lv.setUint16(28, 0, true);
+
+                    localParts.push(localHeader, file.nameBytes, file.data);
+
+                    // Central Directory Header (46 bytes)
+                    const centralHeader = new Uint8Array(46);
+                    const cv = new DataView(centralHeader.buffer);
+                    cv.setUint32(0, 0x02014b50, true);
+                    cv.setUint16(4, 20, true);
+                    cv.setUint16(6, 20, true);
+                    cv.setUint16(8, 0x0800, true);
+                    cv.setUint16(10, 0, true);
+                    cv.setUint16(12, dosTime, true);
+                    cv.setUint16(14, dosDate, true);
+                    cv.setUint32(16, crc, true);
+                    cv.setUint32(20, size, true);
+                    cv.setUint32(24, size, true);
+                    cv.setUint16(28, nameLen, true);
+                    cv.setUint16(30, 0, true);
+                    cv.setUint16(32, 0, true);
+                    cv.setUint16(34, 0, true);
+                    cv.setUint16(36, 0, true);
+                    cv.setUint32(38, 0, true);
+                    cv.setUint32(42, offset, true);
+
+                    centralParts.push(centralHeader, file.nameBytes);
+                    offset += 30 + nameLen + size;
+                }
+
+                let centralDirSize = 0;
+                for (const part of centralParts) {
+                    centralDirSize += part.length;
+                }
+
+                // End of Central Directory Record (22 bytes)
+                const eocd = new Uint8Array(22);
+                const ev = new DataView(eocd.buffer);
+                ev.setUint32(0, 0x06054b50, true);
+                ev.setUint16(4, 0, true);
+                ev.setUint16(6, 0, true);
+                ev.setUint16(8, this.files.length, true);
+                ev.setUint16(10, this.files.length, true);
+                ev.setUint32(12, centralDirSize, true);
+                ev.setUint32(16, offset, true);
+                ev.setUint16(20, 0, true);
+
+                return new Blob([...localParts, ...centralParts, eocd], { type: mimeType });
+            }
+        }
+
+        // Exportar capturas directamente a Word (.docx) 100% Offline
+        window.exportarWord = async function() {
+            const visibleItems = obtenerItemsVisibles();
+            if (visibleItems.length === 0) {
+                mostrarMensaje("No hay miniaturas visibles para exportar a Word.");
+                return;
+            }
+
+            const batchSizeVal = document.getElementById('batchSize').value;
+            const columnas = obtenerColumnasActualesGrid();
+            const capturasData = [];
+
+            try {
+                if (batchSizeVal === 'all') {
+                    mostrarMensaje(`Generando captura de ${visibleItems.length} miniaturas para Word...`);
+                    const canvas = await renderizarLoteEnCanvas(visibleItems, columnas);
+                    capturasData.push({
+                        base64: canvas.toDataURL('image/png').split(',')[1],
+                        width: canvas.width,
+                        height: canvas.height
+                    });
+                } else {
+                    const batchSize = parseInt(batchSizeVal, 10);
+                    const totalPages = Math.ceil(visibleItems.length / batchSize);
+                    mostrarMensaje(`Generando ${totalPages} bloques de capturas para el documento Word...`);
+
+                    for (let i = 0; i < totalPages; i++) {
+                        const batch = visibleItems.slice(i * batchSize, (i + 1) * batchSize);
+                        const canvas = await renderizarLoteEnCanvas(batch, columnas);
+                        capturasData.push({
+                            base64: canvas.toDataURL('image/png').split(',')[1],
+                            width: canvas.width,
+                            height: canvas.height
+                        });
+                    }
+                }
+
+                generarArchivoDocxConCapturas(capturasData);
+                mostrarMensaje("Documento Word (.docx) con capturas generado correctamente.");
+            } catch (error) {
+                console.error("Error al exportar a Word:", error);
+                mostrarMensaje("Ocurrió un error al construir el archivo de Word.");
+            }
+        };
+
+        function generarArchivoDocxConCapturas(capturas) {
+            const zip = new NativeZipBuilder();
+
+            zip.addText("[Content_Types].xml", `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+    <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+    <Default Extension="xml" ContentType="application/xml"/>
+    <Default Extension="png" ContentType="image/png"/>
+    <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
+</Types>`);
+
+            zip.addText("_rels/.rels", `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+    <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>
+</Relationships>`);
+
+            let relsXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">`;
+            let bodyParagraphsXml = '';
+
+            const maxWidthEmu = 6480000;
+            const maxHeightEmu = 8800000;
+
+            capturas.forEach((cap, idx) => {
+                const imgNum = idx + 1;
+                const rId = `rId${imgNum}`;
+                const fileName = `captura_${imgNum}.png`;
+
+                zip.addBase64(`word/media/${fileName}`, cap.base64);
+                relsXml += `\n    <Relationship Id="${rId}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/${fileName}"/>`;
+
+                let cx = maxWidthEmu;
+                let cy = Math.round(maxWidthEmu * (cap.height / cap.width));
+                if (cy > maxHeightEmu) {
+                    const ratio = maxHeightEmu / cy;
+                    cy = maxHeightEmu;
+                    cx = Math.round(cx * ratio);
+                }
+
+                bodyParagraphsXml += `
+        <w:p>
+            <w:pPr>
+                <w:jc w:val="center"/>
+                <w:spacing w:before="0" w:after="120"/>
+            </w:pPr>
+            <w:r>
+                <w:drawing>
+                    <wp:inline distT="0" distB="0" distL="0" distR="0">
+                        <wp:extent cx="${cx}" cy="${cy}"/>
+                        <wp:docPr id="${imgNum}" name="Captura ${imgNum}"/>
+                        <wp:cNvGraphicFramePr>
+                            <a:graphicFrameLocks noChangeAspect="1"/>
+                        </wp:cNvGraphicFramePr>
+                        <a:graphic>
+                            <a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture">
+                                <pic:pic>
+                                    <pic:nvPicPr>
+                                        <pic:cNvPr id="${imgNum}" name="${fileName}"/>
+                                        <pic:cNvPicPr/>
+                                    </pic:nvPicPr>
+                                    <pic:blipFill>
+                                        <a:blip r:embed="${rId}"/>
+                                        <a:stretch>
+                                            <a:fillRect/>
+                                        </a:stretch>
+                                    </pic:blipFill>
+                                    <pic:spPr>
+                                        <a:xfrm>
+                                            <a:off x="0" y="0"/>
+                                            <a:ext cx="${cx}" cy="${cy}"/>
+                                        </a:xfrm>
+                                        <a:prstGeom prst="rect">
+                                            <a:avLst/>
+                                        </a:prstGeom>
+                                    </pic:spPr>
+                                </pic:pic>
+                            </a:graphicData>
+                        </a:graphic>
+                    </wp:inline>
+                </w:drawing>
+            </w:r>
+        </w:p>`;
+            });
+
+            relsXml += `\n</Relationships>`;
+            zip.addText("word/_rels/document.xml.rels", relsXml);
+
+            const documentXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+            xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+            xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"
+            xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
+            xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">
+    <w:body>${bodyParagraphsXml}
+        <w:sectPr>
+            <w:pgSz w:w="12240" w:h="15840"/>
+            <w:pgMar w:top="720" w:right="720" w:bottom="720" w:left="720" w:header="0" w:footer="0" w:gutter="0"/>
+        </w:sectPr>
+    </w:body>
+</w:document>`;
+
+            zip.addText("word/document.xml", documentXml);
+
+            const blob = zip.buildBlob("application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `Capturas_Evidencia_FGE_${Date.now()}.docx`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>

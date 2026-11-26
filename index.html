@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Menú de Herramientas de Informática Forense: Calculadora DVR, Hash y Metadatos, Lectura de Memoria, Lectura de WhatsApp y Reproductor Forense.">
+    <meta name="keywords" content="Informática Forense, Menú Forense, Calculadora Forense DVR, Hash y Metadatos, Lectura de Memoria, Lectura de WhatsApp, Reproductor Forense, Evidencia Digital, Peritaje Informático, Isaí Figueroa, FigueroAPPS">
+    <meta name="author" content="Isaí Figueroa J.">
+    <title>Menú de Herramientas Forenses - Creado por Isaí Figueroa J.</title>
+    <!-- Favicon en SVG integrado para visualización 100% sin conexión -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='46' fill='%230f172a' stroke='%2338bdf8' stroke-width='6'/%3E%3Ctext x='50' y='62' font-family='sans-serif' font-size='34' font-weight='bold' fill='%23ffffff' text-anchor='middle'%3EFGE%3C/text%3E%3C/svg%3E">
+    
+    <style>
+        *, ::before, ::after {
+            box-sizing: border-box;
+            border-width: 0;
+            border-style: solid;
+            border-color: #334155;
+        }
+
+        body {
+            font-family: 'Rajdhani', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #050505; 
+            color: #ffffff;
+            margin: 0;
+            overflow-x: hidden;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        button, input {
+            font-family: inherit;
+            font-size: 100%;
+            margin: 0;
+            padding: 0;
+            color: inherit;
+            background: none;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        /* Fondo de Red Interactiva con tonos random y fondo azul (idéntico al index de referencia) */
+        #network-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at center, #1e293b 0%, #020617 100%);
+            opacity: 0.65;
+            pointer-events: none;
+        }
+
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            border-radius: 0.75rem;
+        }
+
+        .transition-all-smooth {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Utilidades de Layout Offline */
+        .hidden { display: none !important; }
+        .block { display: block; }
+        .flex { display: flex; }
+        .grid { display: grid; }
+        .flex-col { flex-direction: column; }
+        .flex-wrap { flex-wrap: wrap; }
+        .items-center { align-items: center; }
+        .justify-center { justify-content: center; }
+        .justify-between { justify-content: space-between; }
+        .relative { position: relative; }
+        .absolute { position: absolute; }
+        .inset-y-0 { top: 0; bottom: 0; }
+        .left-0 { left: 0; }
+        .right-0 { right: 0; }
+        .z-10 { z-index: 10; }
+        .pointer-events-none { pointer-events: none; }
+        .select-none { user-select: none; }
+
+        /* Dimensiones y Espaciados */
+        .w-full { width: 100%; }
+        .w-16 { width: 4rem; }
+        .w-14 { width: 3.5rem; }
+        .w-12 { width: 3rem; }
+        .w-9 { width: 2.25rem; }
+        .w-8 { width: 2rem; }
+        .w-2\.5 { width: 0.625rem; }
+        .h-16 { height: 4rem; }
+        .h-14 { height: 3.5rem; }
+        .h-12 { height: 3rem; }
+        .h-9 { height: 2.25rem; }
+        .h-8 { height: 2rem; }
+        .h-2\.5 { height: 0.625rem; }
+        .min-h-screen { min-height: 100vh; }
+        .max-w-5xl { max-width: 64rem; }
+
+        .gap-1\.5 { gap: 0.375rem; }
+        .gap-2 { gap: 0.5rem; }
+        .gap-3 { gap: 0.75rem; }
+        .gap-4 { gap: 1rem; }
+        .gap-5 { gap: 1.25rem; }
+        .gap-6 { gap: 1.5rem; }
+
+        .p-4 { padding: 1rem; }
+        .p-6 { padding: 1.5rem; }
+        .py-1 { padding-top: 0.25rem; padding-bottom: 0.25rem; }
+        .py-2\.5 { padding-top: 0.625rem; padding-bottom: 0.625rem; }
+        .py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
+        .py-8 { padding-top: 2rem; padding-bottom: 2rem; }
+        .px-3 { padding-left: 0.75rem; padding-right: 0.75rem; }
+        .px-4 { padding-left: 1rem; padding-right: 1rem; }
+        .pl-10 { padding-left: 2.5rem; }
+        .pr-4 { padding-right: 1rem; }
+
+        .mt-1 { margin-top: 0.25rem; }
+        .mt-1\.5 { margin-top: 0.375rem; }
+        .mt-2 { margin-top: 0.5rem; }
+        .mt-4 { margin-top: 1rem; }
+        .mb-2 { margin-bottom: 0.5rem; }
+
+        .font-mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+        .text-xs { font-size: 0.75rem; line-height: 1rem; }
+        .text-sm { font-size: 0.875rem; line-height: 1.25rem; }
+        .text-base { font-size: 1rem; line-height: 1.5rem; }
+        .text-lg { font-size: 1.125rem; line-height: 1.75rem; }
+        .text-xl { font-size: 1.25rem; line-height: 1.75rem; }
+        .text-2xl { font-size: 1.5rem; line-height: 2rem; }
+        .font-medium { font-weight: 500; }
+        .font-semibold { font-weight: 600; }
+        .font-bold { font-weight: 700; }
+        .uppercase { text-transform: uppercase; }
+        .text-center { text-align: center; }
+        .tracking-wide { letter-spacing: 0.025em; }
+        .tracking-wider { letter-spacing: 0.05em; }
+        .tracking-widest { letter-spacing: 0.1em; }
+
+        /* Colores de Texto */
+        .text-white { color: #ffffff; }
+        .text-gray-300 { color: #d1d5db; }
+        .text-gray-400 { color: #9ca3af; }
+        .text-blue-200 { color: #bfdbfe; }
+        .text-blue-300 { color: #93c5fd; }
+        .text-blue-400 { color: #60a5fa; }
+        .text-cyan-300 { color: #67e8f9; }
+        .text-cyan-400 { color: #22d3ee; }
+        .text-amber-400 { color: #fbbf24; }
+        .text-emerald-400 { color: #34d399; }
+        .text-purple-400 { color: #c084fc; }
+
+        .u-link {
+            text-decoration: none;
+        }
+        .u-link:hover {
+            color: #93c5fd;
+            text-decoration: underline;
+        }
+        .transition-colors {
+            transition: color 0.2s ease-in-out;
+        }
+
+        .rounded-lg { border-radius: 0.5rem; }
+        .rounded-xl { border-radius: 0.75rem; }
+        .rounded-2xl { border-radius: 1rem; }
+        .rounded-full { border-radius: 9999px; }
+
+        /* Contenedor del Logo Vectorial FGE sin fondo blanco */
+        .fge-logo-container {
+            width: 8.5rem;
+            height: 8.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            filter: drop-shadow(0 0 18px rgba(59, 130, 246, 0.35));
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), filter 0.35s ease;
+        }
+
+        .fge-logo-container:hover {
+            transform: scale(1.05);
+            filter: drop-shadow(0 0 25px rgba(34, 211, 238, 0.55));
+        }
+
+        @media (min-width: 768px) {
+            .fge-logo-container {
+                width: 9.75rem;
+                height: 9.75rem;
+            }
+        }
+
+        .header-title-white {
+            color: #ffffff;
+            text-shadow: 0 2px 15px rgba(59, 130, 246, 0.35);
+        }
+
+        /* Cuadrícula de Módulos Forenses centrada (3 arriba y 2 centrados abajo en escritorio) */
+        .modules-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: stretch;
+            gap: 1.5rem;
+            width: 100%;
+        }
+
+        .modules-grid > .module-card {
+            width: 100%;
+        }
+
+        @media (min-width: 640px) {
+            .modules-grid > .module-card {
+                width: calc(50% - 0.75rem);
+            }
+        }
+
+        @media (min-width: 960px) {
+            .modules-grid {
+                gap: 1.75rem;
+            }
+            .modules-grid > .module-card {
+                width: calc((100% - 3.5rem) / 3);
+            }
+        }
+
+        /* Tarjetas de Módulos */
+        .module-card {
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2.25rem 1.75rem;
+            background: rgba(15, 23, 42, 0.72);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(59, 130, 246, 0.28);
+            border-radius: 0.875rem;
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.6), 0 0 20px rgba(59, 130, 246, 0.08);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+
+        .module-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--card-accent, linear-gradient(to right, #3b82f6, #22d3ee));
+            opacity: 0.85;
+            transition: height 0.25s ease, opacity 0.25s ease;
+        }
+
+        .module-card:hover {
+            transform: translateY(-6px);
+            border-color: var(--card-border-hover, rgba(34, 211, 238, 0.65));
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.75), 0 0 32px var(--card-glow, rgba(6, 182, 212, 0.28));
+            background: rgba(15, 23, 42, 0.9);
+        }
+
+        .module-card:hover::before {
+            height: 4px;
+            opacity: 1;
+        }
+
+        /* Nuevo diseño de Logo más grande con doble anillo luminoso y efecto cápsula 3D */
+        .module-icon-wrapper {
+            position: relative;
+            width: 5.75rem;
+            height: 5.75rem;
+            border-radius: 9999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.35rem;
+            background: radial-gradient(circle at 30% 30%, var(--icon-bg-strong, rgba(59, 130, 246, 0.28)), rgba(2, 6, 23, 0.92) 75%);
+            border: 2px solid var(--icon-border, rgba(59, 130, 246, 0.55));
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.7),
+                        0 0 25px var(--icon-shadow, rgba(59, 130, 246, 0.28)),
+                        inset 0 0 18px var(--icon-shadow, rgba(59, 130, 246, 0.25));
+            color: var(--icon-color, #60a5fa);
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .module-icon-wrapper::after {
+            content: '';
+            position: absolute;
+            inset: -6px;
+            border-radius: 9999px;
+            border: 1px dashed var(--icon-border, rgba(59, 130, 246, 0.45));
+            opacity: 0.55;
+            transition: all 0.4s ease;
+        }
+
+        .module-card:hover .module-icon-wrapper {
+            transform: scale(1.1) translateY(-2px);
+            box-shadow: 0 14px 30px -5px rgba(0, 0, 0, 0.8),
+                        0 0 35px var(--icon-shadow-hover, rgba(34, 211, 238, 0.55)),
+                        inset 0 0 22px var(--icon-shadow-hover, rgba(34, 211, 238, 0.35));
+        }
+
+        .module-card:hover .module-icon-wrapper::after {
+            opacity: 0.95;
+            transform: rotate(25deg) scale(1.04);
+        }
+
+        /* Variantes de color por módulo manteniendo la paleta del index original */
+        .theme-cyan {
+            --card-accent: linear-gradient(to right, #2563eb, #22d3ee);
+            --card-border-hover: rgba(34, 211, 238, 0.65);
+            --card-glow: rgba(34, 211, 238, 0.25);
+            --icon-bg-strong: rgba(34, 211, 238, 0.32);
+            --icon-border: rgba(34, 211, 238, 0.6);
+            --icon-shadow: rgba(6, 182, 212, 0.28);
+            --icon-shadow-hover: rgba(34, 211, 238, 0.6);
+            --icon-color: #22d3ee;
+        }
+
+        .theme-amber {
+            --card-accent: linear-gradient(to right, #d97706, #fbbf24);
+            --card-border-hover: rgba(251, 191, 36, 0.65);
+            --card-glow: rgba(245, 158, 11, 0.25);
+            --icon-bg-strong: rgba(251, 191, 36, 0.32);
+            --icon-border: rgba(251, 191, 36, 0.6);
+            --icon-shadow: rgba(245, 158, 11, 0.28);
+            --icon-shadow-hover: rgba(251, 191, 36, 0.6);
+            --icon-color: #fbbf24;
+        }
+
+        .theme-blue {
+            --card-accent: linear-gradient(to right, #1d4ed8, #60a5fa);
+            --card-border-hover: rgba(96, 165, 250, 0.65);
+            --card-glow: rgba(59, 130, 246, 0.28);
+            --icon-bg-strong: rgba(96, 165, 250, 0.32);
+            --icon-border: rgba(96, 165, 250, 0.6);
+            --icon-shadow: rgba(59, 130, 246, 0.28);
+            --icon-shadow-hover: rgba(96, 165, 250, 0.6);
+            --icon-color: #60a5fa;
+        }
+
+        .theme-emerald {
+            --card-accent: linear-gradient(to right, #059669, #34d399);
+            --card-border-hover: rgba(52, 211, 153, 0.65);
+            --card-glow: rgba(16, 185, 129, 0.25);
+            --icon-bg-strong: rgba(52, 211, 153, 0.32);
+            --icon-border: rgba(52, 211, 153, 0.6);
+            --icon-shadow: rgba(16, 185, 129, 0.28);
+            --icon-shadow-hover: rgba(52, 211, 153, 0.6);
+            --icon-color: #34d399;
+        }
+
+        .theme-purple {
+            --card-accent: linear-gradient(to right, #7c3aed, #c084fc);
+            --card-border-hover: rgba(192, 132, 252, 0.65);
+            --card-glow: rgba(168, 85, 247, 0.25);
+            --icon-bg-strong: rgba(192, 132, 252, 0.32);
+            --icon-border: rgba(192, 132, 252, 0.6);
+            --icon-shadow: rgba(168, 85, 247, 0.28);
+            --icon-shadow-hover: rgba(192, 132, 252, 0.6);
+            --icon-color: #c084fc;
+        }
+
+        .theme-pink {
+            --card-accent: linear-gradient(to right, #db2777, #f472b6);
+            --card-border-hover: rgba(244, 114, 182, 0.65);
+            --card-glow: rgba(236, 72, 153, 0.28);
+            --icon-bg-strong: rgba(244, 114, 182, 0.32);
+            --icon-border: rgba(244, 114, 182, 0.6);
+            --icon-shadow: rgba(236, 72, 153, 0.28);
+            --icon-shadow-hover: rgba(244, 114, 182, 0.6);
+            --icon-color: #f472b6;
+        }
+
+        @keyframes ping {
+            75%, 100% { transform: scale(2); opacity: 0; }
+        }
+        @keyframes pulse {
+            50% { opacity: .5; }
+        }
+        .animate-ping { animation: ping 1.2s cubic-bezier(0, 0, 0.2, 1) infinite; }
+        .animate-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+
+        .svg-icon {
+            display: inline-block;
+            width: 1.15em;
+            height: 1.15em;
+            vertical-align: -0.15em;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            flex-shrink: 0;
+        }
+
+        @media (min-width: 768px) {
+            .md-px-8 { padding-left: 2rem; padding-right: 2rem; }
+            .md-text-3xl { font-size: 1.875rem; line-height: 2.25rem; }
+            .md-row { flex-direction: row; }
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center py-8 px-4 md-px-8 relative min-h-screen">
+
+    <!-- Fondo de partículas idéntico al index de referencia -->
+    <canvas id="network-canvas"></canvas>
+
+    <main class="w-full max-w-5xl relative z-10 flex flex-col gap-6">
+        
+        <!-- ENCABEZADO PRINCIPAL CON LOGO VECTORIAL FGE MORELOS (SIN FONDO BLANCO, SOLO LÍNEAS Y LETRAS) -->
+        <header class="flex flex-col items-center justify-center mb-2">
+            <div class="flex flex-col items-center justify-center gap-3">
+                <div class="fge-logo-container">
+                    <!-- Escudo Vectorial FGE Morelos (Transparente: solo líneas y letras) -->
+                    <svg class="w-full h-full" viewBox="0 0 500 500" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Logo Fiscalía General del Estado de Morelos">
+                        <defs>
+                            <!-- Trayectoria circular superior para MORELOS -->
+                            <path id="fge-arc-top" d="M 64,250 A 186,186 0 1,1 436,250" />
+                            <!-- Trayectoria circular inferior para FISCALÍA GENERAL DEL ESTADO -->
+                            <path id="fge-arc-bottom" d="M 249,33 A 217,217 0 1,0 251,33" />
+                            <!-- Máscara para recortar los anillos concéntricos alrededor del escudo central -->
+                            <mask id="fge-shield-cutout">
+                                <rect x="0" y="0" width="500" height="500" fill="white" />
+                                <path d="M 129,169 Q 250,124 371,169 L 371,306 Q 361,366 250,414 Q 139,366 129,306 Z" fill="black" />
+                            </mask>
+                        </defs>
+
+                        <!-- Anillos Exteriores Principales -->
+                        <circle cx="250" cy="250" r="236" stroke="#94a3b8" stroke-width="9" />
+                        <circle cx="250" cy="250" r="168" stroke="#94a3b8" stroke-width="9" />
+
+                        <!-- Líneas curvas laterales separadoras de texto -->
+                        <path d="M 67,165 A 202,202 0 0,1 100,115" stroke="#94a3b8" stroke-width="10" stroke-linecap="butt" />
+                        <path d="M 400,115 A 202,202 0 0,1 433,165" stroke="#94a3b8" stroke-width="10" stroke-linecap="butt" />
+
+                        <!-- Anillos Concéntricos Internos (recortados por el escudo) -->
+                        <g mask="url(#fge-shield-cutout)" stroke="#94a3b8" stroke-width="8.5">
+                            <circle cx="250" cy="250" r="152" />
+                            <circle cx="250" cy="250" r="136" />
+                        </g>
+
+                        <!-- Escudo Central: Contorno Exterior e Interior -->
+                        <path d="M 136,174 Q 250,132 364,174 L 364,304 Q 354,360 250,404 Q 146,360 136,304 Z" stroke="#94a3b8" stroke-width="8.5" stroke-linejoin="miter" />
+                        <path d="M 150,183 Q 250,146 350,183 L 350,299 Q 341,348 250,388 Q 159,348 150,299 Z" stroke="#94a3b8" stroke-width="8" stroke-linejoin="miter" />
+
+                        <!-- Divisiones Internas del Escudo -->
+                        <line x1="250" y1="147" x2="250" y2="388" stroke="#94a3b8" stroke-width="9" />
+                        <line x1="250" y1="266" x2="350" y2="266" stroke="#94a3b8" stroke-width="8" />
+
+                        <!-- Cuadrante Superior Derecho: Balanza de la Justicia -->
+                        <g stroke="#94a3b8" stroke-linecap="butt" stroke-linejoin="round">
+                            <!-- Brazos superiores y fiel de la balanza -->
+                            <path d="M 275,182 L 291,182 L 294,178 L 302,178 L 305,182 L 321,182" stroke-width="5.5" />
+                            <!-- Columna central -->
+                            <line x1="298" y1="178" x2="298" y2="207" stroke-width="6.5" />
+                            <!-- Soportes de los platillos -->
+                            <line x1="277" y1="182" x2="277" y2="193" stroke-width="4.5" />
+                            <line x1="319" y1="182" x2="319" y2="193" stroke-width="4.5" />
+                            <!-- Platillos izquierdo y derecho -->
+                            <path d="M 268,193 A 9,8 0 0,0 286,193 Z" fill="#94a3b8" stroke="none" />
+                            <path d="M 310,193 A 9,8 0 0,0 328,193 Z" fill="#94a3b8" stroke="none" />
+                            <!-- Base escalonada de la balanza -->
+                            <line x1="281" y1="211" x2="315" y2="211" stroke-width="6" />
+                            <line x1="272" y1="221" x2="324" y2="221" stroke-width="6.5" />
+                        </g>
+
+                        <!-- Cuadrante Superior Derecho: Ojo Visor -->
+                        <g stroke="#94a3b8">
+                            <path d="M 268,246 Q 298,225 328,246" stroke-width="6.5" stroke-linecap="butt" />
+                            <circle cx="298" cy="246" r="10.5" stroke-width="6.5" />
+                        </g>
+
+                        <!-- Cuadrante Inferior Derecho: Silueta del Estado de Morelos en Línea -->
+                        <path d="M 274,276 L 285,281 L 295,279 L 309,282 L 317,291 L 334,283 L 325,309 L 329,326 L 321,327 L 324,344 L 309,341 L 295,353 L 288,341 L 273,341 L 273,335 L 263,327 L 259,317 L 267,307 L 265,299 L 272,290 Z" stroke="#94a3b8" stroke-width="4.5" stroke-linejoin="round" />
+
+                        <!-- Siglas Verticales F G E (Solo letras sin fondo) -->
+                        <g fill="#ffffff" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif" font-weight="900" font-size="56" text-anchor="middle">
+                            <text x="202" y="228">F</text>
+                            <text x="202" y="288">G</text>
+                            <text x="202" y="348">E</text>
+                        </g>
+
+                        <!-- Textos Circulares Oficiales -->
+                        <text fill="#ffffff" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif" font-size="37" font-weight="800" letter-spacing="5px">
+                            <textPath href="#fge-arc-top" startOffset="50%" text-anchor="middle">MORELOS</textPath>
+                        </text>
+                        <text fill="#ffffff" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif" font-size="31.5" font-weight="800" letter-spacing="2.8px">
+                            <textPath href="#fge-arc-bottom" startOffset="50%" text-anchor="middle">FISCALÍA GENERAL DEL ESTADO</textPath>
+                        </text>
+                    </svg>
+                </div>
+                <h1 class="text-2xl md-text-3xl font-bold uppercase tracking-wide header-title-white text-center">
+                    MENÚ DE HERRAMIENTAS FORENSES
+                </h1>
+            </div>
+            <h2 class="text-sm font-medium mt-1.5 tracking-wider uppercase text-center" style="color: rgba(147, 197, 253, 0.85);">
+                Creado por <a class="u-link font-bold text-blue-400 transition-colors" href="http://www.isaifijer.com.mx" target="_blank" rel="noopener noreferrer">Isaí Figueroa J.</a>
+            </h2>
+        </header>
+
+        <!-- CUADRÍCULA DE MÓDULOS FORENSES -->
+        <section class="w-full mt-2">
+            <div id="grid-modulos" class="modules-grid">
+
+                <!-- 1. REPRODUCTOR FORENSE (reproductorforense/index.html) -->
+                <a href="reproductorforense/index.html" class="module-card theme-purple">
+                    <div class="flex flex-col items-center w-full">
+                        <div class="module-icon-wrapper">
+                            <!-- Logo de Reproductor Forense rediseñado -->
+                            <svg class="w-12 h-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="2" y="3" width="20" height="14" rx="2.5" fill="rgba(192, 132, 252, 0.16)"/>
+                                <circle cx="12" cy="10" r="4.2" fill="rgba(15, 23, 42, 0.55)"/>
+                                <polygon points="10.8 8.2 14.5 10 10.8 11.8 10.8 8.2" fill="currentColor" stroke="none"/>
+                                <line x1="4" y1="21" x2="20" y2="21"/>
+                                <circle cx="9" cy="21" r="1.5" fill="currentColor"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-bold uppercase tracking-wider text-white">
+                            Reproductor Forense
+                        </h3>
+                        <p class="text-xs text-gray-300 mt-2" style="line-height: 1.5;">
+                            Inspección de formatos de los archivos.
+                        </p>
+                    </div>
+                </a>
+
+                <!-- 2. HASH Y METADATOS (hash-meta/index.html) -->
+                <a href="hash-meta/index.html" class="module-card theme-amber">
+                    <div class="flex flex-col items-center w-full">
+                        <div class="module-icon-wrapper">
+                            <!-- Logo de Hash y Metadatos rediseñado -->
+                            <svg class="w-12 h-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" fill="rgba(251, 191, 36, 0.16)"/>
+                                <polyline points="14 2 14 8 20 8"/>
+                                <line x1="7.5" y1="13" x2="16.5" y2="13"/>
+                                <line x1="7.5" y1="16.5" x2="16.5" y2="16.5"/>
+                                <line x1="10.5" y1="10.5" x2="9.5" y2="19"/>
+                                <line x1="14.5" y1="10.5" x2="13.5" y2="19"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-bold uppercase tracking-wider text-white">
+                            Hash y Metadatos
+                        </h3>
+                        <p class="text-xs text-gray-300 mt-2" style="line-height: 1.5;">
+                            Cálculo de firmas criptográficas Hash y extracción detallada de metadatos para preservar la cadena de custodia.
+                        </p>
+                    </div>
+                </a>
+
+                <!-- 3. AUTO-ESCÁNER FORENSE DE DISPOSITIVOS (lectura-memoria/index.html) -->
+                <a href="lectura-memoria/index.html" class="module-card theme-blue">
+                    <div class="flex flex-col items-center w-full">
+                        <div class="module-icon-wrapper">
+                            <!-- Logo de Memoria USB Forense rediseñado -->
+                            <svg class="w-12 h-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="6" y="8" width="12" height="14" rx="3" fill="rgba(96, 165, 250, 0.18)"/>
+                                <path d="M8.5 8V3.5a1 1 0 0 1 1-1h5a1 1 0 0 1 1 1V8" fill="rgba(15, 23, 42, 0.5)"/>
+                                <line x1="10.5" y1="5" x2="10.5" y2="6"/>
+                                <line x1="13.5" y1="5" x2="13.5" y2="6"/>
+                                <circle cx="12" cy="14" r="2.2" fill="rgba(96, 165, 250, 0.35)"/>
+                                <path d="M12 16.2v2.8"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-bold uppercase tracking-wider text-white">
+                            AUTO-ESCÁNER FORENSE DE DISPOSITIVOS
+                        </h3>
+                        <p class="text-xs text-gray-300 mt-2" style="line-height: 1.5;">
+                            Conteo y visualización estructurada de todos los formatos de archivos.
+                        </p>
+                    </div>
+                </a>
+
+                <!-- 4. AUTO-ESCÁNER FORENSE DE WHATSAPP (lectura-whatsapp/index.html) -->
+                <a href="lectura-whatsapp/index.html" class="module-card theme-emerald">
+                    <div class="flex flex-col items-center w-full">
+                        <div class="module-icon-wrapper">
+                            <!-- Logo de WhatsApp Forense corregido (teléfono centrado sin sobreponerse a la burbuja) -->
+                            <svg class="w-12 h-12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <!-- Burbuja de diálogo exterior -->
+                                <path d="M12 3a8.5 8.5 0 0 0-7.38 12.72L3.5 20.5l4.92-1.1A8.5 8.5 0 1 0 12 3z" fill="rgba(52, 211, 153, 0.16)" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+                                <!-- Auricular telefónico proporcionado y centrado dentro de la burbuja -->
+                                <path d="M9.15 8.25c.18-.38.48-.52.86-.52h.65c.28 0 .5.12.62.4l.58 1.38c.12.26.08.52-.1.72l-.48.55c.44.82 1.12 1.5 1.94 1.94l.55-.48c.2-.18.46-.22.72-.1l1.38.58c.28.12.4.34.4.62v.65c0 .38-.14.68-.52.86-.48.24-1.15.32-1.82.12-2.05-.6-3.8-2.35-4.4-4.4-.2-.67-.12-1.34.12-1.82z" fill="currentColor" stroke="none"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-bold uppercase tracking-wider text-white">
+                            AUTO-ESCÁNER FORENSE DE WHATSAPP
+                        </h3>
+                        <p class="text-xs text-gray-300 mt-2" style="line-height: 1.5;">
+                            Conteo y visualización estructurada de todos los formatos de archivos dentro de conversaciones de WhatsApp.
+                        </p>
+                    </div>
+                </a>
+
+                <!-- 5. CALCULADORA FORENSE DE DVR (calculadora-dvr/index.html) -->
+                <a href="calculadora-dvr/index.html" class="module-card theme-cyan">
+                    <div class="flex flex-col items-center w-full">
+                        <div class="module-icon-wrapper">
+                            <!-- Logo de Calculadora Forense rediseñado -->
+                            <svg class="w-12 h-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="4" y="2" width="16" height="20" rx="3" fill="rgba(34, 211, 238, 0.16)"/>
+                                <rect x="7" y="5" width="10" height="4" rx="1" fill="rgba(15, 23, 42, 0.65)"/>
+                                <circle cx="8.5" cy="13" r="1" fill="currentColor" stroke="none"/>
+                                <circle cx="12" cy="13" r="1" fill="currentColor" stroke="none"/>
+                                <circle cx="15.5" cy="13" r="1" fill="currentColor" stroke="none"/>
+                                <circle cx="8.5" cy="17" r="1" fill="currentColor" stroke="none"/>
+                                <circle cx="12" cy="17" r="1" fill="currentColor" stroke="none"/>
+                                <path d="M15.5 15.5v3"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-bold uppercase tracking-wider text-white">
+                            Calculadora Forense de DVR
+                        </h3>
+                        <p class="text-xs text-gray-300 mt-2" style="line-height: 1.5;">
+                            Determinación exacta de desfase de tiempo y cálculo de fecha y hora real a buscar en grabadores CCTV.
+                        </p>
+                    </div>
+                </a>
+
+                <!-- 6. GENERADOR DE MINIATURAS (generador_miniaturas/index.html) -->
+                <a href="generador_miniaturas/index.html" class="module-card theme-pink">
+                    <div class="flex flex-col items-center w-full">
+                        <div class="module-icon-wrapper">
+                            <!-- Logo de Sábana de Miniaturas / Cuadrícula de Evidencia -->
+                            <svg class="w-12 h-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                                <!-- Miniatura 1: Imagen -->
+                                <rect x="3" y="3" width="7.5" height="7.5" rx="1.8" fill="rgba(244, 114, 182, 0.22)"/>
+                                <circle cx="5.5" cy="5.5" r="0.85" fill="#f9a8d4" stroke="none"/>
+                                <path d="m3.5 9.5 2.2-2.2 1.8 1.5 1.5-1.3 1 1" stroke-width="1.35"/>
+                                <!-- Miniatura 2: Documento -->
+                                <rect x="13.5" y="3" width="7.5" height="7.5" rx="1.8" fill="rgba(15, 23, 42, 0.55)"/>
+                                <line x1="15.5" y1="5.5" x2="19" y2="5.5" stroke-width="1.4"/>
+                                <line x1="15.5" y1="8" x2="18" y2="8" stroke-width="1.4"/>
+                                <!-- Miniatura 3: Documento -->
+                                <rect x="3" y="13.5" width="7.5" height="7.5" rx="1.8" fill="rgba(15, 23, 42, 0.55)"/>
+                                <line x1="5" y1="16" x2="8.5" y2="16" stroke-width="1.4"/>
+                                <line x1="5" y1="18.5" x2="7.5" y2="18.5" stroke-width="1.4"/>
+                                <!-- Miniatura 4: Evidencia Verificada -->
+                                <rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.8" fill="rgba(236, 72, 153, 0.22)"/>
+                                <path d="m15.5 17.3 1.3 1.3 2.7-2.7" stroke="#f9a8d4" stroke-width="1.85"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-bold uppercase tracking-wider text-white">
+                            Generador de Miniaturas
+                        </h3>
+                        <p class="text-xs text-gray-300 mt-2" style="line-height: 1.5;">
+                            Creación de sábanas de indicios y cuadrículas de miniaturas (IMG, PDF, DOCX, XLSX) con exportación a PNG y Word.
+                        </p>
+                    </div>
+                </a>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- LÓGICA DE FONDO DE PARTÍCULAS (100% OFFLINE) -->
+    <script>
+        // =========================================================
+        // FONDO DE PARTÍCULAS (Idéntico al index de referencia)
+        // =========================================================
+        const canvas = document.getElementById('network-canvas');
+        const ctx = canvas.getContext('2d');
+        let particlesArray = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor(x, y, directionX, directionY, size, color) {
+                this.x = x;
+                this.y = y;
+                this.directionX = directionX;
+                this.directionY = directionY;
+                this.size = size;
+                this.color = color;
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+            }
+            update() {
+                if (this.x > canvas.width || this.x < 0) this.directionX = -this.directionX;
+                if (this.y > canvas.height || this.y < 0) this.directionY = -this.directionY;
+                this.x += this.directionX;
+                this.y += this.directionY;
+                this.draw();
+            }
+        }
+
+        function initParticles() {
+            particlesArray = [];
+            let numberOfParticles = (canvas.height * canvas.width) / 18000;
+            for (let i = 0; i < numberOfParticles; i++) {
+                let size = (Math.random() * 2) + 1;
+                let x = (Math.random() * ((canvas.width - size * 2) - (size * 2)) + size * 2);
+                let y = (Math.random() * ((canvas.height - size * 2) - (size * 2)) + size * 2);
+                let directionX = (Math.random() * 1) - 0.5;
+                let directionY = (Math.random() * 1) - 0.5;
+                
+                // Mismos colores random (verde neón, púrpura, azul cyan, azul)
+                let colors = ['#5dff00', '#bc13fe', '#00f3ff', '#3b82f6'];
+                let color = colors[Math.floor(Math.random() * colors.length)];
+
+                particlesArray.push(new Particle(x, y, directionX, directionY, size, color));
+            }
+        }
+
+        function animateParticles() {
+            requestAnimationFrame(animateParticles);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            for (let i = 0; i < particlesArray.length; i++) {
+                particlesArray[i].update();
+            }
+            connectParticles();
+        }
+
+        function connectParticles() {
+            let opacityValue = 1;
+            for (let a = 0; a < particlesArray.length; a++) {
+                for (let b = a; b < particlesArray.length; b++) {
+                    let distance = ((particlesArray[a].x - particlesArray[b].x) * (particlesArray[a].x - particlesArray[b].x)) + 
+                                   ((particlesArray[a].y - particlesArray[b].y) * (particlesArray[a].y - particlesArray[b].y));
+                    
+                    if (distance < (canvas.width / 10) * (canvas.height / 10)) {
+                        opacityValue = 1 - (distance / 20000);
+                        ctx.strokeStyle = 'rgba(93, 255, 0,' + (opacityValue * 0.3) + ')';
+                        ctx.lineWidth = 1;
+                        ctx.beginPath();
+                        ctx.moveTo(particlesArray[a].x, particlesArray[a].y);
+                        ctx.lineTo(particlesArray[b].x, particlesArray[b].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+        initParticles();
+        animateParticles();
+    </script>
+</body>
+</html>

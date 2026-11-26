@@ -1,0 +1,1703 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Auto-Escáner Forense de Dispositivos para indexar carpetas y realizar el conteo general de archivos por formato para dictámenes periciales.">
+    <meta name="author" content="Isaí Figueroa J.">
+    <title>Auto-Escáner Forense de Dispositivos - Creado por Isaí Figueroa J.</title>
+    <link rel="icon" type="image/x-icon" href="https://isaifijer.com.mx/imagenes/favicon.ico">
+
+    <style>
+        *, ::before, ::after {
+            box-sizing: border-box;
+            border-width: 0;
+            border-style: solid;
+            border-color: #334155;
+        }
+
+        body {
+            font-family: 'Rajdhani', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #050505;
+            color: #ffffff;
+            margin: 0;
+            overflow-x: hidden;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        button, input {
+            font-family: inherit;
+            font-size: 100%;
+            margin: 0;
+            padding: 0;
+            color: inherit;
+            background: none;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        /* Fondo de Red Interactiva idéntico a Calculadora Forense de DVR */
+        #network-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at center, #1e293b 0%, #020617 100%);
+            opacity: 0.65;
+            pointer-events: none;
+        }
+
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 30px rgba(59, 130, 246, 0.15);
+            border-radius: 0.75rem;
+        }
+
+        /* Utilidades de Layout 100% Offline */
+        .hidden { display: none !important; }
+        .block { display: block; }
+        .flex { display: flex; }
+        .grid { display: grid; }
+        .flex-col { flex-direction: column; }
+        .flex-wrap { flex-wrap: wrap; }
+        .flex-1 { flex: 1 1 0%; }
+        .items-center { align-items: center; }
+        .justify-center { justify-content: center; }
+        .justify-between { justify-content: space-between; }
+        .relative { position: relative; }
+        .absolute { position: absolute; }
+        .fixed { position: fixed; }
+        .z-10 { z-index: 10; }
+        .z-50 { z-index: 50; }
+        .pointer-events-none { pointer-events: none; }
+        .select-none { user-select: none; }
+        .truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .shrink-0 { flex-shrink: 0; }
+
+        /* Dimensiones y Espaciados */
+        .w-full { width: 100%; }
+        .w-16 { width: 4rem; }
+        .w-9 { width: 2.25rem; }
+        .w-4 { width: 1rem; }
+        .w-2\.5 { width: 0.625rem; }
+        .h-16 { height: 4rem; }
+        .h-9 { height: 2.25rem; }
+        .h-4 { height: 1rem; }
+        .h-2\.5 { height: 0.625rem; }
+        .h-full { height: 100%; }
+        .min-h-screen { min-height: 100vh; }
+
+        .gap-1\.5 { gap: 0.375rem; }
+        .gap-2 { gap: 0.5rem; }
+        .gap-2\.5 { gap: 0.625rem; }
+        .gap-3 { gap: 0.75rem; }
+        .gap-4 { gap: 1rem; }
+        .gap-5 { gap: 1.25rem; }
+        .gap-6 { gap: 1.5rem; }
+
+        .p-3 { padding: 0.75rem; }
+        .p-4 { padding: 1rem; }
+        .p-6 { padding: 1.5rem; }
+        .py-1 { padding-top: 0.25rem; padding-bottom: 0.25rem; }
+        .py-2\.5 { padding-top: 0.625rem; padding-bottom: 0.625rem; }
+        .py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
+        .py-3\.5 { padding-top: 0.875rem; padding-bottom: 0.875rem; }
+        .py-8 { padding-top: 2rem; padding-bottom: 2rem; }
+        .py-28 { padding-top: 7rem; padding-bottom: 7rem; }
+        .px-2\.5 { padding-left: 0.625rem; padding-right: 0.625rem; }
+        .px-3\.5 { padding-left: 0.875rem; padding-right: 0.875rem; }
+        .px-4 { padding-left: 1rem; padding-right: 1rem; }
+        .px-5 { padding-left: 1.25rem; padding-right: 1.25rem; }
+        .pt-2 { padding-top: 0.5rem; }
+        .pb-3 { padding-bottom: 0.75rem; }
+
+        .mt-1 { margin-top: 0.25rem; }
+        .mt-1\.5 { margin-top: 0.375rem; }
+        .mb-2 { margin-bottom: 0.5rem; }
+        .mb-6 { margin-bottom: 1.5rem; }
+
+        .font-mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+        .text-xs { font-size: 0.75rem; line-height: 1rem; }
+        .text-sm { font-size: 0.875rem; line-height: 1.25rem; }
+        .text-base { font-size: 1rem; line-height: 1.5rem; }
+        .text-lg { font-size: 1.125rem; line-height: 1.75rem; }
+        .text-xl { font-size: 1.25rem; line-height: 1.75rem; }
+        .text-2xl { font-size: 1.5rem; line-height: 2rem; }
+        .font-medium { font-weight: 500; }
+        .font-semibold { font-weight: 600; }
+        .font-bold { font-weight: 700; }
+        .uppercase { text-transform: uppercase; }
+        .italic { font-style: italic; }
+        .text-center { text-align: center; }
+        .tracking-wide { letter-spacing: 0.025em; }
+        .tracking-wider { letter-spacing: 0.05em; }
+        .tracking-widest { letter-spacing: 0.1em; }
+        .leading-relaxed { line-height: 1.625; }
+
+        /* Colores de Texto */
+        .text-white { color: #ffffff; }
+        .text-slate-200 { color: #e2e8f0; }
+        .text-slate-300 { color: #cbd5e1; }
+        .text-slate-400 { color: #94a3b8; }
+        .text-slate-500 { color: #64748b; }
+        .text-slate-700 { color: #334155; }
+        .text-blue-400 { color: #60a5fa; }
+        .text-cyan-300 { color: #67e8f9; }
+        .text-cyan-400 { color: #22d3ee; }
+        .text-emerald-400 { color: #34d399; }
+
+        .rounded { border-radius: 0.25rem; }
+        .rounded-lg { border-radius: 0.5rem; }
+        .rounded-xl { border-radius: 0.75rem; }
+        .rounded-2xl { border-radius: 1.15rem; }
+        .rounded-full { border-radius: 9999px; }
+
+        .u-link {
+            text-decoration: none;
+        }
+        .u-link:hover {
+            color: #93c5fd;
+            text-decoration: underline;
+        }
+        .transition-colors {
+            transition: color 0.2s ease-in-out;
+        }
+        .hover\:text-blue-300:hover {
+            color: #93c5fd;
+        }
+
+        /* Encabezado idéntico a Calculadora Forense de DVR */
+        .header-icon-box {
+            background: linear-gradient(135deg, #2563eb 0%, #3b82f6 50%, #06b6d4 100%);
+            box-shadow: 0 0 25px rgba(59, 130, 246, 0.65);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 1.15rem;
+        }
+
+        .title-gradient {
+            background: linear-gradient(to right, #ffffff, #bfdbfe);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        /* Botón Inicio y Logo FGE idénticos a index_2.html */
+        .btn-inicio {
+            position: fixed;
+            top: 1.25rem;
+            left: 1.25rem;
+            z-index: 40;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.55rem 1rem;
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(59, 130, 246, 0.4);
+            border-radius: 0.65rem;
+            color: #bfdbfe;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            text-decoration: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4), 0 0 12px rgba(59, 130, 246, 0.15);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .btn-inicio:hover {
+            background: rgba(37, 99, 235, 0.25);
+            border-color: #22d3ee;
+            color: #ffffff;
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.45);
+            transform: translateY(-1px);
+        }
+
+        .logo-fge {
+            position: fixed;
+            top: 0.9rem;
+            right: 1.25rem;
+            z-index: 40;
+            width: 5.75rem;
+            height: 5.75rem;
+            background: transparent;
+            filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.75));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.25s ease, filter 0.25s ease;
+            user-select: none;
+        }
+        .logo-fge:hover {
+            transform: scale(1.05);
+            filter: drop-shadow(0 0 14px rgba(148, 163, 184, 0.45));
+        }
+
+        @media (max-width: 639px) {
+            .btn-inicio {
+                top: 0.85rem;
+                left: 0.85rem;
+                padding: 0.45rem 0.75rem;
+                font-size: 0.72rem;
+            }
+            .logo-fge {
+                top: 0.65rem;
+                right: 0.75rem;
+                width: 4.1rem;
+                height: 4.1rem;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .md-px-8 { padding-left: 2rem; padding-right: 2rem; }
+            .md-text-3xl { font-size: 1.875rem; line-height: 2.25rem; }
+        }
+
+        /* Layout de columnas para el escáner */
+        .scanner-workspace {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            max-width: 1600px;
+            gap: 1.5rem;
+        }
+
+        .scanner-sidebar {
+            width: 100%;
+            flex-shrink: 0;
+        }
+
+        .scanner-main {
+            width: 100%;
+            flex: 1 1 0%;
+        }
+
+        @media (min-width: 1024px) {
+            .scanner-workspace {
+                flex-direction: row;
+                align-items: flex-start;
+            }
+            .scanner-sidebar {
+                width: 360px;
+                position: sticky;
+                top: 1.5rem;
+            }
+        }
+
+        /* Controles del panel izquierdo */
+        .drop-zone-box {
+            cursor: pointer;
+            background: rgba(15, 23, 42, 0.6);
+            border: 2px dashed rgba(6, 182, 212, 0.4);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.25s ease;
+        }
+        .drop-zone-box:hover, .drop-zone-box.drag-active {
+            border-color: #22d3ee;
+            background: rgba(30, 41, 59, 0.75);
+        }
+
+        .usb-icon-badge {
+            width: 4rem;
+            height: 4rem;
+            border-radius: 1rem;
+            background: linear-gradient(135deg, #2563eb, #06b6d4);
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 15px -3px rgba(6, 182, 212, 0.25);
+            transition: transform 0.2s ease;
+        }
+        .drop-zone-box:hover .usb-icon-badge {
+            transform: scale(1.05);
+        }
+
+        .progress-card {
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid rgba(6, 182, 212, 0.4);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+        }
+
+        .progress-track {
+            width: 100%;
+            background: #1e293b;
+            border-radius: 9999px;
+            height: 0.625rem;
+            overflow: hidden;
+            border: 1px solid #334155;
+        }
+
+        .progress-fill {
+            background: linear-gradient(to right, #3b82f6, #22d3ee, #34d399);
+            height: 100%;
+            border-radius: 9999px;
+            transition: width 0.08s linear;
+        }
+
+        .option-row {
+            background: rgba(15, 23, 42, 0.55);
+            border: 1px solid rgba(51, 65, 85, 0.7);
+            border-radius: 0.5rem;
+            padding: 0.625rem 0.875rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .stats-grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.75rem;
+        }
+
+        .stat-box {
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid rgba(51, 65, 85, 0.8);
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            text-align: center;
+        }
+
+        .btn-copy-word {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            background: #1e293b;
+            border: 1px solid rgba(6, 182, 212, 0.4);
+            color: #ffffff;
+            font-size: 0.875rem;
+            font-weight: 700;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+            transition: all 0.2s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .btn-copy-word:hover {
+            background: #334155;
+            border-color: #22d3ee;
+        }
+
+        .btn-action-word {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            background: linear-gradient(to right, #2563eb, #0891b2);
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.35);
+            color: #ffffff;
+            font-size: 0.875rem;
+            font-weight: 700;
+            border-radius: 0.5rem;
+            transition: all 0.25s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .btn-action-word:hover {
+            background: linear-gradient(to right, #3b82f6, #06b6d4);
+            box-shadow: 0 0 28px rgba(6, 182, 212, 0.55);
+            transform: translateY(-1px);
+        }
+
+        /* Hoja Blanca de Vista Previa con fondo blanco sólido */
+        .word-sheet {
+            background-color: #ffffff;
+            color: #000000;
+            font-family: 'Calibri', 'Arial', sans-serif;
+            font-size: 11pt;
+            line-height: 1.5;
+            width: 100%;
+            max-width: 100%;
+            min-height: 74vh;
+            height: auto;
+            padding: 2.5rem 3rem;
+            margin: 0 auto 2rem auto;
+            border-radius: 0.75rem;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.75);
+            overflow-wrap: break-word;
+        }
+
+        @media (max-width: 640px) {
+            .word-sheet {
+                padding: 1.5rem 1.25rem;
+                font-size: 10pt;
+            }
+        }
+
+        .sheet-header {
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 0.75rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .unit-badge {
+            font-size: 0.75rem;
+            background: #f1f5f9;
+            color: #334155;
+            border: 1px solid #e2e8f0;
+            padding: 0.25rem 0.625rem;
+            border-radius: 0.25rem;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-weight: 600;
+        }
+
+        /* Estilos de viñetas multinivel idénticos a Word */
+        .doc-list-container ul {
+            list-style-type: disc;
+            margin-left: 1.75rem;
+            margin-top: 0.25rem;
+            margin-bottom: 0.25rem;
+            padding-left: 0.5rem;
+        }
+        .doc-list-container ul ul {
+            list-style-type: circle;
+        }
+        .doc-list-container ul ul ul {
+            list-style-type: square;
+        }
+        .doc-list-container li {
+            margin-bottom: 0.3rem;
+            color: #000000;
+        }
+
+        .svg-icon {
+            display: inline-block;
+            width: 1.1em;
+            height: 1.1em;
+            vertical-align: -0.15em;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            flex-shrink: 0;
+        }
+
+        @keyframes ping {
+            75%, 100% { transform: scale(2); opacity: 0; }
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .animate-ping { animation: ping 1.2s cubic-bezier(0, 0, 0.2, 1) infinite; }
+        .animate-spin { animation: spin 1s linear infinite; }
+
+        /* Toast de notificación */
+        .toast-box {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            background: #0f172a;
+            border: 1px solid rgba(6, 182, 212, 0.5);
+            color: #ffffff;
+            padding: 0.75rem 1.25rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+            transition: opacity 0.3s ease;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .toast-box.show {
+            opacity: 1;
+        }
+
+        /* Scrollbars personalizados */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.8);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #38bdf8;
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center py-8 px-4 md-px-8 relative min-h-screen">
+
+    <!-- Fondo animado de partículas -->
+    <canvas id="network-canvas"></canvas>
+
+    <!-- BOTÓN SUPERIOR IZQUIERDO: REGRESAR AL MENÚ PRINCIPAL (../index.html) -->
+    <a href="../index.html" class="btn-inicio" title="Volver al Menú Principal">
+        <svg class="svg-icon text-cyan-400" style="width: 1.25em; height: 1.25em;" viewBox="0 0 24 24">
+            <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+            <polyline points="9 22 9 12 15 12 15 22"/>
+        </svg>
+        <span>Inicio</span>
+    </a>
+
+    <!-- LOGO SUPERIOR DERECHO: FISCALÍA GENERAL DEL ESTADO DE MORELOS (100% OFFLINE SVG SIN FONDO BLANCO) -->
+    <div class="logo-fge" title="Fiscalía General del Estado de Morelos">
+        <svg viewBox="0 0 240 240" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <!-- Arco superior para "MORELOS" -->
+                <path id="fge-arc-top" d="M 31,120 A 89,89 0 1,1 209,120" />
+                <!-- Arco inferior para "FISCALÍA GENERAL DEL ESTADO" -->
+                <path id="fge-arc-bottom" d="M 19.3,98.6 A 103,103 0 1,0 220.7,98.6" />
+                <!-- Máscara para recortar los anillos detrás del escudo manteniendo el fondo 100% transparente -->
+                <mask id="fge-shield-cutout">
+                    <rect x="0" y="0" width="240" height="240" fill="#ffffff" />
+                    <path d="M 71,67 Q 120,51 169,67 L 169,128 C 169,157 146.5,174 120,185 C 93.5,174 71,157 71,128 Z" fill="#000000" />
+                </mask>
+            </defs>
+
+            <!-- Círculo Exterior Transparente con Línea Plata/Acero (#94a3b8) -->
+            <circle cx="120" cy="120" r="115" fill="none" stroke="#94a3b8" stroke-width="4.5"/>
+
+            <!-- Tres Anillos Concéntricos Centrales en Línea Plata/Acero (Recortados al borde del escudo) -->
+            <g mask="url(#fge-shield-cutout)" fill="none" stroke="#94a3b8" stroke-width="3.6">
+                <circle cx="120" cy="120" r="78"/>
+                <circle cx="120" cy="120" r="70"/>
+                <circle cx="120" cy="120" r="62"/>
+            </g>
+
+            <!-- Líneas diagonales laterales separadoras -->
+            <line x1="34" y1="81" x2="49" y2="62" stroke="#94a3b8" stroke-width="4.5" stroke-linecap="round"/>
+            <line x1="206" y1="81" x2="191" y2="62" stroke="#94a3b8" stroke-width="4.5" stroke-linecap="round"/>
+
+            <!-- Texto Curvo Superior en Blanco de Alto Contraste: MORELOS -->
+            <text fill="#ffffff" font-family="system-ui, -apple-system, 'Segoe UI', Arial, sans-serif" font-size="21" font-weight="900" letter-spacing="3.5">
+                <textPath href="#fge-arc-top" startOffset="50%" text-anchor="middle">MORELOS</textPath>
+            </text>
+
+            <!-- Texto Curvo Inferior en Blanco de Alto Contraste: FISCALÍA GENERAL DEL ESTADO -->
+            <text fill="#ffffff" font-family="system-ui, -apple-system, 'Segoe UI', Arial, sans-serif" font-size="18" font-weight="900" letter-spacing="1.6">
+                <textPath href="#fge-arc-bottom" startOffset="50%" text-anchor="middle">FISCALÍA GENERAL DEL ESTADO</textPath>
+            </text>
+
+            <!-- Doble Contorno del Escudo Central y Divisiones Internas en Plata/Acero (#94a3b8) -->
+            <path d="M 72,68 Q 120,52 168,68 L 168,128 C 168,156 146,173 120,184 C 94,173 72,156 72,128 Z" fill="none" stroke="#94a3b8" stroke-width="3.5" stroke-linejoin="round"/>
+            <path d="M 78,73 Q 120,58.5 162,73 L 162,128 C 162,152 143,167 120,177 C 97,167 78,152 78,128 Z" fill="none" stroke="#94a3b8" stroke-width="3" stroke-linejoin="round"/>
+            <!-- División vertical central y horizontal derecha -->
+            <line x1="120" y1="64" x2="120" y2="177" stroke="#94a3b8" stroke-width="3.2"/>
+            <line x1="120" y1="123" x2="162" y2="123" stroke="#94a3b8" stroke-width="3.2"/>
+
+            <!-- Siglas F G E en Blanco de Alto Contraste (#ffffff) -->
+            <text x="100" y="103" fill="#ffffff" font-family="system-ui, -apple-system, 'Segoe UI', Arial, sans-serif" font-size="26" font-weight="900" text-anchor="middle">F</text>
+            <text x="100" y="131" fill="#ffffff" font-family="system-ui, -apple-system, 'Segoe UI', Arial, sans-serif" font-size="26" font-weight="900" text-anchor="middle">G</text>
+            <text x="100" y="158" fill="#ffffff" font-family="system-ui, -apple-system, 'Segoe UI', Arial, sans-serif" font-size="26" font-weight="900" text-anchor="middle">E</text>
+
+            <!-- Símbolo Superior Derecho: Balanza de la Justicia y Ojo Visor en Línea Plata/Acero (#94a3b8) -->
+            <g stroke="#94a3b8" fill="none">
+                <!-- Base escalonada y mástil de la balanza -->
+                <line x1="128" y1="100" x2="150" y2="100" stroke-width="3" stroke-linecap="round"/>
+                <line x1="131" y1="95.5" x2="147" y2="95.5" stroke-width="2.8" stroke-linecap="round"/>
+                <line x1="139" y1="80" x2="139" y2="95.5" stroke-width="2.8" stroke-linecap="round"/>
+                <!-- Brazo superior y platillos -->
+                <path d="M 130,82.5 L 136,82.5 L 139,80.5 L 142,82.5 L 148,82.5" stroke-width="2.4" stroke-linejoin="round"/>
+                <line x1="130.5" y1="82.5" x2="130.5" y2="88.5" stroke-width="2"/>
+                <path d="M 126.5,88.5 A 4,4 0 0,0 134.5,88.5 Z" fill="#94a3b8" stroke="none"/>
+                <line x1="147.5" y1="82.5" x2="147.5" y2="88.5" stroke-width="2"/>
+                <path d="M 143.5,88.5 A 4,4 0 0,0 151.5,88.5 Z" fill="#94a3b8" stroke="none"/>
+                <!-- Ojo visor inferior -->
+                <path d="M 127.5,113.5 Q 139,104 150.5,113.5" stroke-width="3" stroke-linecap="round"/>
+                <circle cx="139" cy="113.5" r="4.5" stroke-width="2.8"/>
+            </g>
+
+            <!-- Símbolo Inferior Derecho: Silueta del Estado de Morelos trazada en Línea (#94a3b8) -->
+            <path d="M 131.5,128.5 L 136.5,129.5 L 138.5,132 L 142,131.5 L 145,133.5 L 151.5,132 L 150,136.5 L 148,141 L 150.5,145.5 L 146.5,150.5 L 144.5,158 L 141.5,156 L 138,156 L 135,160 L 131,154 L 125.5,149.5 L 124.5,145 L 127.5,141.5 L 127,136.5 L 131,133.5 Z" fill="none" stroke="#94a3b8" stroke-width="2.3" stroke-linejoin="round"/>
+        </svg>
+    </div>
+
+    <main class="w-full relative z-10 flex flex-col items-center gap-6">
+
+        <!-- ENCABEZADO (Misma posición, fuente y espaciado exacto que Calculadora Forense de DVR) -->
+        <header class="flex flex-col items-center justify-center mb-2">
+            <div class="flex flex-col items-center justify-center gap-3">
+                <div class="w-16 h-16 rounded-2xl header-icon-box flex items-center justify-center relative">
+                    <!-- Ícono de Árbol de Carpetas / Escáner Forense en SVG -->
+                    <svg class="w-9 h-9 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 10a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1h-2.5a1 1 0 0 1-.8-.4l-.9-1.2A1 1 0 0 0 15 3h-2a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1Z" fill="rgba(255,255,255,0.16)"/>
+                        <path d="M20 21a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1h-2.9a1 1 0 0 1-.88-.55l-.42-.85a1 1 0 0 0-.92-.6H13a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1Z" fill="rgba(255,255,255,0.16)"/>
+                        <path d="M3 5a2 2 0 0 0 2 2h3"/>
+                        <path d="M3 3v13a2 2 0 0 0 2 2h3"/>
+                    </svg>
+                    <!-- Indicador REC parpadeante -->
+                    <span class="absolute w-2.5 h-2.5 rounded-full animate-ping" style="top: 6px; right: 6px; background-color: #f87171;"></span>
+                    <span class="absolute w-2.5 h-2.5 rounded-full" style="top: 6px; right: 6px; background-color: #ef4444; border: 1px solid rgba(255,255,255,0.6);"></span>
+                </div>
+                <h1 class="text-2xl md-text-3xl font-bold uppercase tracking-wide title-gradient text-center">
+                    AUTO-ESCÁNER FORENSE DE DISPOSITIVOS
+                </h1>
+            </div>
+            <h2 class="text-sm font-medium mt-1.5 tracking-wider uppercase text-center" style="color: rgba(147, 197, 253, 0.85);">
+                Creado por <a class="u-link font-bold text-blue-400 hover:text-blue-300 transition-colors" href="http://www.isaifijer.com.mx" target="_blank" rel="noopener noreferrer">Isaí Figueroa J.</a>
+            </h2>
+        </header>
+
+        <!-- CONTENEDOR PRINCIPAL DE ESCANEO Y VISTA PREVIA -->
+        <div class="scanner-workspace">
+
+            <!-- PANEL IZQUIERDO: CONTROLES DE ESCANEO -->
+            <aside class="scanner-sidebar">
+                <div class="glass-panel p-6 flex flex-col gap-5">
+
+                    <!-- Botón de Escaneo de Unidad / Carpeta -->
+                    <div id="dropZone"
+                         ondragover="handleDragOver(event)"
+                         ondragleave="handleDragLeave(event)"
+                         ondrop="handleDropFolder(event)"
+                         onclick="openInstantDirectoryPicker(event)"
+                         class="drop-zone-box select-none">
+                        <div class="flex flex-col items-center justify-center gap-3">
+                            <div class="usb-icon-badge">
+                                <svg class="w-9 h-9 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="10" cy="7" r="1"/>
+                                    <circle cx="4" cy="20" r="1"/>
+                                    <path d="M4.7 19.3 19 5"/>
+                                    <path d="m21 3-3 1 2 2Z"/>
+                                    <path d="M9.26 7.68 5 12l2 5"/>
+                                    <path d="m10 14 5 2 3.5-3.5"/>
+                                    <path d="m18 12 1-1 1 1-1 1Z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <span class="block font-bold text-white text-base tracking-wide">
+                                    Selecciona/Arrastra aquí el dispositivo/carpeta
+                                </span>
+                                <span class="block text-xs text-slate-300 mt-1 leading-relaxed">
+                                    Selecciona tu dispositivo para hacer un conteo general de los archivos
+                                </span>
+                            </div>
+                            <input type="file" id="directoryInput" webkitdirectory directory onchange="scanDirectoryFallback(event)" onclick="event.stopPropagation()" class="hidden">
+                        </div>
+                    </div>
+
+                    <!-- Lector de Porcentaje y Contador de Progreso en Tiempo Real -->
+                    <div id="scanProgressContainer" class="hidden progress-card flex-col gap-2.5">
+                        <div class="flex items-center justify-between gap-2">
+                            <span class="text-xs font-bold uppercase tracking-wider text-cyan-300 flex items-center gap-2 truncate">
+                                <span id="scanSpinnerIcon" class="shrink-0 flex items-center">
+                                    <svg class="svg-icon text-cyan-400 animate-spin" viewBox="0 0 24 24">
+                                        <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+                                    </svg>
+                                </span>
+                                <span id="scanStatusLabel" class="truncate">Preparando lectura...</span>
+                            </span>
+                            <span id="scanPercentText" class="font-bold text-xl text-emerald-400 shrink-0">0%</span>
+                        </div>
+                        <div class="progress-track">
+                            <div id="scanProgressBar" class="progress-fill" style="width: 0%"></div>
+                        </div>
+                        <div class="flex justify-between items-center text-xs font-mono text-slate-300">
+                            <span id="scanCounterDetail">0 / 0 leídos</span>
+                            <span id="scanVisibleDetail" class="text-cyan-300">0 visibles</span>
+                        </div>
+                    </div>
+
+                    <!-- Opción para omitir el nombre de la unidad -->
+                    <div class="option-row">
+                        <label for="omitDriveLetterToggle" class="text-xs text-slate-200 font-semibold cursor-pointer select-none">
+                            Omitir el nombre de la unidad
+                        </label>
+                        <input type="checkbox" id="omitDriveLetterToggle" checked onchange="reRenderCurrentTree()" class="w-4 h-4 rounded cursor-pointer" style="accent-color: #06b6d4;">
+                    </div>
+
+                    <!-- Panel de Estadísticas y Botones de Exportación -->
+                    <div id="statsPanel" class="hidden flex-col gap-4 pt-2" style="border-top: 1px solid rgba(51, 65, 85, 0.7);">
+                        
+                        <div class="stats-grid-2">
+                            <div class="stat-box">
+                                <span class="block text-xs uppercase tracking-wider text-slate-400">Carpetas</span>
+                                <span id="folderCount" class="font-mono font-bold text-cyan-400 text-lg">0</span>
+                            </div>
+                            <div class="stat-box">
+                                <span class="block text-xs uppercase tracking-wider text-slate-400">Archivos Visibles</span>
+                                <span id="fileCount" class="font-mono font-bold text-emerald-400 text-lg">0</span>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col gap-3">
+                            <!-- Copiar directamente con formato para pegar en Word -->
+                            <button type="button" onclick="copyToClipboard()" class="btn-copy-word">
+                                <svg class="svg-icon text-cyan-400" viewBox="0 0 24 24">
+                                    <rect width="14" height="14" x="8" y="8" rx="2" ry="2"/>
+                                    <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
+                                </svg>
+                                Copiar con Viñetas para Word
+                            </button>
+
+                            <!-- Descargar archivo Word (.doc) -->
+                            <button type="button" onclick="exportToWord()" class="btn-action-word">
+                                <svg class="svg-icon text-white" viewBox="0 0 24 24">
+                                    <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+                                    <polyline points="14 2 14 8 20 8"/>
+                                    <path d="M8 13h2l1 5 1-5h2l1 5 1-5h2"/>
+                                </svg>
+                                Descargar en Word (.doc)
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </aside>
+
+            <!-- PANEL DERECHO: VISTA PREVIA EN HOJA BLANCA EXPANDIBLE -->
+            <section class="scanner-main">
+                <div class="word-sheet">
+                    <div class="sheet-header">
+                        <span class="text-xs font-bold text-slate-500 uppercase tracking-widest">
+                            Vista Previa de Contenido Estructural
+                        </span>
+                        <span id="unitBadge" class="unit-badge">
+                            Sin unidad seleccionada
+                        </span>
+                    </div>
+
+                    <!-- Contenido dinámico de viñetas -->
+                    <div id="previewContent" class="doc-list-container">
+                        <div class="text-center text-slate-400 py-28 italic flex flex-col items-center gap-3">
+                            <svg class="w-16 h-16" style="color: #cbd5e1;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M6 18h8"/>
+                                <path d="M3 22h18"/>
+                                <path d="M14 22a7 7 0 1 0 0-14h-1"/>
+                                <path d="M9 14h2"/>
+                                <path d="M9 12a2 2 0 0 1-2-2V6h6v4a2 2 0 0 1-2 2Z"/>
+                                <path d="M12 6V3a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v3"/>
+                            </svg>
+                            <span>Selecciona una unidad USB o carpeta para generar el desglose pericial de archivos...</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+
+    </main>
+
+    <!-- Notificación Toast 100% Offline -->
+    <div id="toast" class="toast-box">
+        <svg class="svg-icon text-cyan-400" viewBox="0 0 24 24">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+            <polyline points="22 4 12 14.01 9 11.01"/>
+        </svg>
+        <span id="toastMsg" class="text-sm font-medium"></span>
+    </div>
+
+    <script>
+        // =========================================================
+        // 1. FONDO DE PARTÍCULAS INTERACTIVO (Mismo de index.html)
+        // =========================================================
+        const canvas = document.getElementById('network-canvas');
+        const ctx = canvas.getContext('2d');
+        let particlesArray = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor(x, y, directionX, directionY, size, color) {
+                this.x = x;
+                this.y = y;
+                this.directionX = directionX;
+                this.directionY = directionY;
+                this.size = size;
+                this.color = color;
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+            }
+            update() {
+                if (this.x > canvas.width || this.x < 0) this.directionX = -this.directionX;
+                if (this.y > canvas.height || this.y < 0) this.directionY = -this.directionY;
+                this.x += this.directionX;
+                this.y += this.directionY;
+                this.draw();
+            }
+        }
+
+        function initParticles() {
+            particlesArray = [];
+            let numberOfParticles = (canvas.height * canvas.width) / 18000;
+            for (let i = 0; i < numberOfParticles; i++) {
+                let size = (Math.random() * 2) + 1;
+                let x = (Math.random() * ((canvas.width - size * 2) - (size * 2)) + size * 2);
+                let y = (Math.random() * ((canvas.height - size * 2) - (size * 2)) + size * 2);
+                let directionX = (Math.random() * 1) - 0.5;
+                let directionY = (Math.random() * 1) - 0.5;
+
+                let colors = ['#5dff00', '#bc13fe', '#00f3ff', '#3b82f6'];
+                let color = colors[Math.floor(Math.random() * colors.length)];
+
+                particlesArray.push(new Particle(x, y, directionX, directionY, size, color));
+            }
+        }
+
+        function connectParticles() {
+            for (let a = 0; a < particlesArray.length; a++) {
+                for (let b = a; b < particlesArray.length; b++) {
+                    let distance = ((particlesArray[a].x - particlesArray[b].x) * (particlesArray[a].x - particlesArray[b].x)) +
+                                   ((particlesArray[a].y - particlesArray[b].y) * (particlesArray[a].y - particlesArray[b].y));
+
+                    if (distance < (canvas.width / 10) * (canvas.height / 10)) {
+                        let opacityValue = 1 - (distance / 20000);
+                        ctx.strokeStyle = 'rgba(93, 255, 0,' + (opacityValue * 0.3) + ')';
+                        ctx.lineWidth = 1;
+                        ctx.beginPath();
+                        ctx.moveTo(particlesArray[a].x, particlesArray[a].y);
+                        ctx.lineTo(particlesArray[b].x, particlesArray[b].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+
+        function animateParticles() {
+            requestAnimationFrame(animateParticles);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particlesArray.length; i++) {
+                particlesArray[i].update();
+            }
+            connectParticles();
+        }
+
+        initParticles();
+        animateParticles();
+
+        // =========================================================
+        // 2. CONVERSOR DE NÚMEROS A LETRAS Y CLASIFICADOR FORENSE
+        // =========================================================
+        function numToWords(n) {
+            n = parseInt(n, 10);
+            if (isNaN(n) || n < 0) return "cero";
+            if (n === 0) return "cero";
+
+            function unidades(num) {
+                switch (num) {
+                    case 1: return "un";
+                    case 2: return "dos";
+                    case 3: return "tres";
+                    case 4: return "cuatro";
+                    case 5: return "cinco";
+                    case 6: return "seis";
+                    case 7: return "siete";
+                    case 8: return "ocho";
+                    case 9: return "nueve";
+                    default: return "";
+                }
+            }
+
+            function decenas(num) {
+                const decena = Math.floor(num / 10);
+                const unidad = num % 10;
+                switch (decena) {
+                    case 1:
+                        switch (unidad) {
+                            case 0: return "diez";
+                            case 1: return "once";
+                            case 2: return "doce";
+                            case 3: return "trece";
+                            case 4: return "catorce";
+                            case 5: return "quince";
+                            case 6: return "dieciséis";
+                            default: return "dieci" + unidades(unidad);
+                        }
+                    case 2:
+                        if (unidad === 0) return "veinte";
+                        if (unidad === 1) return "veintiún";
+                        if (unidad === 2) return "veintidós";
+                        if (unidad === 3) return "veintitrés";
+                        if (unidad === 6) return "veintiséis";
+                        return "veinti" + unidades(unidad);
+                    case 3: return unidad === 0 ? "treinta" : "treinta y " + unidades(unidad);
+                    case 4: return unidad === 0 ? "cuarenta" : "cuarenta y " + unidades(unidad);
+                    case 5: return unidad === 0 ? "cincuenta" : "cincuenta y " + unidades(unidad);
+                    case 6: return unidad === 0 ? "sesenta" : "sesenta y " + unidades(unidad);
+                    case 7: return unidad === 0 ? "setenta" : "setenta y " + unidades(unidad);
+                    case 8: return unidad === 0 ? "ochenta" : "ochenta y " + unidades(unidad);
+                    case 9: return unidad === 0 ? "noventa" : "noventa y " + unidades(unidad);
+                    case 0: return unidades(unidad);
+                    default: return "";
+                }
+            }
+
+            function centenas(num) {
+                const centena = Math.floor(num / 100);
+                const resto = num % 100;
+                let prefijo = "";
+                switch (centena) {
+                    case 1:
+                        if (resto === 0) return "cien";
+                        prefijo = "ciento";
+                        break;
+                    case 2: prefijo = "doscientos"; break;
+                    case 3: prefijo = "trescientos"; break;
+                    case 4: prefijo = "cuatrocientos"; break;
+                    case 5: prefijo = "quinientos"; break;
+                    case 6: prefijo = "seiscientos"; break;
+                    case 7: prefijo = "setecientos"; break;
+                    case 8: prefijo = "ochocientos"; break;
+                    case 9: prefijo = "novecientos"; break;
+                    case 0: return decenas(resto);
+                }
+                return resto === 0 ? prefijo : prefijo + " " + decenas(resto);
+            }
+
+            function miles(num) {
+                const mil = Math.floor(num / 1000);
+                const resto = num % 1000;
+                let strMil = "";
+                if (mil === 1) {
+                    strMil = "mil";
+                } else if (mil > 1) {
+                    strMil = centenas(mil) + " mil";
+                }
+                const strResto = resto > 0 ? centenas(resto) : "";
+                return (strMil + " " + strResto).trim();
+            }
+
+            function millones(num) {
+                const millon = Math.floor(num / 1000000);
+                const resto = num % 1000000;
+                let strMillon = "";
+                if (millon === 1) {
+                    strMillon = "un millón";
+                } else if (millon > 1) {
+                    strMillon = miles(millon) + " millones";
+                }
+                const strResto = resto > 0 ? miles(resto) : "";
+                return (strMillon + " " + strResto).trim();
+            }
+
+            return millones(n);
+        }
+
+        function capitalizeFirstLetter(str) {
+            if (!str) return "";
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+
+        function getFileTypeString(ext) {
+            const types = {
+                // Video
+                'MP4': 'de video', 'AVI': 'de video', 'MOV': 'de video', 'MKV': 'de video',
+                'WMV': 'de video', 'FLV': 'de video', '3GP': 'de video', 'DAV': 'de video', 'TS': 'de video',
+                // Imagen
+                'JPG': 'de imagen', 'JPEG': 'de imagen', 'PNG': 'de imagen', 'WEBP': 'de imagen',
+                'GIF': 'de imagen', 'BMP': 'de imagen', 'PIC': 'de imagen', 'HEIC': 'de imagen', 'TIFF': 'de imagen',
+                // Audio
+                'MP3': 'de audio', 'WAV': 'de audio', 'OGG': 'de audio', 'OPUS': 'de audio',
+                'M4A': 'de audio', 'AAC': 'de audio', 'WMA': 'de audio', 'AMR': 'de audio',
+                // Texto / Documentos
+                'TXT': 'de texto', 'LOG': 'de texto',
+                'PDF': 'de documento', 'DOC': 'de documento', 'DOCX': 'de documento', 'RTF': 'de documento',
+                'XLS': 'de hoja de cálculo', 'XLSX': 'de hoja de cálculo', 'CSV': 'de datos',
+                'PPT': 'de presentación', 'PPTX': 'de presentación',
+                // Contactos / Comprimidos / Sistema
+                'VCF': 'de contacto',
+                'ZIP': 'comprimido', 'RAR': 'comprimido', '7Z': 'comprimido', 'TAR': 'comprimido', 'GZ': 'comprimido',
+                'BIN': 'de sistema', 'DAT': 'de datos', 'DB': 'de base de datos', 'SQL': 'de base de datos',
+                'HTML': 'web', 'HTM': 'web', 'XML': 'de datos', 'JSON': 'de datos', 'EXE': 'ejecutable'
+            };
+            return types[ext] || '';
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toastMsg');
+            toastMsg.innerText = msg;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3200);
+        }
+
+        const SVG_ICON_SPINNER = `<svg class="svg-icon text-cyan-400 animate-spin" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>`;
+        const SVG_ICON_CHECK = `<svg class="svg-icon text-emerald-400" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`;
+
+        // =========================================================
+        // 3. ESCANEO DE CARPETAS, PORCENTAJE EN VIVO Y FILTRO DE UNIDAD
+        // =========================================================
+        let lastScannedRoot = null;
+        let totalFilesProcessed = 0;
+        let totalFoldersProcessed = 0;
+        let waitingForFallbackDialog = false;
+
+        function isHiddenOrSystemPart(partName) {
+            if (!partName) return true;
+            const upper = partName.toUpperCase();
+            if (partName.startsWith('.')) return true;
+            if (partName.startsWith('~$')) return true;
+            const ignoredNames = [
+                '__MACOSX',
+                'SYSTEM VOLUME INFORMATION',
+                '$RECYCLE.BIN',
+                'RECYCLER',
+                'THUMBS.DB',
+                'DESKTOP.INI',
+                'FOUND.000'
+            ];
+            return ignoredNames.includes(upper);
+        }
+
+        function isDriveRootLabel(name) {
+            if (!name) return true;
+            const trimmed = name.trim();
+            if (trimmed === '\\' || trimmed === '/' || trimmed === '.') return true;
+            if (/^[A-Za-z]:[\\/]?$/.test(trimmed)) return true;
+            if (/\([A-Za-z]:\)$/i.test(trimmed)) return true;
+            return false;
+        }
+
+        function stripDriveLetterFromText(name) {
+            if (!name) return "";
+            const cleaned = name
+                .replace(/^[A-Za-z]:[\\/]+/, '')
+                .replace(/\s*\([A-Za-z]:\)/g, '')
+                .replace(/^[A-Za-z]:[\\/]?$/, '')
+                .replace(/^[\\/]+$/, '')
+                .trim();
+            return cleaned;
+        }
+
+        function nextFrame() {
+            return new Promise(resolve => requestAnimationFrame(resolve));
+        }
+
+        function showImmediateProgressUI(initialMessage) {
+            const progressContainer = document.getElementById('scanProgressContainer');
+            const progressBar = document.getElementById('scanProgressBar');
+            const percentText = document.getElementById('scanPercentText');
+            const counterDetail = document.getElementById('scanCounterDetail');
+            const visibleDetail = document.getElementById('scanVisibleDetail');
+            const statusLabel = document.getElementById('scanStatusLabel');
+            const spinnerIcon = document.getElementById('scanSpinnerIcon');
+            const statsPanel = document.getElementById('statsPanel');
+            const fileCountEl = document.getElementById('fileCount');
+            const folderCountEl = document.getElementById('folderCount');
+
+            progressContainer.classList.remove('hidden');
+            progressContainer.classList.add('flex');
+            statsPanel.classList.remove('hidden');
+            statsPanel.classList.add('flex');
+
+            spinnerIcon.innerHTML = SVG_ICON_SPINNER;
+            progressBar.style.width = '0%';
+            percentText.innerText = '0%';
+            statusLabel.innerText = initialMessage || 'Iniciando lectura directa...';
+            counterDetail.innerText = '0 leídos';
+            visibleDetail.innerText = '0 visibles';
+            fileCountEl.innerText = '0';
+            folderCountEl.innerText = '0';
+        }
+
+        // Selector instantáneo: usa showDirectoryPicker() para empezar en 0 segundos sin congelar el navegador
+        async function openInstantDirectoryPicker(event) {
+            if (window.showDirectoryPicker) {
+                try {
+                    const dirHandle = await window.showDirectoryPicker({ mode: 'read' });
+                    await scanWithDirectoryHandle(dirHandle);
+                    return;
+                } catch (err) {
+                    // Si el usuario canceló la ventana, no hacer nada
+                    if (err && err.name === 'AbortError') {
+                        return;
+                    }
+                    // Si está en un entorno restringido, usar el input tradicional de respaldo
+                }
+            }
+
+            // Respaldo: mostrar barra en 0% mientras el navegador prepara los archivos
+            const input = document.getElementById('directoryInput');
+            input.value = '';
+            waitingForFallbackDialog = true;
+            showImmediateProgressUI('Esperando selección de carpeta...');
+            input.click();
+        }
+
+        // Detectar cuando se cierra la ventana del sistema en modo respaldo
+        window.addEventListener('focus', () => {
+            if (waitingForFallbackDialog) {
+                waitingForFallbackDialog = false;
+                const statusLabel = document.getElementById('scanStatusLabel');
+                if (statusLabel && statusLabel.innerText.includes('Esperando')) {
+                    statusLabel.innerText = 'Preparando índice de la USB...';
+                }
+            }
+        });
+
+        // Escaneo directo con progreso jerárquico estricto de 0% a 100% (sin retrocesos ni saltos)
+        async function scanWithDirectoryHandle(rootDirHandle) {
+            totalFilesProcessed = 0;
+            totalFoldersProcessed = 0;
+
+            showImmediateProgressUI('Conectado a la unidad. Escaneando...');
+            await nextFrame();
+
+            const progressBar = document.getElementById('scanProgressBar');
+            const percentText = document.getElementById('scanPercentText');
+            const counterDetail = document.getElementById('scanCounterDetail');
+            const visibleDetail = document.getElementById('scanVisibleDetail');
+            const statusLabel = document.getElementById('scanStatusLabel');
+            const spinnerIcon = document.getElementById('scanSpinnerIcon');
+            const fileCountEl = document.getElementById('fileCount');
+            const folderCountEl = document.getElementById('folderCount');
+
+            const rawRootName = (rootDirHandle.name || "").trim();
+            const isSystemSlashRoot = isDriveRootLabel(rawRootName);
+
+            const rootNode = {
+                name: isSystemSlashRoot ? "" : rawRootName,
+                isDriveRoot: isSystemSlashRoot,
+                folders: {},
+                files: {}
+            };
+
+            let totalReadEntries = 0;
+            let completedWeight = 0;
+            let highestTargetPercent = 0;
+            let displayedPercent = 0;
+            let lastFrameTime = performance.now();
+
+            // Función auxiliar que avanza el porcentaje de 1 en 1 sin retroceder jamás ni saltar números
+            function stepProgressUI(folderName, targetPct) {
+                if (targetPct > highestTargetPercent) {
+                    highestTargetPercent = Math.min(99, targetPct);
+                }
+                if (displayedPercent < highestTargetPercent) {
+                    displayedPercent++;
+                }
+                progressBar.style.width = `${displayedPercent}%`;
+                percentText.innerText = `${displayedPercent}%`;
+                if (folderName) {
+                    statusLabel.innerText = `LEYENDO: ${folderName}`;
+                }
+                counterDetail.innerText = `${totalReadEntries.toLocaleString('es-MX')} leídos`;
+                visibleDetail.innerText = `${totalFilesProcessed.toLocaleString('es-MX')} visibles`;
+                fileCountEl.innerText = totalFilesProcessed.toLocaleString('es-MX');
+                folderCountEl.innerText = totalFoldersProcessed.toLocaleString('es-MX');
+            }
+
+            // Cola de carpetas con peso jerárquico (total = 99%) para que nunca disminuya al encontrar más carpetas
+            const queue = [{ handle: rootDirHandle, targetNode: rootNode, weight: 99 }];
+
+            while (queue.length > 0) {
+                const { handle, targetNode, weight } = queue.shift();
+                const discoveredSubDirs = [];
+                let entriesInFolder = 0;
+
+                try {
+                    for await (const entry of handle.values()) {
+                        totalReadEntries++;
+                        entriesInFolder++;
+                        const entryName = entry.name;
+
+                        // Si es carpeta o archivo oculto, se ignora de inmediato sin leer su interior
+                        if (isHiddenOrSystemPart(entryName)) {
+                            continue;
+                        }
+
+                        if (entry.kind === 'directory') {
+                            targetNode.folders[entryName] = {
+                                name: entryName,
+                                folders: {},
+                                files: {}
+                            };
+                            totalFoldersProcessed++;
+                            discoveredSubDirs.push({
+                                handle: entry,
+                                targetNode: targetNode.folders[entryName]
+                            });
+                        } else if (entry.kind === 'file') {
+                            const extMatch = entryName.match(/\.([^.]+)$/);
+                            const ext = extMatch ? extMatch[1].toUpperCase() : 'SIN EXTENSIÓN';
+
+                            if (!targetNode.files[ext]) {
+                                targetNode.files[ext] = 0;
+                            }
+                            targetNode.files[ext]++;
+                            totalFilesProcessed++;
+                        }
+
+                        // Actualizar la interfaz cada ~25ms subiendo de 1% en 1%
+                        const now = performance.now();
+                        if (now - lastFrameTime > 25) {
+                            const intraFolderWeight = weight * 0.75 * (1 - (1 / (1 + entriesInFolder / 3000)));
+                            const estimatedPct = Math.floor(completedWeight + intraFolderWeight);
+                            stepProgressUI(targetNode.name || 'UNIDAD USB', estimatedPct);
+                            lastFrameTime = now;
+                            await nextFrame();
+                        }
+                    }
+                } catch (dirErr) {
+                    // Ignorar carpetas del sistema sin permisos de lectura
+                }
+
+                // Repartir el peso de esta carpeta entre sus subcarpetas o sumarlo si ya no tiene subcarpetas
+                if (discoveredSubDirs.length === 0) {
+                    completedWeight += weight;
+                } else {
+                    const selfPortion = weight * 0.12;
+                    completedWeight += selfPortion;
+                    const childWeight = (weight - selfPortion) / discoveredSubDirs.length;
+                    for (const sub of discoveredSubDirs) {
+                        queue.push({
+                            handle: sub.handle,
+                            targetNode: sub.targetNode,
+                            weight: childWeight
+                        });
+                    }
+                }
+
+                const currentTargetPct = Math.floor(completedWeight);
+                if (performance.now() - lastFrameTime > 20) {
+                    stepProgressUI(targetNode.name || 'UNIDAD USB', currentTargetPct);
+                    lastFrameTime = performance.now();
+                    await nextFrame();
+                } else if (currentTargetPct > highestTargetPercent) {
+                    highestTargetPercent = Math.min(99, currentTargetPct);
+                }
+            }
+
+            // Completar suavemente de 1% en 1% hasta llegar a 100% sin saltos bruscos
+            while (displayedPercent < 100) {
+                displayedPercent = Math.min(100, displayedPercent + 2);
+                progressBar.style.width = `${displayedPercent}%`;
+                percentText.innerText = `${displayedPercent}%`;
+                await nextFrame();
+            }
+
+            // Finalizar al 100%
+            progressBar.style.width = '100%';
+            percentText.innerText = '100%';
+            spinnerIcon.innerHTML = SVG_ICON_CHECK;
+            statusLabel.innerText = 'LECTURA COMPLETADA (100%)';
+            counterDetail.innerText = `${totalReadEntries.toLocaleString('es-MX')} / ${totalReadEntries.toLocaleString('es-MX')} leídos`;
+            visibleDetail.innerText = `${totalFilesProcessed.toLocaleString('es-MX')} visibles`;
+            fileCountEl.innerText = totalFilesProcessed.toLocaleString('es-MX');
+            folderCountEl.innerText = totalFoldersProcessed.toLocaleString('es-MX');
+
+            lastScannedRoot = rootNode;
+            reRenderCurrentTree();
+            showToast("Escaneo completado y estructurado de la A-Z");
+        }
+
+        // Soporte para Arrastrar y Soltar (Drag & Drop) una carpeta o unidad directamente
+        function handleDragOver(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            document.getElementById('dropZone').classList.add('drag-active');
+        }
+
+        function handleDragLeave(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            document.getElementById('dropZone').classList.remove('drag-active');
+        }
+
+        async function handleDropFolder(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            document.getElementById('dropZone').classList.remove('drag-active');
+
+            const items = event.dataTransfer ? event.dataTransfer.items : null;
+            if (!items || items.length === 0) return;
+
+            const firstItem = items[0];
+            if (firstItem.getAsFileSystemHandle) {
+                try {
+                    const handle = await firstItem.getAsFileSystemHandle();
+                    if (handle && handle.kind === 'directory') {
+                        await scanWithDirectoryHandle(handle);
+                        return;
+                    }
+                } catch (e) {
+                    // Continuar con webkitGetAsEntry si falla
+                }
+            }
+        }
+
+        // Modo de respaldo tradicional (webkitdirectory) con animación fluida de 0% a 100%
+        async function scanDirectoryFallback(event) {
+            waitingForFallbackDialog = false;
+            const files = event.target.files;
+            if (!files || files.length === 0) return;
+
+            const totalRawFiles = files.length;
+            totalFilesProcessed = 0;
+            totalFoldersProcessed = 0;
+
+            showImmediateProgressUI('Leyendo archivos...');
+            await nextFrame();
+
+            const progressBar = document.getElementById('scanProgressBar');
+            const percentText = document.getElementById('scanPercentText');
+            const counterDetail = document.getElementById('scanCounterDetail');
+            const visibleDetail = document.getElementById('scanVisibleDetail');
+            const statusLabel = document.getElementById('scanStatusLabel');
+            const spinnerIcon = document.getElementById('scanSpinnerIcon');
+            const fileCountEl = document.getElementById('fileCount');
+            const folderCountEl = document.getElementById('folderCount');
+
+            const rootNode = { name: "Carpeta_Principal", folders: {}, files: {} };
+            const steps = Math.min(90, Math.max(30, totalRawFiles));
+            const batchSize = Math.max(1, Math.ceil(totalRawFiles / steps));
+            let lastPercentShown = -1;
+
+            for (let i = 0; i < totalRawFiles; i++) {
+                const file = files[i];
+                const rawPath = file.webkitRelativePath || file.name;
+                const pathParts = rawPath.split('/').filter(p => p.length > 0);
+
+                if (i === 0 && pathParts.length > 0) {
+                    rootNode.name = pathParts[0];
+                }
+
+                const innerParts = pathParts.slice(1);
+                if (!innerParts.some(part => isHiddenOrSystemPart(part))) {
+                    let current = rootNode;
+                    for (let j = 1; j < pathParts.length - 1; j++) {
+                        const folderName = pathParts[j];
+                        if (!current.folders[folderName]) {
+                            current.folders[folderName] = { name: folderName, folders: {}, files: {} };
+                            totalFoldersProcessed++;
+                        }
+                        current = current.folders[folderName];
+                    }
+
+                    const fileName = pathParts[pathParts.length - 1];
+                    if (fileName && !isHiddenOrSystemPart(fileName)) {
+                        const extMatch = fileName.match(/\.([^.]+)$/);
+                        const ext = extMatch ? extMatch[1].toUpperCase() : 'SIN EXTENSIÓN';
+
+                        if (!current.files[ext]) {
+                            current.files[ext] = 0;
+                        }
+                        current.files[ext]++;
+                        totalFilesProcessed++;
+                    }
+                }
+
+                if ((i + 1) % batchSize === 0 || i === totalRawFiles - 1) {
+                    const currentCount = i + 1;
+                    const percent = Math.round((currentCount / totalRawFiles) * 100);
+
+                    progressBar.style.width = `${percent}%`;
+                    percentText.innerText = `${percent}%`;
+                    statusLabel.innerText = `LEYENDO DISPOSITIVO (${percent}%)`;
+                    counterDetail.innerText = `${currentCount.toLocaleString('es-MX')} / ${totalRawFiles.toLocaleString('es-MX')} leídos`;
+                    visibleDetail.innerText = `${totalFilesProcessed.toLocaleString('es-MX')} visibles`;
+                    fileCountEl.innerText = totalFilesProcessed.toLocaleString('es-MX');
+                    folderCountEl.innerText = totalFoldersProcessed.toLocaleString('es-MX');
+
+                    if (percent !== lastPercentShown) {
+                        lastPercentShown = percent;
+                        await nextFrame();
+                    }
+                }
+            }
+
+            spinnerIcon.innerHTML = SVG_ICON_CHECK;
+            statusLabel.innerText = 'LECTURA COMPLETADA (100%)';
+            lastScannedRoot = rootNode;
+
+            reRenderCurrentTree();
+
+            showToast("Escaneo completado y estructurado de la A-Z");
+        }
+
+        function reRenderCurrentTree() {
+            if (!lastScannedRoot) return;
+            const omitUnitName = document.getElementById('omitDriveLetterToggle').checked;
+            const resultHTML = renderTreeHTML(lastScannedRoot, omitUnitName);
+            document.getElementById('previewContent').innerHTML = resultHTML;
+
+            const topFolders = sortAlpha(Object.keys(lastScannedRoot.folders));
+            const cleanRootName = stripDriveLetterFromText(lastScannedRoot.name);
+            let badgeLabel = cleanRootName || (topFolders.length === 1 ? topFolders[0] : "Unidad USB");
+            document.getElementById('unitBadge').innerText = `Origen: ${badgeLabel}`;
+        }
+
+        function sortAlpha(keysArray) {
+            return keysArray.sort((a, b) => a.localeCompare(b, 'es', { numeric: true, sensitivity: 'base' }));
+        }
+
+        // Recolecta recursivamente el conteo total de archivos con extensión en todo el directorio (sin carpetas)
+        function collectGlobalExtensionCounts(node, totals = {}) {
+            if (!node) return totals;
+
+            if (node.files) {
+                for (const ext of Object.keys(node.files)) {
+                    if (ext !== 'SIN EXTENSIÓN') {
+                        totals[ext] = (totals[ext] || 0) + node.files[ext];
+                    }
+                }
+            }
+
+            if (node.folders) {
+                for (const folderName of Object.keys(node.folders)) {
+                    collectGlobalExtensionCounts(node.folders[folderName], totals);
+                }
+            }
+
+            return totals;
+        }
+
+        // Genera el recuadro resaltado con el conteo final exclusivo de archivos con extensión
+        function renderGlobalSummaryBox(rootNode) {
+            const globalExts = collectGlobalExtensionCounts(rootNode);
+            const sortedGlobalExts = sortAlpha(Object.keys(globalExts));
+
+            if (sortedGlobalExts.length === 0) {
+                return '';
+            }
+
+            let totalGlobalFiles = 0;
+            let itemsHTML = '';
+
+            for (const ext of sortedGlobalExts) {
+                const count = globalExts[ext];
+                totalGlobalFiles += count;
+                itemsHTML += renderFileItem(count, ext);
+            }
+
+            const totalLetters = capitalizeFirstLetter(numToWords(totalGlobalFiles));
+            const totalDigits = totalGlobalFiles.toString().padStart(2, '0');
+            const totalWord = totalGlobalFiles === 1 ? 'archivo' : 'archivos';
+
+            return `
+                <div style="margin-top: 28px; padding: 16px 22px; background-color: #f0f9ff; border: 2px solid #0284c7; border-left: 6px solid #0284c7; border-radius: 8px;">
+                    <p style="margin: 0 0 8px 0; font-weight: bold; color: #0369a1; text-transform: uppercase; font-size: 10.5pt; letter-spacing: 0.03em;">
+                        CONTEO FINAL GLOBAL DE ARCHIVOS POR FORMATO (SIN CARPETAS):
+                    </p>
+                    <ul style="margin-top: 4px; margin-bottom: 10px;">
+                        ${itemsHTML}
+                    </ul>
+                    <p style="margin: 8px 0 0 0; padding-top: 8px; border-top: 1px solid #bae6fd; font-weight: bold; color: #0f172a; font-size: 10.5pt;">
+                        Total general de archivos con extensión: ${totalLetters} (${totalDigits}) ${totalWord}.
+                    </p>
+                </div>
+            `;
+        }
+
+        function renderTreeHTML(rootNode, omitUnitName) {
+            const sortedFolders = sortAlpha(Object.keys(rootNode.folders));
+            const sortedExts = sortAlpha(Object.keys(rootNode.files));
+
+            if (sortedFolders.length === 0 && sortedExts.length === 0) {
+                return `<p class="text-slate-700 italic">No se encontraron archivos visibles en la ubicación seleccionada.</p>`;
+            }
+
+            const cleanRootName = stripDriveLetterFromText(rootNode.name);
+            const hasValidRootName = cleanRootName.length > 0 && !isDriveRootLabel(cleanRootName);
+            const summaryBoxHTML = renderGlobalSummaryBox(rootNode);
+
+            // Caso 1: Se seleccionó directamente la raíz de una unidad (ej. I:\ donde el sistema devuelve "\")
+            // Nunca se imprime "Carpeta con nombre: \".
+            if (!hasValidRootName) {
+                // Si dentro de la unidad hay una única carpeta principal y el usuario marca "Omitir el nombre de la unidad",
+                // se omite esa carpeta contenedora y se listan directamente sus subcarpetas/archivos.
+                if (omitUnitName && sortedFolders.length === 1 && sortedExts.length === 0) {
+                    const singleMainFolder = rootNode.folders[sortedFolders[0]];
+                    const innerFolders = sortAlpha(Object.keys(singleMainFolder.folders));
+                    const innerExts = sortAlpha(Object.keys(singleMainFolder.files));
+                    let html = `<ul>`;
+                    for (let folder of innerFolders) {
+                        html += renderFolderNode(singleMainFolder.folders[folder]);
+                    }
+                    for (let ext of innerExts) {
+                        html += renderFileItem(singleMainFolder.files[ext], ext);
+                    }
+                    html += `</ul>` + summaryBoxHTML;
+                    return html;
+                }
+
+                let html = `<ul>`;
+                for (let folder of sortedFolders) {
+                    html += renderFolderNode(rootNode.folders[folder]);
+                }
+                for (let ext of sortedExts) {
+                    html += renderFileItem(rootNode.files[ext], ext);
+                }
+                html += `</ul>` + summaryBoxHTML;
+                return html;
+            }
+
+            // Caso 2: Se seleccionó una carpeta con nombre (ej. USB_Fiscalia_Caso_Angeles)
+            // Si "Omitir el nombre de la unidad" está activo, se omite el nodo raíz y se muestra puro contenido.
+            if (omitUnitName) {
+                let html = `<ul>`;
+                for (let folder of sortedFolders) {
+                    html += renderFolderNode(rootNode.folders[folder]);
+                }
+                for (let ext of sortedExts) {
+                    html += renderFileItem(rootNode.files[ext], ext);
+                }
+                html += `</ul>` + summaryBoxHTML;
+                return html;
+            } else {
+                let html = `<ul>`;
+                html += renderFolderNode(rootNode);
+                html += `</ul>` + summaryBoxHTML;
+                return html;
+            }
+        }
+
+        function renderFolderNode(node) {
+            const displayName = stripDriveLetterFromText(node.name) || node.name;
+
+            let html = `<li><strong>Carpeta con nombre:</strong> ${displayName}`;
+
+            const sortedFolders = sortAlpha(Object.keys(node.folders));
+            const sortedExts = sortAlpha(Object.keys(node.files));
+
+            if (sortedFolders.length > 0 || sortedExts.length > 0) {
+                html += `<ul>`;
+                for (let folder of sortedFolders) {
+                    html += renderFolderNode(node.folders[folder]);
+                }
+                for (let ext of sortedExts) {
+                    html += renderFileItem(node.files[ext], ext);
+                }
+                html += `</ul>`;
+            }
+
+            html += `</li>`;
+            return html;
+        }
+
+        function renderFileItem(count, ext) {
+            const typeStr = getFileTypeString(ext);
+            const numLetters = capitalizeFirstLetter(numToWords(count));
+            const numDigits = count.toString().padStart(2, '0');
+            const word = count === 1 ? "archivo" : "archivos";
+            const typePhrase = typeStr ? ` ${typeStr}` : '';
+
+            if (ext === 'SIN EXTENSIÓN') {
+                return `<li>${numLetters} (${numDigits}) ${word} sin extensión definida.</li>`;
+            }
+            return `<li>${numLetters} (${numDigits}) ${word}${typePhrase} en formato *.${ext}.</li>`;
+        }
+
+        // =========================================================
+        // 4. COPIAR Y DESCARGAR EN WORD (.DOC)
+        // =========================================================
+        function copyToClipboard() {
+            const content = document.getElementById('previewContent');
+            if (!lastScannedRoot || totalFilesProcessed === 0) {
+                showToast("Primero escanea una carpeta o unidad USB.");
+                return;
+            }
+
+            const selection = window.getSelection();
+            const range = document.createRange();
+            range.selectNodeContents(content);
+            selection.removeAllRanges();
+            selection.addRange(range);
+
+            try {
+                document.execCommand('copy');
+                showToast("¡Copiado con viñetas y negritas! Pégalo en tu Word (Ctrl + V).");
+            } catch (e) {
+                showToast("No se pudo copiar automáticamente.");
+            }
+
+            selection.removeAllRanges();
+        }
+
+        function exportToWord() {
+            if (!lastScannedRoot || totalFilesProcessed === 0) {
+                showToast("Primero escanea una carpeta o unidad USB.");
+                return;
+            }
+
+            const htmlContent = document.getElementById('previewContent').innerHTML;
+
+            const wordDocument = `
+                <html xmlns:o="urn:schemas-microsoft-com:office:office"
+                      xmlns:w="urn:schemas-microsoft-com:office:word"
+                      xmlns="http://www.w3.org/TR/REC-html40">
+                <head>
+                    <meta charset="utf-8">
+                    <title>Contenido Estructural Forense</title>
+                    <style>
+                        body {
+                            font-family: 'Arial', sans-serif;
+                            font-size: 11pt;
+                            color: #000000;
+                        }
+                        ul {
+                            margin-top: 2pt;
+                            margin-bottom: 2pt;
+                            list-style-type: disc;
+                        }
+                        ul ul {
+                            list-style-type: circle;
+                        }
+                        ul ul ul {
+                            list-style-type: square;
+                        }
+                        li {
+                            margin-bottom: 3pt;
+                            line-height: 1.35;
+                        }
+                        strong {
+                            font-weight: bold;
+                        }
+                    </style>
+                </head>
+                <body>
+                    ${htmlContent}
+                </body>
+                </html>
+            `;
+
+            const blob = new Blob(['\ufeff', wordDocument], {
+                type: 'application/msword;charset=utf-8'
+            });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            const safeName = stripDriveLetterFromText(lastScannedRoot.name) || 'Dispositivo_USB';
+            a.download = `Contenido_Forense_${safeName}.doc`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            showToast("Descargando archivo de Word (.doc)");
+        }
+    </script>
+</body>
+</html>
