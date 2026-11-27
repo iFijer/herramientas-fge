@@ -125,6 +125,7 @@
         .items-center { align-items: center; }
         .justify-center { justify-content: center; }
         .justify-between { justify-content: space-between; }
+        .grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
         .grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 
         .relative { position: relative; }
@@ -458,18 +459,18 @@
         }
 
         /* =========================================================
-           CALENDARIO INTERACTIVO DE RANGO DE FECHAS Y DESGLOSE
+           CALENDARIO COMPACTO DE RANGO DE FECHAS Y DESGLOSE
            ========================================================= */
         .date-filter-card {
             width: 100%;
             max-width: 920px;
-            margin: 0 auto 1.5rem auto;
-            padding: 1.15rem 1.35rem;
+            margin: 0 auto 1.25rem auto;
+            padding: 0.78rem 1.05rem;
             border: 1px solid rgba(34, 211, 238, 0.35);
             background: rgba(15, 23, 42, 0.72);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.6), 0 0 24px rgba(6, 182, 212, 0.12);
+            box-shadow: 0 16px 34px -15px rgba(0, 0, 0, 0.6), 0 0 20px rgba(6, 182, 212, 0.12);
             border-radius: 0.75rem;
         }
 
@@ -478,51 +479,54 @@
             flex-wrap: wrap;
             align-items: center;
             justify-content: space-between;
-            gap: 0.75rem;
-            padding-bottom: 0.85rem;
+            gap: 0.65rem;
+        }
+
+        .date-filter-header.is-open {
+            padding-bottom: 0.7rem;
             border-bottom: 1px solid rgba(51, 65, 85, 0.75);
         }
 
         .date-filter-body {
             display: grid;
-            grid-template-columns: 310px 1fr;
-            gap: 1.25rem;
-            margin-top: 1rem;
+            grid-template-columns: 248px 1fr;
+            gap: 0.95rem;
+            margin-top: 0.8rem;
             align-items: start;
         }
 
-        @media (max-width: 820px) {
+        @media (max-width: 780px) {
             .date-filter-body {
                 grid-template-columns: 1fr;
             }
         }
 
         .cal-box {
-            background: rgba(2, 6, 23, 0.65);
+            background: rgba(2, 6, 23, 0.68);
             border: 1px solid rgba(51, 65, 85, 0.85);
-            border-radius: 0.75rem;
-            padding: 0.85rem;
+            border-radius: 0.65rem;
+            padding: 0.6rem;
         }
 
         .cal-nav {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 0.35rem;
-            margin-bottom: 0.65rem;
+            gap: 0.25rem;
+            margin-bottom: 0.45rem;
         }
 
         .cal-nav-btn {
-            width: 1.85rem;
-            height: 1.85rem;
+            width: 1.55rem;
+            height: 1.55rem;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            border-radius: 0.45rem;
+            border-radius: 0.38rem;
             background: rgba(30, 41, 59, 0.9);
             border: 1px solid rgba(71, 85, 105, 0.8);
             color: #e2e8f0;
-            font-size: 0.95rem;
+            font-size: 0.85rem;
             font-weight: 700;
             transition: all 0.18s ease;
             flex-shrink: 0;
@@ -537,20 +541,20 @@
         .cal-select-group {
             display: flex;
             align-items: center;
-            gap: 0.35rem;
+            gap: 0.25rem;
             flex: 1;
             justify-content: center;
         }
 
         .cal-select {
             font-family: inherit;
-            font-size: 0.8rem;
+            font-size: 0.72rem;
             font-weight: 700;
             color: #f8fafc;
             background-color: #0f172a;
             border: 1px solid rgba(71, 85, 105, 0.85);
-            border-radius: 0.4rem;
-            padding: 0.25rem 0.4rem;
+            border-radius: 0.35rem;
+            padding: 0.18rem 0.28rem;
             cursor: pointer;
             outline: none;
             transition: border-color 0.2s ease;
@@ -563,26 +567,39 @@
 
         .cal-jump-row {
             display: flex;
+            flex-wrap: wrap;
             align-items: center;
             justify-content: space-between;
-            gap: 0.4rem;
-            margin-bottom: 0.55rem;
+            gap: 0.28rem;
+            margin-bottom: 0.42rem;
         }
 
         .cal-jump-btn {
-            font-size: 10.5px;
-            font-weight: 600;
+            font-size: 9.5px;
+            font-weight: 700;
             color: #93c5fd;
-            background: rgba(30, 41, 59, 0.65);
+            background: rgba(30, 41, 59, 0.7);
             border: 1px solid rgba(59, 130, 246, 0.35);
-            border-radius: 0.35rem;
-            padding: 0.18rem 0.5rem;
+            border-radius: 0.32rem;
+            padding: 0.14rem 0.38rem;
             transition: all 0.18s ease;
         }
 
         .cal-jump-btn:hover {
-            background: rgba(37, 99, 235, 0.25);
+            background: rgba(37, 99, 235, 0.28);
             border-color: #60a5fa;
+            color: #ffffff;
+        }
+
+        .cal-jump-btn.is-today-btn {
+            color: #fde68a;
+            border-color: rgba(251, 191, 36, 0.55);
+            background: rgba(120, 53, 15, 0.35);
+        }
+
+        .cal-jump-btn.is-today-btn:hover {
+            background: rgba(217, 119, 6, 0.35);
+            border-color: #fbbf24;
             color: #ffffff;
         }
 
@@ -590,39 +607,39 @@
             display: grid;
             grid-template-columns: repeat(7, 1fr);
             gap: 2px;
-            margin-bottom: 0.3rem;
+            margin-bottom: 0.2rem;
             text-align: center;
         }
 
         .cal-weekdays span {
-            font-size: 10px;
+            font-size: 9.5px;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.04em;
             color: #64748b;
-            padding: 0.15rem 0;
+            padding: 0.1rem 0;
         }
 
         .cal-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            gap: 3px;
+            gap: 2px;
         }
 
         .cal-empty {
-            height: 2.2rem;
+            height: 1.72rem;
         }
 
         .cal-day {
             position: relative;
-            height: 2.2rem;
-            border-radius: 0.45rem;
+            height: 1.72rem;
+            border-radius: 0.35rem;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             gap: 1px;
-            font-size: 0.78rem;
+            font-size: 0.7rem;
             font-weight: 600;
             color: #94a3b8;
             background: rgba(15, 23, 42, 0.45);
@@ -639,25 +656,35 @@
         }
 
         .cal-day.out-of-range {
-            opacity: 0.48;
+            opacity: 0.46;
             color: #64748b;
         }
 
         .cal-day.in-extraction {
             color: #cbd5e1;
-            background: rgba(30, 41, 59, 0.45);
+            background: rgba(30, 41, 59, 0.48);
         }
 
         .cal-day.has-activity {
             color: #ffffff;
             background: rgba(14, 116, 144, 0.28);
-            border-color: rgba(34, 211, 238, 0.35);
+            border-color: rgba(34, 211, 238, 0.38);
             font-weight: 700;
         }
 
         .cal-day.has-files {
-            background: rgba(6, 95, 70, 0.36);
-            border-color: rgba(52, 211, 153, 0.48);
+            background: rgba(6, 95, 70, 0.38);
+            border-color: rgba(52, 211, 153, 0.52);
+        }
+
+        /* Marca siempre visible para el día actual (Hoy) */
+        .cal-day.is-today {
+            opacity: 1 !important;
+            border: 1.5px solid #fbbf24 !important;
+            background: rgba(245, 158, 11, 0.22);
+            color: #fef3c7 !important;
+            font-weight: 800 !important;
+            box-shadow: 0 0 8px rgba(251, 191, 36, 0.45), inset 0 0 6px rgba(251, 191, 36, 0.25);
         }
 
         .cal-day.is-in-range {
@@ -679,8 +706,14 @@
             border-color: #a5f3fc !important;
             color: #020617 !important;
             font-weight: 800 !important;
-            box-shadow: 0 0 12px rgba(34, 211, 238, 0.55);
+            box-shadow: 0 0 10px rgba(34, 211, 238, 0.55);
             opacity: 1 !important;
+        }
+
+        .cal-day.is-today.is-selected-start,
+        .cal-day.is-today.is-selected-end {
+            border-color: #fbbf24 !important;
+            box-shadow: 0 0 0 1.5px #fbbf24, 0 0 12px rgba(34, 211, 238, 0.55) !important;
         }
 
         .cal-dots {
@@ -688,12 +721,12 @@
             align-items: center;
             justify-content: center;
             gap: 2px;
-            height: 4px;
+            height: 3px;
         }
 
         .cal-dot {
-            width: 4px;
-            height: 4px;
+            width: 3.5px;
+            height: 3.5px;
             border-radius: 9999px;
         }
 
@@ -720,24 +753,24 @@
             flex-wrap: wrap;
             align-items: center;
             justify-content: space-between;
-            gap: 0.45rem;
-            margin-top: 0.65rem;
-            padding-top: 0.55rem;
+            gap: 0.35rem;
+            margin-top: 0.48rem;
+            padding-top: 0.42rem;
             border-top: 1px solid rgba(51, 65, 85, 0.6);
-            font-size: 10.5px;
+            font-size: 9.5px;
             color: #94a3b8;
         }
 
         .cal-legend-item {
             display: inline-flex;
             align-items: center;
-            gap: 0.3rem;
+            gap: 0.25rem;
         }
 
         .date-controls-panel {
             display: flex;
             flex-direction: column;
-            gap: 0.85rem;
+            gap: 0.7rem;
             min-width: 0;
         }
 
@@ -1085,7 +1118,7 @@
                         <div id="scanProgressBar" class="bg-gradient-progress h-full rounded-full transition-all" style="width: 0%"></div>
                     </div>
                     <div class="flex flex-wrap justify-between items-center gap-2 text-[11px] font-mono text-slate-300">
-                        <span id="scanCounterDetail">0 mensajes analizados</span>
+                        <span id="scanCounterDetail">0 días analizados</span>
                         <span id="scanVisibleDetail" class="text-cyan-300">0 adjuntos</span>
                     </div>
                 </div>
@@ -1109,18 +1142,14 @@
                 <!-- Panel de Estadísticas y Botones de Exportación -->
                 <div id="statsPanel" class="hidden flex-col gap-4 pt-2 border-t border-slate-700/70">
                     
-                    <div class="grid grid-cols-3 gap-2">
-                        <div class="bg-slate-900/90 border border-slate-700/80 rounded-lg p-2.5 text-center">
-                            <span class="block text-[10px] uppercase tracking-wider text-slate-400">Mensajes</span>
-                            <span id="totalMsgCount" class="font-mono font-bold text-cyan-400 text-base">0</span>
-                        </div>
+                    <div class="grid grid-cols-2 gap-2">
                         <div class="bg-slate-900/90 border border-slate-700/80 rounded-lg p-2.5 text-center">
                             <span class="block text-[10px] uppercase tracking-wider text-slate-400">Adjuntos</span>
                             <span id="fileCount" class="font-mono font-bold text-emerald-400 text-base">0</span>
                         </div>
                         <div class="bg-slate-900/90 border border-slate-700/80 rounded-lg p-2.5 text-center">
-                            <span class="block text-[10px] uppercase tracking-wider text-slate-400">Textos</span>
-                            <span id="textMsgCount" class="font-mono font-bold text-amber-400 text-base">0</span>
+                            <span class="block text-[10px] uppercase tracking-wider text-slate-400">Participantes</span>
+                            <span id="participantCount" class="font-mono font-bold text-cyan-400 text-base">0</span>
                         </div>
                     </div>
 
@@ -1149,15 +1178,15 @@
             </div>
         </aside>
 
-        <!-- PANEL DERECHO: CALENDARIO DE RANGO DE FECHAS + VISTA PREVIA EN HOJA BLANCA -->
+        <!-- PANEL DERECHO: CALENDARIO COMPACTO DE RANGO DE FECHAS + VISTA PREVIA EN HOJA BLANCA -->
         <main class="w-full lg:w-2/3 xl:w-3/4 flex-1">
 
-            <!-- CALENDARIO DE RANGO DE FECHAS DE LA EXTRACCIÓN Y DESGLOSE DE ARCHIVOS -->
+            <!-- CALENDARIO COMPACTO DE RANGO DE FECHAS (OCULTO POR DEFECTO HASTA QUE SE ABRA) -->
             <section id="dateFilterPanel" class="hidden date-filter-card" aria-label="Calendario de rango de fechas de la extracción">
-                <div class="date-filter-header">
+                <div id="dateFilterHeader" class="date-filter-header">
                     <div class="flex items-center gap-2.5">
                         <div class="w-9 h-9 rounded-lg bg-slate-900 border border-cyan-500/40 flex items-center justify-center shrink-0">
-                            <svg class="svg-icon text-cyan-400" style="width: 1.25rem; height: 1.25rem;" viewBox="0 0 24 24">
+                            <svg class="svg-icon text-cyan-400" style="width: 1.2rem; height: 1.2rem;" viewBox="0 0 24 24">
                                 <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
                                 <line x1="16" y1="2" x2="16" y2="6"/>
                                 <line x1="8" y1="2" x2="8" y2="6"/>
@@ -1165,10 +1194,10 @@
                             </svg>
                         </div>
                         <div>
-                            <h3 class="text-sm font-bold uppercase tracking-wider text-white" style="margin: 0;">
-                                Calendario de Rango de Fechas de la Extracción
+                            <h3 class="text-xs sm:text-sm font-bold uppercase tracking-wider text-white" style="margin: 0;">
+                                Buscar por Rango de Fechas
                             </h3>
-                            <p id="extractionRangeMeta" class="text-xs text-slate-300 font-mono" style="margin: 2px 0 0 0;">
+                            <p id="extractionRangeMeta" class="text-[11px] text-slate-300 font-mono" style="margin: 2px 0 0 0;">
                                 Rango detectado: --
                             </p>
                         </div>
@@ -1178,14 +1207,20 @@
                         <span id="dateFilterStatusPill" class="status-pill-full">
                             Mostrando todo el TXT
                         </span>
-                        <button type="button" id="toggleCalendarBtn" onclick="toggleCalendarPanel()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-2.5 py-1 rounded-lg transition font-semibold">
-                            Ocultar calendario
+                        <button type="button" id="toggleCalendarBtn" onclick="toggleCalendarPanel()" class="text-xs bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-cyan-500/40 px-3 py-1.5 rounded-lg transition font-bold flex items-center gap-1.5">
+                            <svg class="svg-icon" viewBox="0 0 24 24">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                                <line x1="16" y1="2" x2="16" y2="6"/>
+                                <line x1="8" y1="2" x2="8" y2="6"/>
+                                <line x1="3" y1="10" x2="21" y2="10"/>
+                            </svg>
+                            <span id="toggleCalendarBtnLabel">Abrir calendario</span>
                         </button>
                     </div>
                 </div>
 
-                <div id="dateFilterBody" class="date-filter-body">
-                    <!-- Columna izquierda: Calendario interactivo mensual -->
+                <div id="dateFilterBody" class="hidden date-filter-body">
+                    <!-- Columna izquierda: Calendario interactivo mensual compacto -->
                     <div class="cal-box">
                         <div class="cal-nav">
                             <button type="button" class="cal-nav-btn" onclick="changeCalendarMonth(-1)" title="Mes anterior" aria-label="Mes anterior">&#8249;</button>
@@ -1197,8 +1232,9 @@
                         </div>
 
                         <div id="calJumpRow" class="cal-jump-row">
-                            <button type="button" id="jumpStartBtn" class="cal-jump-btn" onclick="jumpCalendarToBoundary('start')">Inicio extracción</button>
-                            <button type="button" id="jumpEndBtn" class="cal-jump-btn" onclick="jumpCalendarToBoundary('end')">Fin extracción</button>
+                            <button type="button" id="jumpTodayBtn" class="cal-jump-btn is-today-btn" onclick="jumpCalendarToBoundary('today')">Hoy</button>
+                            <button type="button" id="jumpStartBtn" class="cal-jump-btn" onclick="jumpCalendarToBoundary('start')">Inicio</button>
+                            <button type="button" id="jumpEndBtn" class="cal-jump-btn" onclick="jumpCalendarToBoundary('end')">Fin</button>
                         </div>
 
                         <div class="cal-weekdays">
@@ -1215,16 +1251,16 @@
 
                         <div class="cal-legend">
                             <span class="cal-legend-item">
-                                <span class="cal-dot cal-dot-msg"></span>
-                                Mensajes
+                                <span style="width: 9px; height: 9px; border-radius: 2px; border: 1.5px solid #fbbf24; background: rgba(245, 158, 11, 0.25); display: inline-block;"></span>
+                                Hoy
                             </span>
                             <span class="cal-legend-item">
                                 <span class="cal-dot cal-dot-file"></span>
-                                Con archivos
+                                Archivos
                             </span>
                             <span class="cal-legend-item">
-                                <span style="width: 10px; height: 10px; border-radius: 3px; background: linear-gradient(135deg, #06b6d4, #10b981); display: inline-block;"></span>
-                                Seleccionado
+                                <span style="width: 9px; height: 9px; border-radius: 2px; background: linear-gradient(135deg, #06b6d4, #10b981); display: inline-block;"></span>
+                                Rango
                             </span>
                         </div>
                     </div>
@@ -1233,13 +1269,13 @@
                     <div class="date-controls-panel">
                         <div class="date-inputs-grid">
                             <div>
-                                <label for="dateStartInput" class="block text-[11px] font-bold uppercase tracking-wider text-cyan-300 mb-2" style="margin-bottom: 0.3rem;">
+                                <label for="dateStartInput" class="block text-[11px] font-bold uppercase tracking-wider text-cyan-300" style="margin-bottom: 0.25rem;">
                                     Fecha inicial
                                 </label>
                                 <input type="date" id="dateStartInput" class="date-input-dark" onchange="handleDateInputsChange()">
                             </div>
                             <div>
-                                <label for="dateEndInput" class="block text-[11px] font-bold uppercase tracking-wider text-cyan-300 mb-2" style="margin-bottom: 0.3rem;">
+                                <label for="dateEndInput" class="block text-[11px] font-bold uppercase tracking-wider text-cyan-300" style="margin-bottom: 0.25rem;">
                                     Fecha final
                                 </label>
                                 <input type="date" id="dateEndInput" class="date-input-dark" onchange="handleDateInputsChange()">
@@ -1248,7 +1284,7 @@
 
                         <div class="flex flex-wrap items-center justify-between gap-2">
                             <span id="dateSelectionHint" class="text-xs text-slate-300">
-                                Selecciona una fecha o un rango en el calendario. Si no marcas fecha se muestra todo el TXT.
+                                Selecciona una fecha o rango para filtrar archivos y ver la conversación. Si no marcas fecha se muestra todo el TXT.
                             </span>
                             <button type="button" id="clearDateFilterBtn" onclick="clearDateFilter()" class="btn-clear-dates shrink-0">
                                 <svg class="svg-icon" viewBox="0 0 24 24">
@@ -1266,7 +1302,7 @@
                                     Desglose de archivos — Todo el TXT
                                 </span>
                                 <span id="breakdownSummaryCount" class="text-[11px] font-mono text-slate-300">
-                                    0 adjuntos · 0 textos
+                                    0 adjuntos
                                 </span>
                             </div>
 
@@ -1943,6 +1979,7 @@
                     participants[msg.sender] = {
                         name: msg.sender,
                         totalMessages: 0,
+                        totalAttachments: 0,
                         textMessages: 0,
                         omittedMedia: 0,
                         filesByExt: {},
@@ -1980,6 +2017,7 @@
                         dEntry.filesByExt[ext] = (dEntry.filesByExt[ext] || 0) + 1;
 
                         totalAttachments++;
+                        p.totalAttachments++;
                         p.totalMessages++;
                         dEntry.totalAttachments++;
                         dEntry.totalMessages++;
@@ -2171,6 +2209,11 @@
         // =========================================================
         // 3B. CALENDARIO DE RANGO DE FECHAS Y FILTRO DE EXTRACCIÓN
         // =========================================================
+        function getTodayIso() {
+            const now = new Date();
+            return toIsoDate(now.getFullYear(), now.getMonth() + 1, now.getDate());
+        }
+
         function isDateFilterActive() {
             return Boolean(selectedStartIso || selectedEndIso);
         }
@@ -2196,22 +2239,28 @@
             }
 
             panel.classList.remove('hidden');
-            isCalendarCollapsed = false;
-            document.getElementById('dateFilterBody').classList.remove('hidden');
-            document.getElementById('toggleCalendarBtn').innerText = 'Ocultar calendario';
 
-            const minParts = parseIsoParts(currentWhatsappData.minIsoDate);
-            const maxParts = parseIsoParts(currentWhatsappData.maxIsoDate);
-            calViewYear = minParts.year;
-            calViewMonth = minParts.month - 1;
+            // Inicia oculto/compacto para que el usuario lo abra solo si desea buscar por fecha
+            isCalendarCollapsed = true;
+            document.getElementById('dateFilterBody').classList.add('hidden');
+            document.getElementById('dateFilterHeader').classList.remove('is-open');
+            document.getElementById('toggleCalendarBtnLabel').innerText = 'Abrir calendario';
 
-            // Configurar límites de los inputs de fecha (sin preseleccionar para mostrar todo el TXT por defecto)
+            // El calendario siempre abre posicionado en el mes y día actual (Hoy) marcado
+            const todayIso = getTodayIso();
+            const todayParts = parseIsoParts(todayIso);
+            calViewYear = todayParts.year;
+            calViewMonth = todayParts.month - 1;
+
+            // Inputs de fecha sin preselección (muestra todo el TXT por defecto)
             const startInput = document.getElementById('dateStartInput');
             const endInput = document.getElementById('dateEndInput');
-            startInput.min = currentWhatsappData.minIsoDate;
-            startInput.max = currentWhatsappData.maxIsoDate;
-            endInput.min = currentWhatsappData.minIsoDate;
-            endInput.max = currentWhatsappData.maxIsoDate;
+            const minBound = currentWhatsappData.minIsoDate < todayIso ? currentWhatsappData.minIsoDate : todayIso;
+            const maxBound = currentWhatsappData.maxIsoDate > todayIso ? currentWhatsappData.maxIsoDate : todayIso;
+            startInput.min = minBound;
+            startInput.max = maxBound;
+            endInput.min = minBound;
+            endInput.max = maxBound;
             startInput.value = '';
             endInput.value = '';
 
@@ -2223,16 +2272,16 @@
                 : `Extracción: del ${formatIsoToDisplay(currentWhatsappData.minIsoDate)} al ${formatIsoToDisplay(currentWhatsappData.maxIsoDate)} (${activeDays} ${daysWord})`;
             document.getElementById('extractionRangeMeta').innerText = rangeText;
 
-            // Botones de salto rápido Inicio / Fin
-            const jumpRow = document.getElementById('calJumpRow');
-            const sameMonth = (minParts.year === maxParts.year && minParts.month === maxParts.month);
-            if (sameMonth) {
-                jumpRow.classList.add('hidden');
-            } else {
-                jumpRow.classList.remove('hidden');
-                document.getElementById('jumpStartBtn').innerText = `Inicio (${formatIsoToDisplay(currentWhatsappData.minIsoDate)})`;
-                document.getElementById('jumpEndBtn').innerText = `Fin (${formatIsoToDisplay(currentWhatsappData.maxIsoDate)})`;
-            }
+            // Botones de salto rápido: Hoy, Inicio y Fin de la extracción (en una sola fila compacta)
+            const jumpTodayBtn = document.getElementById('jumpTodayBtn');
+            const jumpStartBtn = document.getElementById('jumpStartBtn');
+            const jumpEndBtn = document.getElementById('jumpEndBtn');
+            jumpTodayBtn.innerText = `Hoy (${pad2(todayParts.day)}/${pad2(todayParts.month)})`;
+            jumpTodayBtn.title = `Ir al día actual: ${formatIsoToDisplay(todayIso)}`;
+            jumpStartBtn.innerText = 'Inicio TXT';
+            jumpStartBtn.title = `Ir al inicio de la extracción: ${formatIsoToDisplay(currentWhatsappData.minIsoDate)}`;
+            jumpEndBtn.innerText = 'Fin TXT';
+            jumpEndBtn.title = `Ir al fin de la extracción: ${formatIsoToDisplay(currentWhatsappData.maxIsoDate)}`;
 
             populateCalendarSelects();
         }
@@ -2245,10 +2294,11 @@
                 .map((name, idx) => `<option value="${idx}" ${idx === calViewMonth ? 'selected' : ''}>${name}</option>`)
                 .join('');
 
+            const todayY = parseIsoParts(getTodayIso()).year;
             const minY = parseIsoParts(currentWhatsappData.minIsoDate).year;
             const maxY = parseIsoParts(currentWhatsappData.maxIsoDate).year;
-            const startY = Math.min(minY, calViewYear);
-            const endY = Math.max(maxY, calViewYear);
+            const startY = Math.min(minY, todayY, calViewYear);
+            const endY = Math.max(maxY, todayY, calViewYear);
 
             let yearOptions = '';
             for (let y = startY; y <= endY; y++) {
@@ -2260,13 +2310,16 @@
         function toggleCalendarPanel() {
             isCalendarCollapsed = !isCalendarCollapsed;
             const body = document.getElementById('dateFilterBody');
-            const btn = document.getElementById('toggleCalendarBtn');
+            const header = document.getElementById('dateFilterHeader');
+            const btnLabel = document.getElementById('toggleCalendarBtnLabel');
             if (isCalendarCollapsed) {
                 body.classList.add('hidden');
-                btn.innerText = 'Mostrar calendario';
+                header.classList.remove('is-open');
+                btnLabel.innerText = 'Abrir calendario';
             } else {
                 body.classList.remove('hidden');
-                btn.innerText = 'Ocultar calendario';
+                header.classList.add('is-open');
+                btnLabel.innerText = 'Ocultar calendario';
             }
         }
 
@@ -2292,7 +2345,14 @@
 
         function jumpCalendarToBoundary(which) {
             if (!currentWhatsappData) return;
-            const iso = which === 'end' ? currentWhatsappData.maxIsoDate : currentWhatsappData.minIsoDate;
+            let iso;
+            if (which === 'today') {
+                iso = getTodayIso();
+            } else if (which === 'end') {
+                iso = currentWhatsappData.maxIsoDate;
+            } else {
+                iso = currentWhatsappData.minIsoDate;
+            }
             const p = parseIsoParts(iso);
             if (!p) return;
             calViewYear = p.year;
@@ -2445,6 +2505,7 @@
 
             const minIso = currentWhatsappData.minIsoDate;
             const maxIso = currentWhatsappData.maxIsoDate;
+            const todayIso = getTodayIso();
             const effectiveRange = getEffectiveDateRange();
 
             let html = '';
@@ -2456,6 +2517,7 @@
                 const iso = toIsoDate(calViewYear, calViewMonth + 1, day);
                 const dayInfo = currentWhatsappData.dailyIndex[iso] || null;
                 const inExtraction = (iso >= minIso && iso <= maxIso);
+                const isToday = (iso === todayIso);
 
                 const classes = ['cal-day'];
                 if (!inExtraction) classes.push('out-of-range');
@@ -2468,33 +2530,40 @@
                     }
                 }
 
+                if (isToday) {
+                    classes.push('is-today');
+                }
+
                 if (effectiveRange) {
                     if (iso === effectiveRange.start) classes.push('is-selected-start');
                     if (iso === effectiveRange.end) classes.push('is-selected-end');
                     if (iso > effectiveRange.start && iso < effectiveRange.end) classes.push('is-in-range');
                 }
 
-                let tooltip = formatIsoToDisplay(iso);
+                let tooltip = (isToday ? 'HOY · ' : '') + formatIsoToDisplay(iso);
                 if (dayInfo && dayInfo.totalMessages > 0) {
                     const extSummary = sortAlpha(Object.keys(dayInfo.filesByExt))
                         .map(ext => `${dayInfo.filesByExt[ext]} ${ext}`)
                         .join(', ');
-                    tooltip += ` — ${dayInfo.totalMessages} registros | ${dayInfo.totalAttachments} adjuntos`;
-                    if (extSummary) tooltip += ` (${extSummary})`;
-                    tooltip += ` | ${dayInfo.totalTextMessages} textos`;
+                    if (dayInfo.totalAttachments > 0) {
+                        const attWord = dayInfo.totalAttachments === 1 ? 'adjunto' : 'adjuntos';
+                        tooltip += ` — ${dayInfo.totalAttachments} ${attWord}`;
+                        if (extSummary) tooltip += ` (${extSummary})`;
+                    } else {
+                        tooltip += ' — Actividad registrada (sin archivos adjuntos)';
+                    }
                 } else if (inExtraction) {
-                    tooltip += ' — Sin mensajes registrados en esta fecha';
+                    tooltip += ' — Sin actividad registrada en esta fecha';
                 } else {
                     tooltip += ' — Fuera del rango de la extracción';
                 }
 
                 let dotsHtml = '<span class="cal-dots">';
                 if (dayInfo) {
-                    if (dayInfo.totalTextMessages > 0 || dayInfo.totalOmittedMedia > 0) {
-                        dotsHtml += '<span class="cal-dot cal-dot-msg"></span>';
-                    }
                     if (dayInfo.totalAttachments > 0) {
                         dotsHtml += '<span class="cal-dot cal-dot-file"></span>';
+                    } else if (dayInfo.totalMessages > 0) {
+                        dotsHtml += '<span class="cal-dot cal-dot-msg"></span>';
                     }
                 }
                 dotsHtml += '</span>';
@@ -2503,6 +2572,7 @@
                     <button type="button"
                             class="${classes.join(' ')}"
                             data-iso="${iso}"
+                            ${isToday ? 'aria-current="date"' : ''}
                             title="${escapeHTML(tooltip)}"
                             onclick="handleCalendarDayClick('${iso}')"
                             onmouseenter="handleCalendarDayHover('${iso}')">
@@ -2534,7 +2604,7 @@
                 statusPill.className = 'status-pill-full';
                 statusPill.innerText = 'Mostrando todo el TXT';
                 clearBtn.classList.remove('is-active-filter');
-                hintEl.innerText = 'Haz clic en una fecha o rango en el calendario para filtrar. Si no marcas fecha se muestra todo el TXT.';
+                hintEl.innerText = 'Selecciona una fecha o rango para filtrar archivos y ver la conversación. Si no marcas fecha se muestra todo el TXT.';
                 titleEl.innerText = 'Desglose de archivos — Todo el TXT';
             } else {
                 const isSingleDay = range.start === range.end;
@@ -2549,17 +2619,24 @@
                 if (isSelectingRange) {
                     hintEl.innerText = `Fecha marcada: ${labelRange}. Haz clic en otra fecha para completar un rango, o en el mismo día para ver todo el TXT.`;
                 } else {
-                    hintEl.innerText = `Mostrando únicamente el periodo del ${labelRange} (${data.sortedIsoDates.length} ${data.sortedIsoDates.length === 1 ? 'día con actividad' : 'días con actividad'}).`;
+                    hintEl.innerText = `Mostrando el periodo del ${labelRange} y su conversación (${data.sortedIsoDates.length} ${data.sortedIsoDates.length === 1 ? 'día con actividad' : 'días con actividad'}).`;
                 }
                 titleEl.innerText = `Desglose de archivos — ${labelRange}`;
             }
 
-            summaryCountEl.innerText = `${data.totalAttachments.toLocaleString('es-MX')} adjuntos · ${data.totalTextMessages.toLocaleString('es-MX')} textos · ${data.totalMessages.toLocaleString('es-MX')} registros`;
+            const adjWord = data.totalAttachments === 1 ? 'adjunto' : 'adjuntos';
+            let summaryParts = [`${data.totalAttachments.toLocaleString('es-MX')} ${adjWord}`];
+            if (data.totalOmittedMedia > 0) {
+                summaryParts.push(`${data.totalOmittedMedia.toLocaleString('es-MX')} omitidos`);
+            }
+            summaryCountEl.innerText = summaryParts.join(' · ');
 
-            // Chips de desglose por formato
+            // Chips de desglose únicamente por formato de archivo (sin conteo de textos)
             const sortedExts = sortAlpha(Object.keys(data.globalExtensions));
             if (data.totalMessages === 0) {
-                chipsEl.innerHTML = `<span class="text-xs text-slate-400 italic">No se encontraron archivos ni mensajes dentro de las fechas marcadas.</span>`;
+                chipsEl.innerHTML = `<span class="text-xs text-slate-400 italic">No se encontró contenido dentro de las fechas marcadas.</span>`;
+            } else if (sortedExts.length === 0 && data.totalOmittedMedia === 0) {
+                chipsEl.innerHTML = `<span class="text-xs text-slate-400 italic">Sin archivos multimedia adjuntos en este periodo.</span>`;
             } else {
                 let chipsHtml = '';
                 for (const ext of sortedExts) {
@@ -2571,14 +2648,6 @@
                         <span class="ext-chip ${catClass}" title="${count} archivo(s) *.${ext}${typeLabel}">
                             <span>*.${escapeHTML(ext)}</span>
                             <span class="ext-chip-count">${count}</span>
-                        </span>
-                    `;
-                }
-                if (data.totalTextMessages > 0) {
-                    chipsHtml += `
-                        <span class="ext-chip chip-txt">
-                            <span>Textos</span>
-                            <span class="ext-chip-count">${data.totalTextMessages}</span>
                         </span>
                     `;
                 }
@@ -2670,23 +2739,26 @@
             const counterDetail = document.getElementById('scanCounterDetail');
             const visibleDetail = document.getElementById('scanVisibleDetail');
             const unitBadge = document.getElementById('unitBadge');
+            const participantCount = Object.keys(data.participants).length;
+            const activeDays = data.sortedIsoDates.length;
+            const daysWord = activeDays === 1 ? 'día' : 'días';
+            const adjWord = data.totalAttachments === 1 ? 'adjunto' : 'adjuntos';
 
             if (!range) {
-                counterDetail.innerText = `${data.totalMessages.toLocaleString('es-MX')} mensajes leídos`;
-                visibleDetail.innerText = `${data.totalAttachments.toLocaleString('es-MX')} adjuntos | ${data.totalTextMessages.toLocaleString('es-MX')} textos`;
+                counterDetail.innerText = `${activeDays.toLocaleString('es-MX')} ${daysWord} con actividad`;
+                visibleDetail.innerText = `${data.totalAttachments.toLocaleString('es-MX')} ${adjWord}`;
                 unitBadge.innerText = `Origen: ${currentSourceName} · Todo el TXT`;
             } else {
                 const labelRange = range.start === range.end
                     ? formatIsoToDisplay(range.start)
                     : `${formatIsoToDisplay(range.start)} al ${formatIsoToDisplay(range.end)}`;
-                counterDetail.innerText = `${data.totalMessages.toLocaleString('es-MX')} de ${currentWhatsappData.totalMessages.toLocaleString('es-MX')} en rango`;
-                visibleDetail.innerText = `${data.totalAttachments.toLocaleString('es-MX')} adjuntos | ${data.totalTextMessages.toLocaleString('es-MX')} textos`;
+                counterDetail.innerText = `${activeDays.toLocaleString('es-MX')} ${daysWord} en rango`;
+                visibleDetail.innerText = `${data.totalAttachments.toLocaleString('es-MX')} ${adjWord}`;
                 unitBadge.innerText = `Origen: ${currentSourceName} · Filtro: ${labelRange}`;
             }
 
-            document.getElementById('totalMsgCount').innerText = data.totalMessages.toLocaleString('es-MX');
             document.getElementById('fileCount').innerText = data.totalAttachments.toLocaleString('es-MX');
-            document.getElementById('textMsgCount').innerText = data.totalTextMessages.toLocaleString('es-MX');
+            document.getElementById('participantCount').innerText = participantCount.toLocaleString('es-MX');
         }
 
         function renderFileItem(count, ext) {
@@ -2697,13 +2769,6 @@
             const typePhrase = typeStr ? ` ${typeStr}` : '';
 
             return `<li>${numLetters} (${numDigits}) ${word}${typePhrase} en formato *.${ext}.</li>`;
-        }
-
-        function renderTextCountItem(count) {
-            const numLetters = capitalizeFirstLetter(numToWords(count));
-            const numDigits = count.toString().padStart(2, '0');
-            const word = count === 1 ? "mensaje" : "mensajes";
-            return `<li>${numLetters} (${numDigits}) ${word} de texto.</li>`;
         }
 
         function reRenderWhatsappReport() {
@@ -2725,7 +2790,7 @@
                             <line x1="3" y1="10" x2="21" y2="10"/>
                         </svg>
                         <p style="margin: 0; font-size: 11pt; color: #334155;">
-                            No se encontraron mensajes ni archivos adjuntos en el rango seleccionado (<strong>${escapeHTML(labelRange)}</strong>).
+                            No se encontró conversación ni archivos adjuntos en el rango seleccionado (<strong>${escapeHTML(labelRange)}</strong>).
                         </p>
                         <button type="button" onclick="clearDateFilter()" style="padding: 8px 16px; border-radius: 8px; background: #0284c7; color: #ffffff; font-weight: 700; font-size: 10pt; cursor: pointer;">
                             Mostrar todo el contenido del TXT
@@ -2743,7 +2808,7 @@
 
             let html = '';
 
-            // 1. PARTE SUPERIOR: PERIODO, INTERLOCUTORES Y CONTEO TOTAL GLOBAL
+            // 1. PARTE SUPERIOR: PERIODO, INTERLOCUTORES Y CONTEO TOTAL DE ARCHIVOS (SIN TEXTOS NI TOTAL GENERAL DE EVENTOS)
             const firstMsg = data.messages[0];
             const lastMsg = data.messages[data.messages.length - 1];
             const firstDateLabel = firstMsg.isoDate ? formatIsoToDisplay(firstMsg.isoDate) : firstMsg.date;
@@ -2761,34 +2826,28 @@
 
             const numPartLetters = capitalizeFirstLetter(numToWords(participantNames.length));
             const numPartDigits = participantNames.length.toString().padStart(2, '0');
+            const partWord = participantNames.length === 1 ? 'participante' : 'participantes';
 
             const totalAttachLetters = capitalizeFirstLetter(numToWords(data.totalAttachments));
             const totalAttachDigits = data.totalAttachments.toString().padStart(2, '0');
             const attachWord = data.totalAttachments === 1 ? 'archivo adjunto' : 'archivos adjuntos';
 
-            const totalMsgLetters = capitalizeFirstLetter(numToWords(data.totalMessages));
-            const totalMsgDigits = data.totalMessages.toString().padStart(2, '0');
-            const msgWord = data.totalMessages === 1 ? 'registro analizado' : 'registros analizados';
-
             html += `<ul>`;
             html += `<li><strong>${escapeHTML(periodoLabel)}</strong> ${escapeHTML(rangoFechas)}.</li>`;
-            html += `<li><strong>Interlocutores identificados (${numPartDigits}):</strong> ${numPartLetters} (${numPartDigits}) participantes: ${participantNames.map(n => `<strong>${escapeHTML(n)}</strong>`).join(', ')}.</li>`;
+            html += `<li><strong>Interlocutores identificados (${numPartDigits}):</strong> ${numPartLetters} (${numPartDigits}) ${partWord}: ${participantNames.map(n => `<strong>${escapeHTML(n)}</strong>`).join(', ')}.</li>`;
             html += `<li><strong>Conteo total global de la conversación (por formato y tipo):</strong><ul>`;
 
             for (const ext of sortedGlobalExts) {
                 html += renderFileItem(data.globalExtensions[ext], ext);
             }
-            if (data.totalTextMessages > 0) {
-                html += renderTextCountItem(data.totalTextMessages);
-            }
             if (data.totalOmittedMedia > 0) {
                 const omLetters = capitalizeFirstLetter(numToWords(data.totalOmittedMedia));
                 const omDigits = data.totalOmittedMedia.toString().padStart(2, '0');
-                html += `<li>${omLetters} (${omDigits}) elementos marcados como multimedia omitido.</li>`;
+                const omPhrase = data.totalOmittedMedia === 1 ? 'elemento marcado' : 'elementos marcados';
+                html += `<li>${omLetters} (${omDigits}) ${omPhrase} como multimedia omitido.</li>`;
             }
 
             html += `<li><strong>Total de archivos multimedia adjuntos:</strong> ${totalAttachLetters} (${totalAttachDigits}) ${attachWord}.</li>`;
-            html += `<li><strong>Total general de eventos en la conversación:</strong> ${totalMsgLetters} (${totalMsgDigits}) ${msgWord}.</li>`;
             html += `</ul></li>`;
             html += `</ul>`;
 
@@ -2802,6 +2861,11 @@
                 html += renderDateBreakdownBox(data);
             }
 
+            // 4. CONVERSACIÓN DEL PERIODO SELECCIONADO (SOLO CUANDO SE SELECCIONA UNA FECHA O RANGO)
+            if (range && data.messages && data.messages.length > 0) {
+                html += renderFilteredConversationBox(data, range);
+            }
+
             document.getElementById('previewContent').innerHTML = html;
         }
 
@@ -2811,21 +2875,23 @@
             for (const pName of participantNames) {
                 const p = data.participants[pName];
                 const pExts = sortAlpha(Object.keys(p.filesByExt));
-                const totalPLetters = capitalizeFirstLetter(numToWords(p.totalMessages));
-                const totalPDigits = p.totalMessages.toString().padStart(2, '0');
-                const regWord = p.totalMessages === 1 ? 'registro' : 'registros';
+                const attachCount = p.totalAttachments || 0;
+                const attachLetters = capitalizeFirstLetter(numToWords(attachCount));
+                const attachDigits = attachCount.toString().padStart(2, '0');
+                const attachWord = attachCount === 1 ? 'archivo adjunto' : 'archivos adjuntos';
 
-                participantsHTML += `<li><strong>Participante:</strong> ${escapeHTML(p.name)} <em>(${totalPLetters} [${totalPDigits}] ${regWord} en total)</em><ul>`;
+                participantsHTML += `<li><strong>Participante:</strong> ${escapeHTML(p.name)} <em>(${attachLetters} [${attachDigits}] ${attachWord})</em><ul>`;
                 for (const ext of pExts) {
                     participantsHTML += renderFileItem(p.filesByExt[ext], ext);
-                }
-                if (p.textMessages > 0) {
-                    participantsHTML += renderTextCountItem(p.textMessages);
                 }
                 if (p.omittedMedia > 0) {
                     const omLetters = capitalizeFirstLetter(numToWords(p.omittedMedia));
                     const omDigits = p.omittedMedia.toString().padStart(2, '0');
-                    participantsHTML += `<li>${omLetters} (${omDigits}) archivos multimedia omitidos.</li>`;
+                    const omPhrase = p.omittedMedia === 1 ? 'archivo multimedia omitido' : 'archivos multimedia omitidos';
+                    participantsHTML += `<li>${omLetters} (${omDigits}) ${omPhrase}.</li>`;
+                }
+                if (pExts.length === 0 && p.omittedMedia === 0) {
+                    participantsHTML += `<li>Sin archivos multimedia adjuntos registrados.</li>`;
                 }
                 participantsHTML += `</ul></li>`;
             }
@@ -2833,7 +2899,7 @@
             return `
                 <div style="margin-top: 28px; padding: 16px 22px; background-color: #f0f9ff; border: 2px solid #0284c7; border-left: 6px solid #0284c7; border-radius: 8px;">
                     <p style="margin: 0 0 8px 0; font-weight: bold; color: #0369a1; text-transform: uppercase; font-size: 10.5pt; letter-spacing: 0.03em;">
-                        DESGLOSE DE CONTENIDO POR PARTICIPANTE:
+                        DESGLOSE DE ARCHIVOS POR PARTICIPANTE:
                     </p>
                     <ul style="margin-top: 4px; margin-bottom: 4px;">
                         ${participantsHTML}
@@ -2847,16 +2913,14 @@
 
             for (const day of data.dailyBreakdown) {
                 const dExts = sortAlpha(Object.keys(day.filesByExt));
-                const totalDLetters = capitalizeFirstLetter(numToWords(day.totalMessages));
-                const totalDDigits = day.totalMessages.toString().padStart(2, '0');
-                const regWord = day.totalMessages === 1 ? 'registro' : 'registros';
+                const attachCount = day.totalAttachments || 0;
+                const attachLetters = capitalizeFirstLetter(numToWords(attachCount));
+                const attachDigits = attachCount.toString().padStart(2, '0');
+                const attachWord = attachCount === 1 ? 'archivo adjunto' : 'archivos adjuntos';
 
-                daysHTML += `<li><strong>Fecha:</strong> ${escapeHTML(day.displayDate)} <em>(${totalDLetters} [${totalDDigits}] ${regWord} en total)</em><ul>`;
+                daysHTML += `<li><strong>Fecha:</strong> ${escapeHTML(day.displayDate)} <em>(${attachLetters} [${attachDigits}] ${attachWord})</em><ul>`;
                 for (const ext of dExts) {
                     daysHTML += renderFileItem(day.filesByExt[ext], ext);
-                }
-                if (day.totalTextMessages > 0) {
-                    daysHTML += renderTextCountItem(day.totalTextMessages);
                 }
                 if (day.totalOmittedMedia > 0) {
                     const omLetters = capitalizeFirstLetter(numToWords(day.totalOmittedMedia));
@@ -2864,17 +2928,61 @@
                     const omPhrase = day.totalOmittedMedia === 1 ? 'elemento marcado' : 'elementos marcados';
                     daysHTML += `<li>${omLetters} (${omDigits}) ${omPhrase} como multimedia omitido.</li>`;
                 }
+                if (dExts.length === 0 && day.totalOmittedMedia === 0) {
+                    daysHTML += `<li>Sin archivos multimedia adjuntos registrados.</li>`;
+                }
                 daysHTML += `</ul></li>`;
             }
 
             return `
                 <div style="margin-top: 24px; padding: 16px 22px; background-color: #ecfdf5; border: 2px solid #059669; border-left: 6px solid #059669; border-radius: 8px;">
                     <p style="margin: 0 0 8px 0; font-weight: bold; color: #047857; text-transform: uppercase; font-size: 10.5pt; letter-spacing: 0.03em;">
-                        DESGLOSE DE ARCHIVOS Y MENSAJES POR FECHA:
+                        DESGLOSE DE ARCHIVOS POR FECHA:
                     </p>
                     <ul style="margin-top: 4px; margin-bottom: 4px;">
                         ${daysHTML}
                     </ul>
+                </div>
+            `;
+        }
+
+        function renderFilteredConversationBox(data, range) {
+            const rangeHeaderLabel = range.start === range.end
+                ? formatIsoToDisplay(range.start)
+                : `DEL ${formatIsoToDisplay(range.start)} AL ${formatIsoToDisplay(range.end)}`;
+
+            let convHTML = '';
+            let lastDateStr = null;
+
+            for (const msg of data.messages) {
+                const dateLabel = msg.isoDate ? formatIsoToDisplay(msg.isoDate) : msg.date;
+                if (dateLabel !== lastDateStr) {
+                    convHTML += `
+                        <p style="margin: 12px 0 6px 0; padding: 3px 10px; background-color: #e2e8f0; color: #1e293b; font-weight: bold; font-size: 9.5pt; border-radius: 4px; display: inline-block;">
+                            ${escapeHTML(dateLabel)}
+                        </p>
+                    `;
+                    lastDateStr = dateLabel;
+                }
+
+                const formattedBody = escapeHTML(msg.body || '').replace(/\n/g, '<br>');
+                convHTML += `
+                    <p style="margin: 4px 0 6px 0; padding-left: 8px; border-left: 2px solid #cbd5e1; line-height: 1.45; color: #0f172a; font-size: 10.5pt;">
+                        <span style="color: #64748b; font-size: 9.5pt;">[${escapeHTML(dateLabel)}, ${escapeHTML(msg.time)}]</span>
+                        <strong style="color: #0369a1;"> ${escapeHTML(msg.sender)}:</strong>
+                        <span> ${formattedBody}</span>
+                    </p>
+                `;
+            }
+
+            return `
+                <div id="filteredConversationSection" style="margin-top: 24px; padding: 16px 22px; background-color: #f8fafc; border: 2px solid #475569; border-left: 6px solid #0f172a; border-radius: 8px;">
+                    <p style="margin: 0 0 10px 0; font-weight: bold; color: #0f172a; text-transform: uppercase; font-size: 10.5pt; letter-spacing: 0.03em;">
+                        CONVERSACIÓN DEL PERIODO SELECCIONADO (${escapeHTML(rangeHeaderLabel)}):
+                    </p>
+                    <div>
+                        ${convHTML}
+                    </div>
                 </div>
             `;
         }
