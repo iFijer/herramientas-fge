@@ -320,7 +320,7 @@
         }
 
         .btn-inicio {
-            position: fixed;
+            position: absolute;
             top: 1.25rem;
             left: 1.25rem;
             z-index: 40;
@@ -351,7 +351,7 @@
         }
 
         .logo-fge {
-            position: fixed;
+            position: absolute;
             top: 0.9rem;
             right: 1.25rem;
             z-index: 40;
@@ -455,6 +455,452 @@
         }
         ::-webkit-scrollbar-thumb:hover {
             background: #38bdf8;
+        }
+
+        /* =========================================================
+           CALENDARIO INTERACTIVO DE RANGO DE FECHAS Y DESGLOSE
+           ========================================================= */
+        .date-filter-card {
+            width: 100%;
+            max-width: 920px;
+            margin: 0 auto 1.5rem auto;
+            padding: 1.15rem 1.35rem;
+            border: 1px solid rgba(34, 211, 238, 0.35);
+            background: rgba(15, 23, 42, 0.72);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.6), 0 0 24px rgba(6, 182, 212, 0.12);
+            border-radius: 0.75rem;
+        }
+
+        .date-filter-header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+            padding-bottom: 0.85rem;
+            border-bottom: 1px solid rgba(51, 65, 85, 0.75);
+        }
+
+        .date-filter-body {
+            display: grid;
+            grid-template-columns: 310px 1fr;
+            gap: 1.25rem;
+            margin-top: 1rem;
+            align-items: start;
+        }
+
+        @media (max-width: 820px) {
+            .date-filter-body {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .cal-box {
+            background: rgba(2, 6, 23, 0.65);
+            border: 1px solid rgba(51, 65, 85, 0.85);
+            border-radius: 0.75rem;
+            padding: 0.85rem;
+        }
+
+        .cal-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.35rem;
+            margin-bottom: 0.65rem;
+        }
+
+        .cal-nav-btn {
+            width: 1.85rem;
+            height: 1.85rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0.45rem;
+            background: rgba(30, 41, 59, 0.9);
+            border: 1px solid rgba(71, 85, 105, 0.8);
+            color: #e2e8f0;
+            font-size: 0.95rem;
+            font-weight: 700;
+            transition: all 0.18s ease;
+            flex-shrink: 0;
+        }
+
+        .cal-nav-btn:hover {
+            background: rgba(6, 182, 212, 0.2);
+            border-color: #22d3ee;
+            color: #ffffff;
+        }
+
+        .cal-select-group {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            flex: 1;
+            justify-content: center;
+        }
+
+        .cal-select {
+            font-family: inherit;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #f8fafc;
+            background-color: #0f172a;
+            border: 1px solid rgba(71, 85, 105, 0.85);
+            border-radius: 0.4rem;
+            padding: 0.25rem 0.4rem;
+            cursor: pointer;
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+
+        .cal-select:focus,
+        .cal-select:hover {
+            border-color: #22d3ee;
+        }
+
+        .cal-jump-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.4rem;
+            margin-bottom: 0.55rem;
+        }
+
+        .cal-jump-btn {
+            font-size: 10.5px;
+            font-weight: 600;
+            color: #93c5fd;
+            background: rgba(30, 41, 59, 0.65);
+            border: 1px solid rgba(59, 130, 246, 0.35);
+            border-radius: 0.35rem;
+            padding: 0.18rem 0.5rem;
+            transition: all 0.18s ease;
+        }
+
+        .cal-jump-btn:hover {
+            background: rgba(37, 99, 235, 0.25);
+            border-color: #60a5fa;
+            color: #ffffff;
+        }
+
+        .cal-weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 2px;
+            margin-bottom: 0.3rem;
+            text-align: center;
+        }
+
+        .cal-weekdays span {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #64748b;
+            padding: 0.15rem 0;
+        }
+
+        .cal-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 3px;
+        }
+
+        .cal-empty {
+            height: 2.2rem;
+        }
+
+        .cal-day {
+            position: relative;
+            height: 2.2rem;
+            border-radius: 0.45rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: #94a3b8;
+            background: rgba(15, 23, 42, 0.45);
+            border: 1px solid transparent;
+            transition: all 0.15s ease;
+            user-select: none;
+            padding: 0;
+        }
+
+        .cal-day:hover {
+            border-color: rgba(34, 211, 238, 0.75);
+            background: rgba(34, 211, 238, 0.16);
+            color: #ffffff;
+        }
+
+        .cal-day.out-of-range {
+            opacity: 0.48;
+            color: #64748b;
+        }
+
+        .cal-day.in-extraction {
+            color: #cbd5e1;
+            background: rgba(30, 41, 59, 0.45);
+        }
+
+        .cal-day.has-activity {
+            color: #ffffff;
+            background: rgba(14, 116, 144, 0.28);
+            border-color: rgba(34, 211, 238, 0.35);
+            font-weight: 700;
+        }
+
+        .cal-day.has-files {
+            background: rgba(6, 95, 70, 0.36);
+            border-color: rgba(52, 211, 153, 0.48);
+        }
+
+        .cal-day.is-in-range {
+            background: rgba(6, 182, 212, 0.36) !important;
+            border-color: rgba(34, 211, 238, 0.78) !important;
+            color: #ffffff !important;
+            opacity: 1 !important;
+        }
+
+        .cal-day.is-hover-range {
+            background: rgba(56, 189, 248, 0.22) !important;
+            border-color: rgba(56, 189, 248, 0.5) !important;
+            color: #ffffff !important;
+        }
+
+        .cal-day.is-selected-start,
+        .cal-day.is-selected-end {
+            background: linear-gradient(135deg, #06b6d4, #10b981) !important;
+            border-color: #a5f3fc !important;
+            color: #020617 !important;
+            font-weight: 800 !important;
+            box-shadow: 0 0 12px rgba(34, 211, 238, 0.55);
+            opacity: 1 !important;
+        }
+
+        .cal-dots {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            height: 4px;
+        }
+
+        .cal-dot {
+            width: 4px;
+            height: 4px;
+            border-radius: 9999px;
+        }
+
+        .cal-dot-msg {
+            background-color: #38bdf8;
+        }
+
+        .cal-dot-file {
+            background-color: #34d399;
+        }
+
+        .cal-day.is-selected-start .cal-dot-msg,
+        .cal-day.is-selected-end .cal-dot-msg {
+            background-color: #0f172a;
+        }
+
+        .cal-day.is-selected-start .cal-dot-file,
+        .cal-day.is-selected-end .cal-dot-file {
+            background-color: #022c22;
+        }
+
+        .cal-legend {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.45rem;
+            margin-top: 0.65rem;
+            padding-top: 0.55rem;
+            border-top: 1px solid rgba(51, 65, 85, 0.6);
+            font-size: 10.5px;
+            color: #94a3b8;
+        }
+
+        .cal-legend-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .date-controls-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 0.85rem;
+            min-width: 0;
+        }
+
+        .date-inputs-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.65rem;
+        }
+
+        @media (max-width: 480px) {
+            .date-inputs-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .date-input-dark {
+            width: 100%;
+            background: rgba(2, 6, 23, 0.85);
+            border: 1px solid rgba(71, 85, 105, 0.85);
+            border-radius: 0.5rem;
+            padding: 0.45rem 0.6rem;
+            font-size: 0.8rem;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            color: #f8fafc;
+            color-scheme: dark;
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .date-input-dark:focus {
+            border-color: #22d3ee;
+            box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.2);
+        }
+
+        .btn-clear-dates {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+            padding: 0.45rem 0.85rem;
+            border-radius: 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            background: rgba(30, 41, 59, 0.85);
+            border: 1px solid rgba(71, 85, 105, 0.8);
+            color: #cbd5e1;
+            transition: all 0.2s ease;
+        }
+
+        .btn-clear-dates:hover {
+            background: rgba(6, 182, 212, 0.2);
+            border-color: #22d3ee;
+            color: #ffffff;
+        }
+
+        .btn-clear-dates.is-active-filter {
+            background: linear-gradient(to right, rgba(16, 185, 129, 0.22), rgba(6, 182, 212, 0.22));
+            border-color: #34d399;
+            color: #6ee7b7;
+        }
+
+        .btn-clear-dates.is-active-filter:hover {
+            background: linear-gradient(to right, rgba(16, 185, 129, 0.35), rgba(6, 182, 212, 0.35));
+            color: #ffffff;
+        }
+
+        .breakdown-box {
+            background: rgba(2, 6, 23, 0.62);
+            border: 1px solid rgba(51, 65, 85, 0.8);
+            border-radius: 0.65rem;
+            padding: 0.85rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.65rem;
+        }
+
+        .ext-chips-wrap {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.45rem;
+        }
+
+        .ext-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.28rem 0.6rem;
+            border-radius: 0.45rem;
+            font-size: 0.74rem;
+            font-weight: 600;
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid rgba(56, 189, 248, 0.35);
+            color: #e2e8f0;
+        }
+
+        .ext-chip-count {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-weight: 700;
+            padding: 0.05rem 0.38rem;
+            border-radius: 0.3rem;
+            background: rgba(34, 211, 238, 0.16);
+            color: #67e8f9;
+        }
+
+        .ext-chip.chip-img { border-color: rgba(34, 211, 238, 0.45); }
+        .ext-chip.chip-img .ext-chip-count { background: rgba(34, 211, 238, 0.2); color: #67e8f9; }
+        .ext-chip.chip-vid { border-color: rgba(192, 132, 252, 0.45); }
+        .ext-chip.chip-vid .ext-chip-count { background: rgba(192, 132, 252, 0.2); color: #d8b4fe; }
+        .ext-chip.chip-aud { border-color: rgba(52, 211, 153, 0.45); }
+        .ext-chip.chip-aud .ext-chip-count { background: rgba(52, 211, 153, 0.2); color: #6ee7b7; }
+        .ext-chip.chip-doc { border-color: rgba(251, 191, 36, 0.45); }
+        .ext-chip.chip-doc .ext-chip-count { background: rgba(251, 191, 36, 0.2); color: #fde68a; }
+        .ext-chip.chip-txt { border-color: rgba(148, 163, 184, 0.35); }
+        .ext-chip.chip-txt .ext-chip-count { background: rgba(148, 163, 184, 0.18); color: #cbd5e1; }
+
+        .file-list-drawer {
+            max-height: 210px;
+            overflow-y: auto;
+            border-top: 1px solid rgba(51, 65, 85, 0.65);
+            padding-top: 0.55rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+
+        .file-list-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.5rem;
+            padding: 0.32rem 0.5rem;
+            border-radius: 0.4rem;
+            background: rgba(15, 23, 42, 0.72);
+            border: 1px solid rgba(51, 65, 85, 0.55);
+            font-size: 11px;
+        }
+
+        .status-pill-full {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.22rem 0.6rem;
+            border-radius: 9999px;
+            font-size: 11px;
+            font-weight: 700;
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(52, 211, 153, 0.45);
+            color: #6ee7b7;
+        }
+
+        .status-pill-filtered {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.22rem 0.6rem;
+            border-radius: 9999px;
+            font-size: 11px;
+            font-weight: 700;
+            background: rgba(6, 182, 212, 0.2);
+            border: 1px solid rgba(34, 211, 238, 0.65);
+            color: #67e8f9;
         }
     </style>
 </head>
@@ -638,7 +1084,7 @@
                     <div class="w-full bg-slate-800 rounded-full h-2.5 overflow-hidden border border-slate-700">
                         <div id="scanProgressBar" class="bg-gradient-progress h-full rounded-full transition-all" style="width: 0%"></div>
                     </div>
-                    <div class="flex justify-between items-center text-[11px] font-mono text-slate-300">
+                    <div class="flex flex-wrap justify-between items-center gap-2 text-[11px] font-mono text-slate-300">
                         <span id="scanCounterDetail">0 mensajes analizados</span>
                         <span id="scanVisibleDetail" class="text-cyan-300">0 adjuntos</span>
                     </div>
@@ -651,6 +1097,12 @@
                             Incluir conteo por participante
                         </label>
                         <input type="checkbox" id="showByParticipantToggle" checked onchange="reRenderWhatsappReport()" class="w-4 h-4 accent-cyan-500 rounded cursor-pointer">
+                    </div>
+                    <div class="bg-slate-900/50 border border-slate-700/70 rounded-lg px-3.5 py-2 flex items-center justify-between">
+                        <label for="showByDateToggle" class="text-xs text-slate-200 font-medium cursor-pointer select-none">
+                            Incluir desglose diario por fecha
+                        </label>
+                        <input type="checkbox" id="showByDateToggle" onchange="reRenderWhatsappReport()" class="w-4 h-4 accent-cyan-500 rounded cursor-pointer">
                     </div>
                 </div>
 
@@ -697,8 +1149,144 @@
             </div>
         </aside>
 
-        <!-- PANEL DERECHO: VISTA PREVIA EN HOJA BLANCA EXPANDIBLE -->
+        <!-- PANEL DERECHO: CALENDARIO DE RANGO DE FECHAS + VISTA PREVIA EN HOJA BLANCA -->
         <main class="w-full lg:w-2/3 xl:w-3/4 flex-1">
+
+            <!-- CALENDARIO DE RANGO DE FECHAS DE LA EXTRACCIÓN Y DESGLOSE DE ARCHIVOS -->
+            <section id="dateFilterPanel" class="hidden date-filter-card" aria-label="Calendario de rango de fechas de la extracción">
+                <div class="date-filter-header">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-9 h-9 rounded-lg bg-slate-900 border border-cyan-500/40 flex items-center justify-center shrink-0">
+                            <svg class="svg-icon text-cyan-400" style="width: 1.25rem; height: 1.25rem;" viewBox="0 0 24 24">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                                <line x1="16" y1="2" x2="16" y2="6"/>
+                                <line x1="8" y1="2" x2="8" y2="6"/>
+                                <line x1="3" y1="10" x2="21" y2="10"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-bold uppercase tracking-wider text-white" style="margin: 0;">
+                                Calendario de Rango de Fechas de la Extracción
+                            </h3>
+                            <p id="extractionRangeMeta" class="text-xs text-slate-300 font-mono" style="margin: 2px 0 0 0;">
+                                Rango detectado: --
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <span id="dateFilterStatusPill" class="status-pill-full">
+                            Mostrando todo el TXT
+                        </span>
+                        <button type="button" id="toggleCalendarBtn" onclick="toggleCalendarPanel()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-2.5 py-1 rounded-lg transition font-semibold">
+                            Ocultar calendario
+                        </button>
+                    </div>
+                </div>
+
+                <div id="dateFilterBody" class="date-filter-body">
+                    <!-- Columna izquierda: Calendario interactivo mensual -->
+                    <div class="cal-box">
+                        <div class="cal-nav">
+                            <button type="button" class="cal-nav-btn" onclick="changeCalendarMonth(-1)" title="Mes anterior" aria-label="Mes anterior">&#8249;</button>
+                            <div class="cal-select-group">
+                                <select id="calMonthSelect" class="cal-select" onchange="handleCalendarSelectChange()" aria-label="Seleccionar mes"></select>
+                                <select id="calYearSelect" class="cal-select" onchange="handleCalendarSelectChange()" aria-label="Seleccionar año"></select>
+                            </div>
+                            <button type="button" class="cal-nav-btn" onclick="changeCalendarMonth(1)" title="Mes siguiente" aria-label="Mes siguiente">&#8250;</button>
+                        </div>
+
+                        <div id="calJumpRow" class="cal-jump-row">
+                            <button type="button" id="jumpStartBtn" class="cal-jump-btn" onclick="jumpCalendarToBoundary('start')">Inicio extracción</button>
+                            <button type="button" id="jumpEndBtn" class="cal-jump-btn" onclick="jumpCalendarToBoundary('end')">Fin extracción</button>
+                        </div>
+
+                        <div class="cal-weekdays">
+                            <span>Lu</span>
+                            <span>Ma</span>
+                            <span>Mi</span>
+                            <span>Ju</span>
+                            <span>Vi</span>
+                            <span>Sá</span>
+                            <span>Do</span>
+                        </div>
+
+                        <div id="calDaysGrid" class="cal-grid" onmouseleave="handleCalendarMouseLeave()"></div>
+
+                        <div class="cal-legend">
+                            <span class="cal-legend-item">
+                                <span class="cal-dot cal-dot-msg"></span>
+                                Mensajes
+                            </span>
+                            <span class="cal-legend-item">
+                                <span class="cal-dot cal-dot-file"></span>
+                                Con archivos
+                            </span>
+                            <span class="cal-legend-item">
+                                <span style="width: 10px; height: 10px; border-radius: 3px; background: linear-gradient(135deg, #06b6d4, #10b981); display: inline-block;"></span>
+                                Seleccionado
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Columna derecha: Selector de rango y desglose de archivos -->
+                    <div class="date-controls-panel">
+                        <div class="date-inputs-grid">
+                            <div>
+                                <label for="dateStartInput" class="block text-[11px] font-bold uppercase tracking-wider text-cyan-300 mb-2" style="margin-bottom: 0.3rem;">
+                                    Fecha inicial
+                                </label>
+                                <input type="date" id="dateStartInput" class="date-input-dark" onchange="handleDateInputsChange()">
+                            </div>
+                            <div>
+                                <label for="dateEndInput" class="block text-[11px] font-bold uppercase tracking-wider text-cyan-300 mb-2" style="margin-bottom: 0.3rem;">
+                                    Fecha final
+                                </label>
+                                <input type="date" id="dateEndInput" class="date-input-dark" onchange="handleDateInputsChange()">
+                            </div>
+                        </div>
+
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <span id="dateSelectionHint" class="text-xs text-slate-300">
+                                Selecciona una fecha o un rango en el calendario. Si no marcas fecha se muestra todo el TXT.
+                            </span>
+                            <button type="button" id="clearDateFilterBtn" onclick="clearDateFilter()" class="btn-clear-dates shrink-0">
+                                <svg class="svg-icon" viewBox="0 0 24 24">
+                                    <polyline points="1 4 1 10 7 10"/>
+                                    <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
+                                </svg>
+                                Mostrar todo el TXT
+                            </button>
+                        </div>
+
+                        <!-- Desglose de archivos dentro de la fecha / rango -->
+                        <div class="breakdown-box">
+                            <div class="flex flex-wrap items-center justify-between gap-2">
+                                <span id="breakdownTitle" class="text-xs font-bold uppercase tracking-wider text-emerald-400">
+                                    Desglose de archivos — Todo el TXT
+                                </span>
+                                <span id="breakdownSummaryCount" class="text-[11px] font-mono text-slate-300">
+                                    0 adjuntos · 0 textos
+                                </span>
+                            </div>
+
+                            <div id="breakdownExtChips" class="ext-chips-wrap"></div>
+
+                            <div id="breakdownFileListWrap" class="hidden flex-col gap-2">
+                                <button type="button" id="toggleFileListBtn" onclick="toggleFileListDrawer()" class="text-xs text-cyan-300 hover:text-blue-300 font-semibold flex items-center gap-1.5 transition" style="width: fit-content;">
+                                    <svg class="svg-icon" viewBox="0 0 24 24">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                        <polyline points="14 2 14 8 20 8"/>
+                                    </svg>
+                                    <span id="toggleFileListLabel">Ver archivos adjuntos del periodo</span>
+                                </button>
+                                <div id="breakdownFileList" class="hidden file-list-drawer"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             <div class="word-sheet">
                 <div class="border-b border-slate-200 pb-3 mb-6 flex flex-wrap justify-between items-center gap-2">
                     <span class="text-xs font-bold text-slate-500 uppercase tracking-widest">
@@ -973,7 +1561,24 @@
         // 3. ANALIZADOR FORENSE DE CONVERSACIONES DE WHATSAPP
         // =========================================================
         let currentWhatsappData = null;
+        let filteredWhatsappData = null;
         let currentSourceName = "Conversacion_WhatsApp";
+
+        // Estado del calendario y filtro por rango de fechas
+        let selectedStartIso = null;
+        let selectedEndIso = null;
+        let isSelectingRange = false;
+        let hoverIsoDate = null;
+        let calViewYear = null;
+        let calViewMonth = null; // 0 - 11
+        let isCalendarCollapsed = false;
+        let isFileListExpanded = false;
+        let showAllFilesInDrawer = false;
+
+        const MONTH_NAMES_ES = [
+            'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+            'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+        ];
 
         function sortAlpha(keysArray) {
             return keysArray.sort((a, b) => a.localeCompare(b, 'es', { numeric: true, sensitivity: 'base' }));
@@ -987,6 +1592,159 @@
                 .replace(/>/g, '&gt;')
                 .replace(/"/g, '&quot;')
                 .replace(/'/g, '&#039;');
+        }
+
+        // Utilidades de fecha 100% locales (sin desfases de zona horaria)
+        function pad2(n) {
+            return String(n).padStart(2, '0');
+        }
+
+        function toIsoDate(year, month, day) {
+            return `${year}-${pad2(month)}-${pad2(day)}`;
+        }
+
+        function parseIsoParts(iso) {
+            if (!iso || typeof iso !== 'string') return null;
+            const m = iso.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+            if (!m) return null;
+            return {
+                year: parseInt(m[1], 10),
+                month: parseInt(m[2], 10),
+                day: parseInt(m[3], 10)
+            };
+        }
+
+        function formatIsoToDisplay(iso) {
+            const p = parseIsoParts(iso);
+            if (!p) return iso || '';
+            return `${pad2(p.day)}/${pad2(p.month)}/${p.year}`;
+        }
+
+        function expandTwoDigitYear(y) {
+            if (y >= 100) return y;
+            return y >= 70 ? 1900 + y : 2000 + y;
+        }
+
+        function isValidCalendarDate(year, month, day) {
+            if (!Number.isInteger(year) || !Number.isInteger(month) || !Number.isInteger(day)) return false;
+            if (year < 1970 || year > 2100 || month < 1 || month > 12 || day < 1 || day > 31) return false;
+            const d = new Date(year, month - 1, day);
+            return d.getFullYear() === year && (d.getMonth() + 1) === month && d.getDate() === day;
+        }
+
+        // Detecta automáticamente si el archivo TXT usa DMY (DD/MM/AAAA), MDY (MM/DD/AAAA) o YMD (AAAA-MM-DD)
+        function detectDateOrder(rawDateList) {
+            let ymdCount = 0;
+            let dmyEvidence = 0;
+            let mdyEvidence = 0;
+            const parsedTriples = [];
+
+            for (const raw of rawDateList) {
+                if (!raw) continue;
+                const parts = raw.trim().split(/[\/.-]/);
+                if (parts.length !== 3) continue;
+                const p0 = parseInt(parts[0], 10);
+                const p1 = parseInt(parts[1], 10);
+                const p2 = parseInt(parts[2], 10);
+                if (isNaN(p0) || isNaN(p1) || isNaN(p2)) continue;
+
+                if (parts[0].length === 4 && p0 >= 1970) {
+                    ymdCount++;
+                    continue;
+                }
+
+                parsedTriples.push([p0, p1, expandTwoDigitYear(p2)]);
+                if (p0 > 12 && p1 <= 12) dmyEvidence++;
+                else if (p1 > 12 && p0 <= 12) mdyEvidence++;
+            }
+
+            if (ymdCount > 0 && ymdCount >= parsedTriples.length) return 'YMD';
+            if (dmyEvidence > mdyEvidence) return 'DMY';
+            if (mdyEvidence > dmyEvidence) return 'MDY';
+
+            // Si todas las fechas tienen día y mes <= 12, evaluar progresión cronológica
+            if (parsedTriples.length >= 2) {
+                const evaluateOrder = (order) => {
+                    let prevTs = null;
+                    let inversions = 0;
+                    let minTs = Infinity;
+                    let maxTs = -Infinity;
+                    let valid = 0;
+                    for (const [a, b, y] of parsedTriples) {
+                        const day = order === 'DMY' ? a : b;
+                        const month = order === 'DMY' ? b : a;
+                        if (!isValidCalendarDate(y, month, day)) return { valid: 0, inversions: Infinity, span: Infinity };
+                        const ts = new Date(y, month - 1, day).getTime();
+                        valid++;
+                        if (prevTs !== null && ts < prevTs) inversions++;
+                        if (ts < minTs) minTs = ts;
+                        if (ts > maxTs) maxTs = ts;
+                        prevTs = ts;
+                    }
+                    return { valid, inversions, span: maxTs - minTs };
+                };
+
+                const dmyScore = evaluateOrder('DMY');
+                const mdyScore = evaluateOrder('MDY');
+                if (dmyScore.inversions !== mdyScore.inversions) {
+                    return dmyScore.inversions < mdyScore.inversions ? 'DMY' : 'MDY';
+                }
+                if (dmyScore.span !== mdyScore.span && isFinite(dmyScore.span) && isFinite(mdyScore.span)) {
+                    return dmyScore.span < mdyScore.span ? 'DMY' : 'MDY';
+                }
+            }
+
+            // Estándar en español / México
+            return 'DMY';
+        }
+
+        function parseRawWhatsappDate(rawDate, order) {
+            if (!rawDate) return null;
+            const parts = rawDate.trim().split(/[\/.-]/);
+            if (parts.length !== 3) return null;
+
+            const n0 = parseInt(parts[0], 10);
+            const n1 = parseInt(parts[1], 10);
+            const n2 = parseInt(parts[2], 10);
+            if (isNaN(n0) || isNaN(n1) || isNaN(n2)) return null;
+
+            let year, month, day;
+            if (parts[0].length === 4 && n0 >= 1970) {
+                year = n0;
+                month = n1;
+                day = n2;
+            } else if (order === 'MDY') {
+                month = n0;
+                day = n1;
+                year = expandTwoDigitYear(n2);
+            } else {
+                day = n0;
+                month = n1;
+                year = expandTwoDigitYear(n2);
+            }
+
+            if (!isValidCalendarDate(year, month, day)) {
+                // Fallback cruzado por si una fecha puntual invierte día/mes
+                if (parts[0].length !== 4 && isValidCalendarDate(year, day, month)) {
+                    const tmp = month;
+                    month = day;
+                    day = tmp;
+                } else {
+                    return null;
+                }
+            }
+
+            return toIsoDate(year, month, day);
+        }
+
+        function getChipCategoryClass(ext) {
+            const imgExts = new Set(['JPG', 'JPEG', 'PNG', 'WEBP', 'GIF', 'BMP', 'PIC', 'HEIC', 'HEIF', 'TIFF', 'TIF', 'SVG', 'RAW']);
+            const vidExts = new Set(['MP4', 'AVI', 'MOV', 'MKV', 'WMV', 'FLV', '3GP', 'WEBM', 'M4V', 'DAV', 'TS', 'MPEG', 'MPG']);
+            const audExts = new Set(['OPUS', 'MP3', 'WAV', 'OGG', 'OGA', 'M4A', 'AAC', 'WMA', 'AMR', 'FLAC']);
+            if (imgExts.has(ext)) return 'chip-img';
+            if (vidExts.has(ext)) return 'chip-vid';
+            if (audExts.has(ext)) return 'chip-aud';
+            return 'chip-doc';
         }
 
         // Manejo de Drag & Drop y selección de archivo .txt
@@ -1016,6 +1774,7 @@
             const files = event.target.files;
             if (!files || files.length === 0) return;
             readWhatsappFile(files[0]);
+            event.target.value = '';
         }
 
         function readWhatsappFile(file) {
@@ -1032,8 +1791,17 @@
             document.getElementById('whatsappRawInput').value = '';
             document.getElementById('whatsappFileInput').value = '';
             currentWhatsappData = null;
+            filteredWhatsappData = null;
+            selectedStartIso = null;
+            selectedEndIso = null;
+            isSelectingRange = false;
+            hoverIsoDate = null;
+            isFileListExpanded = false;
+            showAllFilesInDrawer = false;
+
             document.getElementById('statsPanel').classList.add('hidden');
             document.getElementById('scanProgressContainer').classList.add('hidden');
+            document.getElementById('dateFilterPanel').classList.add('hidden');
             document.getElementById('unitBadge').innerText = 'Sin conversación cargada';
             document.getElementById('previewContent').innerHTML = `
                 <div class="text-center text-slate-400 py-28 italic flex flex-col items-center gap-3">
@@ -1059,12 +1827,12 @@
             'VCF', 'ZIP', 'RAR', '7Z', 'TAR', 'GZ', 'APK', 'EXE', 'BIN', 'DAT', 'DB', 'SQL'
         ]);
 
-        // Limpia caracteres invisibles de control bidireccional que WhatsApp inserta en Android/iOS
+        // Limpia caracteres invisibles de control bidireccional y espacios duros que WhatsApp inserta en Android/iOS
         function cleanInvisibleChars(str) {
             if (!str) return '';
             return str
                 .replace(/[\u200B-\u200F\u202A-\u202E\u2060-\u206F\uFEFF]/g, '')
-                .replace(/\u00A0/g, ' ');
+                .replace(/[\u00A0\u202F]/g, ' ');
         }
 
         // Extrae TODOS los archivos adjuntos presentes en un mensaje (incluso si tienen pie de foto en líneas siguientes)
@@ -1123,7 +1891,7 @@
                 }
                 if (matchedInLine) continue;
 
-                // Caso 4: La línea es directamente un nombre de archivo con extensión conocida (ej. " Captura_1.jpg" o "estado_cuenta.pdf")
+                // Caso 4: La línea es directamente un nombre de archivo con extensión conocida (ej. "Captura_1.jpg" o "estado_cuenta.pdf")
                 const standaloneFileMatch = line.match(/^([\w\-. ()[\]\u00C0-\u017F]+?\.([a-zA-Z0-9]{2,5}))(?:\s*\((?:archivo\s+adjunto|file\s+attached|adjunto)\))?$/i);
                 if (standaloneFileMatch) {
                     const candidateName = standaloneFileMatch[1].trim();
@@ -1147,7 +1915,6 @@
             if (!attachments || attachments.length === 0) return true;
 
             let remaining = cleanInvisibleChars(bodyText);
-            // Remover patrones de adjuntos para ver si además había un mensaje/pie de foto adicional
             remaining = remaining
                 .replace(/<(?:adjunto|attached|archivo\s+adjunto):\s*[^>]+>/gi, '')
                 .replace(/[^\r\n<>:"/\\|?*]+?\.[a-zA-Z0-9]{2,5}\s*\((?:archivo\s+adjunto|file\s+attached|adjunto)\)/gi, '');
@@ -1160,58 +1927,13 @@
             return remaining.trim().length > 0;
         }
 
-        // Parser principal de conversación de WhatsApp (soporta iOS, Android, saltos de línea y fotos con pie de texto)
-        function parseWhatsappConversation(rawText) {
-            const cleanedText = cleanInvisibleChars(rawText).replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-            const lines = cleanedText.split('\n');
-            const messages = [];
-
-            // Regex flexible para encabezados de WhatsApp (Android y iOS, 12h/24h, con o sin segundos, a.m./p.m.)
-            const msgHeaderRegex = /^\[?(\d{1,2}[\/.-]\d{1,2}[\/.-]\d{2,4}),?\s+(\d{1,2}:\d{2}(?::\d{2})?(?:\s*[ap]\.?\s*m\.?|\s*[AP]M)?)\]?(?:\s*[-–—]\s*|\s+)([^:]+?):\s*(.*)$/i;
-
-            let currentMsg = null;
-
-            for (let i = 0; i < lines.length; i++) {
-                const rawLine = lines[i];
-                const trimmedLine = rawLine.trim();
-
-                if (!trimmedLine) continue;
-
-                const match = trimmedLine.match(msgHeaderRegex);
-                if (match) {
-                    if (currentMsg) {
-                        finalizeMessageObject(currentMsg);
-                        messages.push(currentMsg);
-                    }
-                    currentMsg = {
-                        date: match[1].trim(),
-                        time: match[2].trim(),
-                        sender: match[3].trim(),
-                        body: match[4]
-                    };
-                } else if (currentMsg) {
-                    // Continuación de un mensaje multilínea o pie de foto debajo de un .jpg/.mp4/.pdf
-                    currentMsg.body += '\n' + trimmedLine;
-                } else {
-                    // Si pegan líneas sueltas de archivos sin encabezado de fecha
-                    currentMsg = {
-                        date: 'Sin fecha especificada',
-                        time: '--:--',
-                        sender: 'Participante',
-                        body: trimmedLine
-                    };
-                }
-            }
-
-            if (currentMsg) {
-                finalizeMessageObject(currentMsg);
-                messages.push(currentMsg);
-            }
-
-            // Construir estadísticas globales y por participante asegurando el conteo exacto de cada archivo
+        // Construye estadísticas globales, por participante y por fecha para cualquier conjunto de mensajes
+        function buildStatsFromMessages(messages) {
             const globalExtensions = {};
             const participants = {};
             const datesMap = {};
+            const dailyIndex = {};
+            const attachmentsList = [];
             let totalAttachments = 0;
             let totalTextMessages = 0;
             let totalOmittedMedia = 0;
@@ -1231,7 +1953,22 @@
                     datesMap[msg.date] = [];
                 }
 
+                const dayKey = msg.isoDate || 'SIN_FECHA';
+                if (!dailyIndex[dayKey]) {
+                    dailyIndex[dayKey] = {
+                        isoDate: msg.isoDate || null,
+                        displayDate: msg.isoDate ? formatIsoToDisplay(msg.isoDate) : msg.date,
+                        totalMessages: 0,
+                        totalAttachments: 0,
+                        totalTextMessages: 0,
+                        totalOmittedMedia: 0,
+                        filesByExt: {},
+                        attachmentsList: []
+                    };
+                }
+
                 const p = participants[msg.sender];
+                const dEntry = dailyIndex[dayKey];
                 p.messagesList.push(msg);
                 datesMap[msg.date].push(msg);
 
@@ -1240,18 +1977,46 @@
                         const ext = att.ext;
                         globalExtensions[ext] = (globalExtensions[ext] || 0) + 1;
                         p.filesByExt[ext] = (p.filesByExt[ext] || 0) + 1;
+                        dEntry.filesByExt[ext] = (dEntry.filesByExt[ext] || 0) + 1;
+
                         totalAttachments++;
                         p.totalMessages++;
+                        dEntry.totalAttachments++;
+                        dEntry.totalMessages++;
+
+                        const attRecord = {
+                            isoDate: msg.isoDate || null,
+                            displayDate: msg.isoDate ? formatIsoToDisplay(msg.isoDate) : msg.date,
+                            time: msg.time,
+                            sender: msg.sender,
+                            fileName: att.fileName,
+                            ext: ext
+                        };
+                        attachmentsList.push(attRecord);
+                        dEntry.attachmentsList.push(attRecord);
                     }
                 } else if (msg.isOmittedMedia) {
                     totalOmittedMedia++;
                     p.omittedMedia++;
                     p.totalMessages++;
+                    dEntry.totalOmittedMedia++;
+                    dEntry.totalMessages++;
                 } else {
                     totalTextMessages++;
                     p.textMessages++;
                     p.totalMessages++;
+                    dEntry.totalTextMessages++;
+                    dEntry.totalMessages++;
                 }
+            }
+
+            const sortedIsoDates = Object.keys(dailyIndex)
+                .filter(k => k !== 'SIN_FECHA')
+                .sort();
+
+            const dailyBreakdown = sortedIsoDates.map(k => dailyIndex[k]);
+            if (dailyIndex['SIN_FECHA']) {
+                dailyBreakdown.push(dailyIndex['SIN_FECHA']);
             }
 
             const totalEventsCount = totalAttachments + totalTextMessages + totalOmittedMedia;
@@ -1260,12 +2025,85 @@
                 messages,
                 participants,
                 datesMap,
+                dailyIndex,
+                dailyBreakdown,
+                sortedIsoDates,
+                minIsoDate: sortedIsoDates.length > 0 ? sortedIsoDates[0] : null,
+                maxIsoDate: sortedIsoDates.length > 0 ? sortedIsoDates[sortedIsoDates.length - 1] : null,
                 globalExtensions,
+                attachmentsList,
                 totalMessages: totalEventsCount,
                 totalAttachments,
                 totalTextMessages,
                 totalOmittedMedia
             };
+        }
+
+        // Parser principal de conversación de WhatsApp (soporta iOS, Android, saltos de línea y fotos con pie de texto)
+        function parseWhatsappConversation(rawText) {
+            const cleanedText = cleanInvisibleChars(rawText).replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+            const lines = cleanedText.split('\n');
+            const messages = [];
+
+            // Regex flexible para encabezados de WhatsApp (Android y iOS, DMY/MDY/YMD, 12h/24h, con o sin segundos, a.m./p.m.)
+            const msgHeaderRegex = /^\[?((?:\d{1,2}[\/.-]\d{1,2}[\/.-]\d{2,4})|(?:\d{4}[\/.-]\d{1,2}[\/.-]\d{1,2})),?\s+(\d{1,2}:\d{2}(?::\d{2})?(?:\s*[ap]\.?\s*m\.?|\s*[AP]M)?)\]?(?:\s*[-–—]\s*|\s+)([^:]+?):\s*(.*)$/i;
+
+            let currentMsg = null;
+
+            for (let i = 0; i < lines.length; i++) {
+                const rawLine = lines[i];
+                const trimmedLine = rawLine.trim();
+
+                if (!trimmedLine) continue;
+
+                const match = trimmedLine.match(msgHeaderRegex);
+                if (match) {
+                    if (currentMsg) {
+                        finalizeMessageObject(currentMsg);
+                        messages.push(currentMsg);
+                    }
+                    currentMsg = {
+                        date: match[1].trim(),
+                        time: match[2].trim(),
+                        sender: match[3].trim(),
+                        body: match[4],
+                        isoDate: null
+                    };
+                } else if (currentMsg) {
+                    // Continuación de un mensaje multilínea o pie de foto debajo de un .jpg/.mp4/.pdf
+                    currentMsg.body += '\n' + trimmedLine;
+                } else {
+                    // Si pegan líneas sueltas de archivos sin encabezado de fecha
+                    currentMsg = {
+                        date: 'Sin fecha especificada',
+                        time: '--:--',
+                        sender: 'Participante',
+                        body: trimmedLine,
+                        isoDate: null
+                    };
+                }
+            }
+
+            if (currentMsg) {
+                finalizeMessageObject(currentMsg);
+                messages.push(currentMsg);
+            }
+
+            // Detectar formato de fecha global (DMY, MDY o YMD) y normalizar cada mensaje a ISO (YYYY-MM-DD)
+            const rawDates = messages
+                .map(m => m.date)
+                .filter(d => d && d !== 'Sin fecha especificada');
+            const dateOrder = detectDateOrder(rawDates);
+
+            for (const msg of messages) {
+                if (msg.date && msg.date !== 'Sin fecha especificada') {
+                    msg.isoDate = parseRawWhatsappDate(msg.date, dateOrder);
+                }
+            }
+
+            const stats = buildStatsFromMessages(messages);
+            stats.dateOrder = dateOrder;
+            return stats;
         }
 
         function finalizeMessageObject(msg) {
@@ -1299,12 +2137,17 @@
             const parsed = parseWhatsappConversation(trimmed);
             currentWhatsappData = parsed;
 
-            // Actualizar barra de progreso e indicadores laterales
+            // Reiniciar filtro de fecha al cargar nueva conversación: por defecto muestra todo el contenido del TXT
+            selectedStartIso = null;
+            selectedEndIso = null;
+            isSelectingRange = false;
+            hoverIsoDate = null;
+            isFileListExpanded = false;
+            showAllFilesInDrawer = false;
+
             const progressContainer = document.getElementById('scanProgressContainer');
             const progressBar = document.getElementById('scanProgressBar');
             const percentText = document.getElementById('scanPercentText');
-            const counterDetail = document.getElementById('scanCounterDetail');
-            const visibleDetail = document.getElementById('scanVisibleDetail');
             const statusLabel = document.getElementById('scanStatusLabel');
             const spinnerIcon = document.getElementById('scanSpinnerIcon');
             const statsPanel = document.getElementById('statsPanel');
@@ -1319,15 +2162,531 @@
             spinnerIcon.className = 'shrink-0 flex items-center text-emerald-400';
             spinnerIcon.innerHTML = `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`;
             statusLabel.innerText = 'ANÁLISIS COMPLETADO (100%)';
-            counterDetail.innerText = `${parsed.totalMessages.toLocaleString('es-MX')} mensajes leídos`;
-            visibleDetail.innerText = `${parsed.totalAttachments.toLocaleString('es-MX')} adjuntos | ${parsed.totalTextMessages.toLocaleString('es-MX')} textos`;
 
-            document.getElementById('totalMsgCount').innerText = parsed.totalMessages.toLocaleString('es-MX');
-            document.getElementById('fileCount').innerText = parsed.totalAttachments.toLocaleString('es-MX');
-            document.getElementById('textMsgCount').innerText = parsed.totalTextMessages.toLocaleString('es-MX');
-            document.getElementById('unitBadge').innerText = `Origen: ${sourceLabel}`;
+            // Inicializar calendario con el rango detectado de la extracción
+            initExtractionCalendar();
+            applyDateFilter();
+        }
 
+        // =========================================================
+        // 3B. CALENDARIO DE RANGO DE FECHAS Y FILTRO DE EXTRACCIÓN
+        // =========================================================
+        function isDateFilterActive() {
+            return Boolean(selectedStartIso || selectedEndIso);
+        }
+
+        function getEffectiveDateRange() {
+            if (!currentWhatsappData || !isDateFilterActive()) return null;
+            let start = selectedStartIso || currentWhatsappData.minIsoDate;
+            let end = selectedEndIso || currentWhatsappData.maxIsoDate;
+            if (!start || !end) return null;
+            if (start > end) {
+                const tmp = start;
+                start = end;
+                end = tmp;
+            }
+            return { start, end };
+        }
+
+        function initExtractionCalendar() {
+            const panel = document.getElementById('dateFilterPanel');
+            if (!currentWhatsappData || !currentWhatsappData.minIsoDate || !currentWhatsappData.maxIsoDate) {
+                panel.classList.add('hidden');
+                return;
+            }
+
+            panel.classList.remove('hidden');
+            isCalendarCollapsed = false;
+            document.getElementById('dateFilterBody').classList.remove('hidden');
+            document.getElementById('toggleCalendarBtn').innerText = 'Ocultar calendario';
+
+            const minParts = parseIsoParts(currentWhatsappData.minIsoDate);
+            const maxParts = parseIsoParts(currentWhatsappData.maxIsoDate);
+            calViewYear = minParts.year;
+            calViewMonth = minParts.month - 1;
+
+            // Configurar límites de los inputs de fecha (sin preseleccionar para mostrar todo el TXT por defecto)
+            const startInput = document.getElementById('dateStartInput');
+            const endInput = document.getElementById('dateEndInput');
+            startInput.min = currentWhatsappData.minIsoDate;
+            startInput.max = currentWhatsappData.maxIsoDate;
+            endInput.min = currentWhatsappData.minIsoDate;
+            endInput.max = currentWhatsappData.maxIsoDate;
+            startInput.value = '';
+            endInput.value = '';
+
+            // Texto de resumen del rango extraído
+            const activeDays = currentWhatsappData.sortedIsoDates.length;
+            const daysWord = activeDays === 1 ? 'día con actividad' : 'días con actividad';
+            const rangeText = currentWhatsappData.minIsoDate === currentWhatsappData.maxIsoDate
+                ? `Extracción: ${formatIsoToDisplay(currentWhatsappData.minIsoDate)} (${activeDays} ${daysWord})`
+                : `Extracción: del ${formatIsoToDisplay(currentWhatsappData.minIsoDate)} al ${formatIsoToDisplay(currentWhatsappData.maxIsoDate)} (${activeDays} ${daysWord})`;
+            document.getElementById('extractionRangeMeta').innerText = rangeText;
+
+            // Botones de salto rápido Inicio / Fin
+            const jumpRow = document.getElementById('calJumpRow');
+            const sameMonth = (minParts.year === maxParts.year && minParts.month === maxParts.month);
+            if (sameMonth) {
+                jumpRow.classList.add('hidden');
+            } else {
+                jumpRow.classList.remove('hidden');
+                document.getElementById('jumpStartBtn').innerText = `Inicio (${formatIsoToDisplay(currentWhatsappData.minIsoDate)})`;
+                document.getElementById('jumpEndBtn').innerText = `Fin (${formatIsoToDisplay(currentWhatsappData.maxIsoDate)})`;
+            }
+
+            populateCalendarSelects();
+        }
+
+        function populateCalendarSelects() {
+            const monthSelect = document.getElementById('calMonthSelect');
+            const yearSelect = document.getElementById('calYearSelect');
+
+            monthSelect.innerHTML = MONTH_NAMES_ES
+                .map((name, idx) => `<option value="${idx}" ${idx === calViewMonth ? 'selected' : ''}>${name}</option>`)
+                .join('');
+
+            const minY = parseIsoParts(currentWhatsappData.minIsoDate).year;
+            const maxY = parseIsoParts(currentWhatsappData.maxIsoDate).year;
+            const startY = Math.min(minY, calViewYear);
+            const endY = Math.max(maxY, calViewYear);
+
+            let yearOptions = '';
+            for (let y = startY; y <= endY; y++) {
+                yearOptions += `<option value="${y}" ${y === calViewYear ? 'selected' : ''}>${y}</option>`;
+            }
+            yearSelect.innerHTML = yearOptions;
+        }
+
+        function toggleCalendarPanel() {
+            isCalendarCollapsed = !isCalendarCollapsed;
+            const body = document.getElementById('dateFilterBody');
+            const btn = document.getElementById('toggleCalendarBtn');
+            if (isCalendarCollapsed) {
+                body.classList.add('hidden');
+                btn.innerText = 'Mostrar calendario';
+            } else {
+                body.classList.remove('hidden');
+                btn.innerText = 'Ocultar calendario';
+            }
+        }
+
+        function changeCalendarMonth(delta) {
+            if (calViewYear === null || calViewMonth === null) return;
+            calViewMonth += delta;
+            if (calViewMonth < 0) {
+                calViewMonth = 11;
+                calViewYear--;
+            } else if (calViewMonth > 11) {
+                calViewMonth = 0;
+                calViewYear++;
+            }
+            populateCalendarSelects();
+            renderCalendarGrid();
+        }
+
+        function handleCalendarSelectChange() {
+            calViewMonth = parseInt(document.getElementById('calMonthSelect').value, 10);
+            calViewYear = parseInt(document.getElementById('calYearSelect').value, 10);
+            renderCalendarGrid();
+        }
+
+        function jumpCalendarToBoundary(which) {
+            if (!currentWhatsappData) return;
+            const iso = which === 'end' ? currentWhatsappData.maxIsoDate : currentWhatsappData.minIsoDate;
+            const p = parseIsoParts(iso);
+            if (!p) return;
+            calViewYear = p.year;
+            calViewMonth = p.month - 1;
+            populateCalendarSelects();
+            renderCalendarGrid();
+        }
+
+        function handleCalendarDayClick(iso) {
+            if (!currentWhatsappData) return;
+
+            if (!isSelectingRange) {
+                // Primer clic: selecciona un solo día y habilita segundo clic para definir rango
+                selectedStartIso = iso;
+                selectedEndIso = iso;
+                isSelectingRange = true;
+            } else if (iso === selectedStartIso) {
+                // Volver a hacer clic en el mismo único día seleccionado quita el filtro y muestra todo el TXT
+                clearDateFilter();
+                return;
+            } else {
+                // Segundo clic: cierra el rango [inicio, fin]
+                if (iso < selectedStartIso) {
+                    selectedEndIso = selectedStartIso;
+                    selectedStartIso = iso;
+                } else {
+                    selectedEndIso = iso;
+                }
+                isSelectingRange = false;
+            }
+
+            hoverIsoDate = null;
+            showAllFilesInDrawer = false;
+            syncDateInputsFromState();
+            applyDateFilter();
+        }
+
+        function handleCalendarDayHover(iso) {
+            if (!isSelectingRange || !selectedStartIso) return;
+            if (hoverIsoDate === iso) return;
+            hoverIsoDate = iso;
+            updateCalendarHoverPreview();
+        }
+
+        function handleCalendarMouseLeave() {
+            if (!hoverIsoDate) return;
+            hoverIsoDate = null;
+            updateCalendarHoverPreview();
+        }
+
+        function updateCalendarHoverPreview() {
+            const buttons = document.querySelectorAll('#calDaysGrid .cal-day');
+            if (!isSelectingRange || !selectedStartIso || !hoverIsoDate) {
+                buttons.forEach(btn => btn.classList.remove('is-hover-range'));
+                return;
+            }
+            const low = selectedStartIso < hoverIsoDate ? selectedStartIso : hoverIsoDate;
+            const high = selectedStartIso < hoverIsoDate ? hoverIsoDate : selectedStartIso;
+            buttons.forEach(btn => {
+                const d = btn.getAttribute('data-iso');
+                if (d >= low && d <= high && d !== selectedStartIso) {
+                    btn.classList.add('is-hover-range');
+                } else {
+                    btn.classList.remove('is-hover-range');
+                }
+            });
+        }
+
+        function handleDateInputsChange() {
+            if (!currentWhatsappData) return;
+            let startVal = document.getElementById('dateStartInput').value || null;
+            let endVal = document.getElementById('dateEndInput').value || null;
+
+            if (startVal && endVal && startVal > endVal) {
+                const tmp = startVal;
+                startVal = endVal;
+                endVal = tmp;
+                document.getElementById('dateStartInput').value = startVal;
+                document.getElementById('dateEndInput').value = endVal;
+            }
+
+            selectedStartIso = startVal;
+            selectedEndIso = endVal;
+            isSelectingRange = false;
+            hoverIsoDate = null;
+            showAllFilesInDrawer = false;
+
+            const focusIso = startVal || endVal;
+            if (focusIso) {
+                const p = parseIsoParts(focusIso);
+                if (p) {
+                    calViewYear = p.year;
+                    calViewMonth = p.month - 1;
+                    populateCalendarSelects();
+                }
+            }
+
+            applyDateFilter();
+        }
+
+        function syncDateInputsFromState() {
+            const startInput = document.getElementById('dateStartInput');
+            const endInput = document.getElementById('dateEndInput');
+            startInput.value = selectedStartIso || '';
+            endInput.value = selectedEndIso || '';
+        }
+
+        function clearDateFilter() {
+            if (!currentWhatsappData) return;
+            selectedStartIso = null;
+            selectedEndIso = null;
+            isSelectingRange = false;
+            hoverIsoDate = null;
+            showAllFilesInDrawer = false;
+            syncDateInputsFromState();
+            applyDateFilter();
+            showToast("Filtro de fecha desactivado: mostrando todo el contenido del TXT.");
+        }
+
+        function applyDateFilter() {
+            if (!currentWhatsappData) return;
+
+            const range = getEffectiveDateRange();
+            if (!range) {
+                filteredWhatsappData = currentWhatsappData;
+            } else {
+                const filteredMsgs = currentWhatsappData.messages.filter(m =>
+                    m.isoDate && m.isoDate >= range.start && m.isoDate <= range.end
+                );
+                filteredWhatsappData = buildStatsFromMessages(filteredMsgs);
+            }
+
+            renderCalendarGrid();
+            renderDateBreakdownPanel();
+            updateSidebarStats();
             reRenderWhatsappReport();
+        }
+
+        function renderCalendarGrid() {
+            const grid = document.getElementById('calDaysGrid');
+            if (!currentWhatsappData || calViewYear === null || calViewMonth === null) {
+                grid.innerHTML = '';
+                return;
+            }
+
+            const firstOfMonth = new Date(calViewYear, calViewMonth, 1);
+            const daysInMonth = new Date(calViewYear, calViewMonth + 1, 0).getDate();
+            // Lunes = 0 ... Domingo = 6
+            const startOffset = (firstOfMonth.getDay() + 6) % 7;
+
+            const minIso = currentWhatsappData.minIsoDate;
+            const maxIso = currentWhatsappData.maxIsoDate;
+            const effectiveRange = getEffectiveDateRange();
+
+            let html = '';
+            for (let i = 0; i < startOffset; i++) {
+                html += `<div class="cal-empty"></div>`;
+            }
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const iso = toIsoDate(calViewYear, calViewMonth + 1, day);
+                const dayInfo = currentWhatsappData.dailyIndex[iso] || null;
+                const inExtraction = (iso >= minIso && iso <= maxIso);
+
+                const classes = ['cal-day'];
+                if (!inExtraction) classes.push('out-of-range');
+                else classes.push('in-extraction');
+
+                if (dayInfo && dayInfo.totalMessages > 0) {
+                    classes.push('has-activity');
+                    if (dayInfo.totalAttachments > 0) {
+                        classes.push('has-files');
+                    }
+                }
+
+                if (effectiveRange) {
+                    if (iso === effectiveRange.start) classes.push('is-selected-start');
+                    if (iso === effectiveRange.end) classes.push('is-selected-end');
+                    if (iso > effectiveRange.start && iso < effectiveRange.end) classes.push('is-in-range');
+                }
+
+                let tooltip = formatIsoToDisplay(iso);
+                if (dayInfo && dayInfo.totalMessages > 0) {
+                    const extSummary = sortAlpha(Object.keys(dayInfo.filesByExt))
+                        .map(ext => `${dayInfo.filesByExt[ext]} ${ext}`)
+                        .join(', ');
+                    tooltip += ` — ${dayInfo.totalMessages} registros | ${dayInfo.totalAttachments} adjuntos`;
+                    if (extSummary) tooltip += ` (${extSummary})`;
+                    tooltip += ` | ${dayInfo.totalTextMessages} textos`;
+                } else if (inExtraction) {
+                    tooltip += ' — Sin mensajes registrados en esta fecha';
+                } else {
+                    tooltip += ' — Fuera del rango de la extracción';
+                }
+
+                let dotsHtml = '<span class="cal-dots">';
+                if (dayInfo) {
+                    if (dayInfo.totalTextMessages > 0 || dayInfo.totalOmittedMedia > 0) {
+                        dotsHtml += '<span class="cal-dot cal-dot-msg"></span>';
+                    }
+                    if (dayInfo.totalAttachments > 0) {
+                        dotsHtml += '<span class="cal-dot cal-dot-file"></span>';
+                    }
+                }
+                dotsHtml += '</span>';
+
+                html += `
+                    <button type="button"
+                            class="${classes.join(' ')}"
+                            data-iso="${iso}"
+                            title="${escapeHTML(tooltip)}"
+                            onclick="handleCalendarDayClick('${iso}')"
+                            onmouseenter="handleCalendarDayHover('${iso}')">
+                        <span>${day}</span>
+                        ${dotsHtml}
+                    </button>
+                `;
+            }
+
+            grid.innerHTML = html;
+        }
+
+        function renderDateBreakdownPanel() {
+            const data = filteredWhatsappData;
+            if (!data || !currentWhatsappData) return;
+
+            const range = getEffectiveDateRange();
+            const statusPill = document.getElementById('dateFilterStatusPill');
+            const hintEl = document.getElementById('dateSelectionHint');
+            const clearBtn = document.getElementById('clearDateFilterBtn');
+            const titleEl = document.getElementById('breakdownTitle');
+            const summaryCountEl = document.getElementById('breakdownSummaryCount');
+            const chipsEl = document.getElementById('breakdownExtChips');
+            const fileListWrap = document.getElementById('breakdownFileListWrap');
+            const fileListEl = document.getElementById('breakdownFileList');
+            const toggleLabelEl = document.getElementById('toggleFileListLabel');
+
+            if (!range) {
+                statusPill.className = 'status-pill-full';
+                statusPill.innerText = 'Mostrando todo el TXT';
+                clearBtn.classList.remove('is-active-filter');
+                hintEl.innerText = 'Haz clic en una fecha o rango en el calendario para filtrar. Si no marcas fecha se muestra todo el TXT.';
+                titleEl.innerText = 'Desglose de archivos — Todo el TXT';
+            } else {
+                const isSingleDay = range.start === range.end;
+                const labelRange = isSingleDay
+                    ? formatIsoToDisplay(range.start)
+                    : `${formatIsoToDisplay(range.start)} al ${formatIsoToDisplay(range.end)}`;
+
+                statusPill.className = 'status-pill-filtered';
+                statusPill.innerText = `Filtro: ${labelRange}`;
+                clearBtn.classList.add('is-active-filter');
+
+                if (isSelectingRange) {
+                    hintEl.innerText = `Fecha marcada: ${labelRange}. Haz clic en otra fecha para completar un rango, o en el mismo día para ver todo el TXT.`;
+                } else {
+                    hintEl.innerText = `Mostrando únicamente el periodo del ${labelRange} (${data.sortedIsoDates.length} ${data.sortedIsoDates.length === 1 ? 'día con actividad' : 'días con actividad'}).`;
+                }
+                titleEl.innerText = `Desglose de archivos — ${labelRange}`;
+            }
+
+            summaryCountEl.innerText = `${data.totalAttachments.toLocaleString('es-MX')} adjuntos · ${data.totalTextMessages.toLocaleString('es-MX')} textos · ${data.totalMessages.toLocaleString('es-MX')} registros`;
+
+            // Chips de desglose por formato
+            const sortedExts = sortAlpha(Object.keys(data.globalExtensions));
+            if (data.totalMessages === 0) {
+                chipsEl.innerHTML = `<span class="text-xs text-slate-400 italic">No se encontraron archivos ni mensajes dentro de las fechas marcadas.</span>`;
+            } else {
+                let chipsHtml = '';
+                for (const ext of sortedExts) {
+                    const count = data.globalExtensions[ext];
+                    const catClass = getChipCategoryClass(ext);
+                    const typeStr = getFileTypeString(ext);
+                    const typeLabel = typeStr ? ` · ${typeStr}` : '';
+                    chipsHtml += `
+                        <span class="ext-chip ${catClass}" title="${count} archivo(s) *.${ext}${typeLabel}">
+                            <span>*.${escapeHTML(ext)}</span>
+                            <span class="ext-chip-count">${count}</span>
+                        </span>
+                    `;
+                }
+                if (data.totalTextMessages > 0) {
+                    chipsHtml += `
+                        <span class="ext-chip chip-txt">
+                            <span>Textos</span>
+                            <span class="ext-chip-count">${data.totalTextMessages}</span>
+                        </span>
+                    `;
+                }
+                if (data.totalOmittedMedia > 0) {
+                    chipsHtml += `
+                        <span class="ext-chip chip-doc">
+                            <span>Omitidos</span>
+                            <span class="ext-chip-count">${data.totalOmittedMedia}</span>
+                        </span>
+                    `;
+                }
+                chipsEl.innerHTML = chipsHtml;
+            }
+
+            // Lista desplegable de archivos adjuntos dentro de la fecha / rango
+            if (data.attachmentsList && data.attachmentsList.length > 0) {
+                fileListWrap.classList.remove('hidden');
+                fileListWrap.classList.add('flex');
+                const totalFiles = data.attachmentsList.length;
+                toggleLabelEl.innerText = isFileListExpanded
+                    ? `Ocultar lista de archivos adjuntos (${totalFiles.toLocaleString('es-MX')})`
+                    : `Ver lista de archivos adjuntos del periodo (${totalFiles.toLocaleString('es-MX')})`;
+
+                if (isFileListExpanded) {
+                    fileListEl.classList.remove('hidden');
+                    renderBreakdownFileListRows(data.attachmentsList);
+                } else {
+                    fileListEl.classList.add('hidden');
+                }
+            } else {
+                fileListWrap.classList.add('hidden');
+                fileListWrap.classList.remove('flex');
+                fileListEl.classList.add('hidden');
+                fileListEl.innerHTML = '';
+            }
+        }
+
+        function toggleFileListDrawer() {
+            isFileListExpanded = !isFileListExpanded;
+            renderDateBreakdownPanel();
+        }
+
+        function expandAllDrawerFiles() {
+            showAllFilesInDrawer = true;
+            if (filteredWhatsappData && filteredWhatsappData.attachmentsList) {
+                renderBreakdownFileListRows(filteredWhatsappData.attachmentsList);
+            }
+        }
+
+        function renderBreakdownFileListRows(list) {
+            const container = document.getElementById('breakdownFileList');
+            const limit = showAllFilesInDrawer ? list.length : Math.min(list.length, 120);
+
+            let html = '';
+            for (let i = 0; i < limit; i++) {
+                const item = list[i];
+                const catClass = getChipCategoryClass(item.ext);
+                html += `
+                    <div class="file-list-row">
+                        <div class="truncate" style="min-width: 0;">
+                            <span class="font-mono text-cyan-300">${escapeHTML(item.displayDate)} ${escapeHTML(item.time)}</span>
+                            <span class="text-slate-400"> · ${escapeHTML(item.sender)}: </span>
+                            <span class="text-white font-semibold" title="${escapeHTML(item.fileName)}">${escapeHTML(item.fileName)}</span>
+                        </div>
+                        <span class="ext-chip ${catClass} shrink-0" style="padding: 0.1rem 0.4rem; font-size: 10px;">
+                            .${escapeHTML(item.ext)}
+                        </span>
+                    </div>
+                `;
+            }
+
+            if (list.length > limit) {
+                const remaining = list.length - limit;
+                html += `
+                    <button type="button" onclick="expandAllDrawerFiles()" class="text-xs text-cyan-300 hover:text-blue-300 font-semibold py-1 text-center transition">
+                        Mostrar ${remaining.toLocaleString('es-MX')} archivos restantes...
+                    </button>
+                `;
+            }
+
+            container.innerHTML = html;
+        }
+
+        function updateSidebarStats() {
+            const data = filteredWhatsappData;
+            if (!data || !currentWhatsappData) return;
+
+            const range = getEffectiveDateRange();
+            const counterDetail = document.getElementById('scanCounterDetail');
+            const visibleDetail = document.getElementById('scanVisibleDetail');
+            const unitBadge = document.getElementById('unitBadge');
+
+            if (!range) {
+                counterDetail.innerText = `${data.totalMessages.toLocaleString('es-MX')} mensajes leídos`;
+                visibleDetail.innerText = `${data.totalAttachments.toLocaleString('es-MX')} adjuntos | ${data.totalTextMessages.toLocaleString('es-MX')} textos`;
+                unitBadge.innerText = `Origen: ${currentSourceName} · Todo el TXT`;
+            } else {
+                const labelRange = range.start === range.end
+                    ? formatIsoToDisplay(range.start)
+                    : `${formatIsoToDisplay(range.start)} al ${formatIsoToDisplay(range.end)}`;
+                counterDetail.innerText = `${data.totalMessages.toLocaleString('es-MX')} de ${currentWhatsappData.totalMessages.toLocaleString('es-MX')} en rango`;
+                visibleDetail.innerText = `${data.totalAttachments.toLocaleString('es-MX')} adjuntos | ${data.totalTextMessages.toLocaleString('es-MX')} textos`;
+                unitBadge.innerText = `Origen: ${currentSourceName} · Filtro: ${labelRange}`;
+            }
+
+            document.getElementById('totalMsgCount').innerText = data.totalMessages.toLocaleString('es-MX');
+            document.getElementById('fileCount').innerText = data.totalAttachments.toLocaleString('es-MX');
+            document.getElementById('textMsgCount').innerText = data.totalTextMessages.toLocaleString('es-MX');
         }
 
         function renderFileItem(count, ext) {
@@ -1350,9 +2709,35 @@
         function reRenderWhatsappReport() {
             if (!currentWhatsappData || currentWhatsappData.totalMessages === 0) return;
 
-            const showByParticipant = document.getElementById('showByParticipantToggle').checked;
+            const data = filteredWhatsappData || currentWhatsappData;
+            const range = getEffectiveDateRange();
 
-            const data = currentWhatsappData;
+            if (data.totalMessages === 0 && range) {
+                const labelRange = range.start === range.end
+                    ? formatIsoToDisplay(range.start)
+                    : `del ${formatIsoToDisplay(range.start)} al ${formatIsoToDisplay(range.end)}`;
+                document.getElementById('previewContent').innerHTML = `
+                    <div class="text-center text-slate-500 py-28 flex flex-col items-center gap-4">
+                        <svg class="w-14 h-14" style="color: #94a3b8; fill: none; stroke: currentColor; stroke-width: 1.6;" viewBox="0 0 24 24">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                            <line x1="16" y1="2" x2="16" y2="6"/>
+                            <line x1="8" y1="2" x2="8" y2="6"/>
+                            <line x1="3" y1="10" x2="21" y2="10"/>
+                        </svg>
+                        <p style="margin: 0; font-size: 11pt; color: #334155;">
+                            No se encontraron mensajes ni archivos adjuntos en el rango seleccionado (<strong>${escapeHTML(labelRange)}</strong>).
+                        </p>
+                        <button type="button" onclick="clearDateFilter()" style="padding: 8px 16px; border-radius: 8px; background: #0284c7; color: #ffffff; font-weight: 700; font-size: 10pt; cursor: pointer;">
+                            Mostrar todo el contenido del TXT
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            const showByParticipant = document.getElementById('showByParticipantToggle').checked;
+            const showByDate = document.getElementById('showByDateToggle').checked;
+
             const participantNames = sortAlpha(Object.keys(data.participants));
             const sortedGlobalExts = sortAlpha(Object.keys(data.globalExtensions));
 
@@ -1361,9 +2746,18 @@
             // 1. PARTE SUPERIOR: PERIODO, INTERLOCUTORES Y CONTEO TOTAL GLOBAL
             const firstMsg = data.messages[0];
             const lastMsg = data.messages[data.messages.length - 1];
-            const rangoFechas = (firstMsg.date === lastMsg.date)
-                ? `${firstMsg.date} (de las ${firstMsg.time} a las ${lastMsg.time})`
-                : `Del ${firstMsg.date} (${firstMsg.time}) al ${lastMsg.date} (${lastMsg.time})`;
+            const firstDateLabel = firstMsg.isoDate ? formatIsoToDisplay(firstMsg.isoDate) : firstMsg.date;
+            const lastDateLabel = lastMsg.isoDate ? formatIsoToDisplay(lastMsg.isoDate) : lastMsg.date;
+
+            const rangoFechas = (firstDateLabel === lastDateLabel)
+                ? `${firstDateLabel} (de las ${firstMsg.time} a las ${lastMsg.time})`
+                : `Del ${firstDateLabel} (${firstMsg.time}) al ${lastDateLabel} (${lastMsg.time})`;
+
+            const periodoLabel = range
+                ? (range.start === range.end
+                    ? `Periodo de conversación analizado (fecha filtrada: ${formatIsoToDisplay(range.start)}):`
+                    : `Periodo de conversación analizado (rango filtrado del ${formatIsoToDisplay(range.start)} al ${formatIsoToDisplay(range.end)}):`)
+                : `Periodo de conversación analizado:`;
 
             const numPartLetters = capitalizeFirstLetter(numToWords(participantNames.length));
             const numPartDigits = participantNames.length.toString().padStart(2, '0');
@@ -1377,7 +2771,7 @@
             const msgWord = data.totalMessages === 1 ? 'registro analizado' : 'registros analizados';
 
             html += `<ul>`;
-            html += `<li><strong>Periodo de conversación analizado:</strong> ${escapeHTML(rangoFechas)}.</li>`;
+            html += `<li><strong>${escapeHTML(periodoLabel)}</strong> ${escapeHTML(rangoFechas)}.</li>`;
             html += `<li><strong>Interlocutores identificados (${numPartDigits}):</strong> ${numPartLetters} (${numPartDigits}) participantes: ${participantNames.map(n => `<strong>${escapeHTML(n)}</strong>`).join(', ')}.</li>`;
             html += `<li><strong>Conteo total global de la conversación (por formato y tipo):</strong><ul>`;
 
@@ -1401,6 +2795,11 @@
             // 2. RECUADRO AZUL RESALTADO: CONTEO POR PARTICIPANTE
             if (showByParticipant) {
                 html += renderParticipantBreakdownBox(data, participantNames);
+            }
+
+            // 3. RECUADRO ESMERALDA RESALTADO (OPCIONAL): DESGLOSE DIARIO POR FECHA
+            if (showByDate && data.dailyBreakdown && data.dailyBreakdown.length > 0) {
+                html += renderDateBreakdownBox(data);
             }
 
             document.getElementById('previewContent').innerHTML = html;
@@ -1443,6 +2842,43 @@
             `;
         }
 
+        function renderDateBreakdownBox(data) {
+            let daysHTML = '';
+
+            for (const day of data.dailyBreakdown) {
+                const dExts = sortAlpha(Object.keys(day.filesByExt));
+                const totalDLetters = capitalizeFirstLetter(numToWords(day.totalMessages));
+                const totalDDigits = day.totalMessages.toString().padStart(2, '0');
+                const regWord = day.totalMessages === 1 ? 'registro' : 'registros';
+
+                daysHTML += `<li><strong>Fecha:</strong> ${escapeHTML(day.displayDate)} <em>(${totalDLetters} [${totalDDigits}] ${regWord} en total)</em><ul>`;
+                for (const ext of dExts) {
+                    daysHTML += renderFileItem(day.filesByExt[ext], ext);
+                }
+                if (day.totalTextMessages > 0) {
+                    daysHTML += renderTextCountItem(day.totalTextMessages);
+                }
+                if (day.totalOmittedMedia > 0) {
+                    const omLetters = capitalizeFirstLetter(numToWords(day.totalOmittedMedia));
+                    const omDigits = day.totalOmittedMedia.toString().padStart(2, '0');
+                    const omPhrase = day.totalOmittedMedia === 1 ? 'elemento marcado' : 'elementos marcados';
+                    daysHTML += `<li>${omLetters} (${omDigits}) ${omPhrase} como multimedia omitido.</li>`;
+                }
+                daysHTML += `</ul></li>`;
+            }
+
+            return `
+                <div style="margin-top: 24px; padding: 16px 22px; background-color: #ecfdf5; border: 2px solid #059669; border-left: 6px solid #059669; border-radius: 8px;">
+                    <p style="margin: 0 0 8px 0; font-weight: bold; color: #047857; text-transform: uppercase; font-size: 10.5pt; letter-spacing: 0.03em;">
+                        DESGLOSE DE ARCHIVOS Y MENSAJES POR FECHA:
+                    </p>
+                    <ul style="margin-top: 4px; margin-bottom: 4px;">
+                        ${daysHTML}
+                    </ul>
+                </div>
+            `;
+        }
+
         // =========================================================
         // 4. COPIAR Y DESCARGAR EN WORD (.DOC)
         // =========================================================
@@ -1450,6 +2886,10 @@
             const content = document.getElementById('previewContent');
             if (!currentWhatsappData || currentWhatsappData.totalMessages === 0) {
                 showToast("Primero carga un archivo .TXT o pega una conversación de WhatsApp.");
+                return;
+            }
+            if (!filteredWhatsappData || filteredWhatsappData.totalMessages === 0) {
+                showToast("No hay registros dentro del rango de fechas seleccionado para copiar.");
                 return;
             }
 
@@ -1472,6 +2912,10 @@
         function exportToWord() {
             if (!currentWhatsappData || currentWhatsappData.totalMessages === 0) {
                 showToast("Primero carga un archivo .TXT o pega una conversación de WhatsApp.");
+                return;
+            }
+            if (!filteredWhatsappData || filteredWhatsappData.totalMessages === 0) {
+                showToast("No hay registros dentro del rango de fechas seleccionado para descargar.");
                 return;
             }
 
@@ -1523,7 +2967,14 @@
             const a = document.createElement('a');
             a.href = url;
             const safeName = (currentSourceName || 'Conversacion_WhatsApp').replace(/[^a-zA-Z0-9_-]/g, '_');
-            a.download = `Dictamen_WhatsApp_${safeName}.doc`;
+            const activeRange = getEffectiveDateRange();
+            let dateSuffix = '';
+            if (activeRange) {
+                dateSuffix = activeRange.start === activeRange.end
+                    ? `_${activeRange.start}`
+                    : `_${activeRange.start}_al_${activeRange.end}`;
+            }
+            a.download = `Dictamen_WhatsApp_${safeName}${dateSuffix}.doc`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
