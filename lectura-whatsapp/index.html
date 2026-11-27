@@ -677,8 +677,8 @@
             border-color: rgba(52, 211, 153, 0.52);
         }
 
-        /* Marca siempre visible para el día actual (Hoy) */
-        .cal-day.is-today {
+        /* Marca siempre visible para el último día de la conversación */
+        .cal-day.is-last-chat {
             opacity: 1 !important;
             border: 1.5px solid #fbbf24 !important;
             background: rgba(245, 158, 11, 0.22);
@@ -710,8 +710,13 @@
             opacity: 1 !important;
         }
 
-        .cal-day.is-today.is-selected-start,
-        .cal-day.is-today.is-selected-end {
+        .cal-day.is-selected-both {
+            border-color: #ffffff !important;
+            box-shadow: 0 0 0 1.5px rgba(255, 255, 255, 0.9), 0 0 12px rgba(34, 211, 238, 0.7) !important;
+        }
+
+        .cal-day.is-last-chat.is-selected-start,
+        .cal-day.is-last-chat.is-selected-end {
             border-color: #fbbf24 !important;
             box-shadow: 0 0 0 1.5px #fbbf24, 0 0 12px rgba(34, 211, 238, 0.55) !important;
         }
@@ -720,14 +725,22 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 2px;
-            height: 3px;
+            gap: 3px;
+            height: 5px;
         }
 
         .cal-dot {
             width: 3.5px;
             height: 3.5px;
             border-radius: 9999px;
+        }
+
+        .cal-dot-range {
+            width: 4.5px;
+            height: 4.5px;
+            border-radius: 9999px;
+            background-color: #020617;
+            box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.9);
         }
 
         .cal-dot-msg {
@@ -1232,9 +1245,8 @@
                         </div>
 
                         <div id="calJumpRow" class="cal-jump-row">
-                            <button type="button" id="jumpTodayBtn" class="cal-jump-btn is-today-btn" onclick="jumpCalendarToBoundary('today')">Hoy</button>
-                            <button type="button" id="jumpStartBtn" class="cal-jump-btn" onclick="jumpCalendarToBoundary('start')">Inicio</button>
-                            <button type="button" id="jumpEndBtn" class="cal-jump-btn" onclick="jumpCalendarToBoundary('end')">Fin</button>
+                            <button type="button" id="jumpStartBtn" class="cal-jump-btn" onclick="jumpCalendarToBoundary('start')">Inicio TXT</button>
+                            <button type="button" id="jumpEndBtn" class="cal-jump-btn is-today-btn" onclick="jumpCalendarToBoundary('end')">Último día</button>
                         </div>
 
                         <div class="cal-weekdays">
@@ -1252,7 +1264,7 @@
                         <div class="cal-legend">
                             <span class="cal-legend-item">
                                 <span style="width: 9px; height: 9px; border-radius: 2px; border: 1.5px solid #fbbf24; background: rgba(245, 158, 11, 0.25); display: inline-block;"></span>
-                                Hoy
+                                Último día
                             </span>
                             <span class="cal-legend-item">
                                 <span class="cal-dot cal-dot-file"></span>
@@ -2209,17 +2221,15 @@
         // =========================================================
         // 3B. CALENDARIO DE RANGO DE FECHAS Y FILTRO DE EXTRACCIÓN
         // =========================================================
-        function getTodayIso() {
-            const now = new Date();
-            return toIsoDate(now.getFullYear(), now.getMonth() + 1, now.getDate());
-        }
-
         function isDateFilterActive() {
             return Boolean(selectedStartIso || selectedEndIso);
         }
 
         function getEffectiveDateRange() {
             if (!currentWhatsappData || !isDateFilterActive()) return null;
+            if (isSelectingRange && selectedStartIso && !selectedEndIso) {
+                return { start: selectedStartIso, end: selectedStartIso, isPendingEnd: true };
+            }
             let start = selectedStartIso || currentWhatsappData.minIsoDate;
             let end = selectedEndIso || currentWhatsappData.maxIsoDate;
             if (!start || !end) return null;
@@ -2228,7 +2238,7 @@
                 start = end;
                 end = tmp;
             }
-            return { start, end };
+            return { start, end, isPendingEnd: false };
         }
 
         function initExtractionCalendar() {
@@ -2246,21 +2256,18 @@
             document.getElementById('dateFilterHeader').classList.remove('is-open');
             document.getElementById('toggleCalendarBtnLabel').innerText = 'Abrir calendario';
 
-            // El calendario siempre abre posicionado en el mes y día actual (Hoy) marcado
-            const todayIso = getTodayIso();
-            const todayParts = parseIsoParts(todayIso);
-            calViewYear = todayParts.year;
-            calViewMonth = todayParts.month - 1;
+            // El calendario siempre abre posicionado en el último día de la conversación marcado
+            const lastParts = parseIsoParts(currentWhatsappData.maxIsoDate);
+            calViewYear = lastParts.year;
+            calViewMonth = lastParts.month - 1;
 
             // Inputs de fecha sin preselección (muestra todo el TXT por defecto)
             const startInput = document.getElementById('dateStartInput');
             const endInput = document.getElementById('dateEndInput');
-            const minBound = currentWhatsappData.minIsoDate < todayIso ? currentWhatsappData.minIsoDate : todayIso;
-            const maxBound = currentWhatsappData.maxIsoDate > todayIso ? currentWhatsappData.maxIsoDate : todayIso;
-            startInput.min = minBound;
-            startInput.max = maxBound;
-            endInput.min = minBound;
-            endInput.max = maxBound;
+            startInput.min = currentWhatsappData.minIsoDate;
+            startInput.max = currentWhatsappData.maxIsoDate;
+            endInput.min = currentWhatsappData.minIsoDate;
+            endInput.max = currentWhatsappData.maxIsoDate;
             startInput.value = '';
             endInput.value = '';
 
@@ -2272,16 +2279,13 @@
                 : `Extracción: del ${formatIsoToDisplay(currentWhatsappData.minIsoDate)} al ${formatIsoToDisplay(currentWhatsappData.maxIsoDate)} (${activeDays} ${daysWord})`;
             document.getElementById('extractionRangeMeta').innerText = rangeText;
 
-            // Botones de salto rápido: Hoy, Inicio y Fin de la extracción (en una sola fila compacta)
-            const jumpTodayBtn = document.getElementById('jumpTodayBtn');
+            // Botones de salto rápido: Inicio y Último día de la conversación
             const jumpStartBtn = document.getElementById('jumpStartBtn');
             const jumpEndBtn = document.getElementById('jumpEndBtn');
-            jumpTodayBtn.innerText = `Hoy (${pad2(todayParts.day)}/${pad2(todayParts.month)})`;
-            jumpTodayBtn.title = `Ir al día actual: ${formatIsoToDisplay(todayIso)}`;
-            jumpStartBtn.innerText = 'Inicio TXT';
-            jumpStartBtn.title = `Ir al inicio de la extracción: ${formatIsoToDisplay(currentWhatsappData.minIsoDate)}`;
-            jumpEndBtn.innerText = 'Fin TXT';
-            jumpEndBtn.title = `Ir al fin de la extracción: ${formatIsoToDisplay(currentWhatsappData.maxIsoDate)}`;
+            jumpStartBtn.innerText = `Inicio (${formatIsoToDisplay(currentWhatsappData.minIsoDate)})`;
+            jumpStartBtn.title = `Ir al inicio de la conversación: ${formatIsoToDisplay(currentWhatsappData.minIsoDate)}`;
+            jumpEndBtn.innerText = `Último (${formatIsoToDisplay(currentWhatsappData.maxIsoDate)})`;
+            jumpEndBtn.title = `Ir al último día de la conversación: ${formatIsoToDisplay(currentWhatsappData.maxIsoDate)}`;
 
             populateCalendarSelects();
         }
@@ -2294,11 +2298,10 @@
                 .map((name, idx) => `<option value="${idx}" ${idx === calViewMonth ? 'selected' : ''}>${name}</option>`)
                 .join('');
 
-            const todayY = parseIsoParts(getTodayIso()).year;
             const minY = parseIsoParts(currentWhatsappData.minIsoDate).year;
             const maxY = parseIsoParts(currentWhatsappData.maxIsoDate).year;
-            const startY = Math.min(minY, todayY, calViewYear);
-            const endY = Math.max(maxY, todayY, calViewYear);
+            const startY = Math.min(minY, calViewYear);
+            const endY = Math.max(maxY, calViewYear);
 
             let yearOptions = '';
             for (let y = startY; y <= endY; y++) {
@@ -2345,14 +2348,7 @@
 
         function jumpCalendarToBoundary(which) {
             if (!currentWhatsappData) return;
-            let iso;
-            if (which === 'today') {
-                iso = getTodayIso();
-            } else if (which === 'end') {
-                iso = currentWhatsappData.maxIsoDate;
-            } else {
-                iso = currentWhatsappData.minIsoDate;
-            }
+            const iso = which === 'end' ? currentWhatsappData.maxIsoDate : currentWhatsappData.minIsoDate;
             const p = parseIsoParts(iso);
             if (!p) return;
             calViewYear = p.year;
@@ -2365,16 +2361,17 @@
             if (!currentWhatsappData) return;
 
             if (!isSelectingRange) {
-                // Primer clic: selecciona un solo día y habilita segundo clic para definir rango
+                // Primer clic: marca el punto inicial y espera el segundo clic para cerrar el rango
                 selectedStartIso = iso;
-                selectedEndIso = iso;
+                selectedEndIso = null;
                 isSelectingRange = true;
             } else if (iso === selectedStartIso) {
-                // Volver a hacer clic en el mismo único día seleccionado quita el filtro y muestra todo el TXT
-                clearDateFilter();
-                return;
+                // Segundo clic en el MISMO día: confirma inicio y fin en ese mismo día (dos puntos en la fecha)
+                selectedStartIso = iso;
+                selectedEndIso = iso;
+                isSelectingRange = false;
             } else {
-                // Segundo clic: cierra el rango [inicio, fin]
+                // Segundo clic en otro día: cierra el rango [inicio, fin]
                 if (iso < selectedStartIso) {
                     selectedEndIso = selectedStartIso;
                     selectedStartIso = iso;
@@ -2505,7 +2502,6 @@
 
             const minIso = currentWhatsappData.minIsoDate;
             const maxIso = currentWhatsappData.maxIsoDate;
-            const todayIso = getTodayIso();
             const effectiveRange = getEffectiveDateRange();
 
             let html = '';
@@ -2517,7 +2513,7 @@
                 const iso = toIsoDate(calViewYear, calViewMonth + 1, day);
                 const dayInfo = currentWhatsappData.dailyIndex[iso] || null;
                 const inExtraction = (iso >= minIso && iso <= maxIso);
-                const isToday = (iso === todayIso);
+                const isLastChatDay = (iso === maxIso);
 
                 const classes = ['cal-day'];
                 if (!inExtraction) classes.push('out-of-range');
@@ -2530,17 +2526,33 @@
                     }
                 }
 
-                if (isToday) {
-                    classes.push('is-today');
+                if (isLastChatDay) {
+                    classes.push('is-last-chat');
                 }
+
+                let isStart = false;
+                let isEnd = false;
+                let isConfirmedSameDay = false;
 
                 if (effectiveRange) {
-                    if (iso === effectiveRange.start) classes.push('is-selected-start');
-                    if (iso === effectiveRange.end) classes.push('is-selected-end');
-                    if (iso > effectiveRange.start && iso < effectiveRange.end) classes.push('is-in-range');
+                    isStart = (iso === effectiveRange.start);
+                    isEnd = (!effectiveRange.isPendingEnd && iso === effectiveRange.end);
+                    isConfirmedSameDay = (isStart && isEnd);
+
+                    if (isStart) classes.push('is-selected-start');
+                    if (isEnd) classes.push('is-selected-end');
+                    if (isConfirmedSameDay) classes.push('is-selected-both');
+                    if (!effectiveRange.isPendingEnd && iso > effectiveRange.start && iso < effectiveRange.end) {
+                        classes.push('is-in-range');
+                    }
                 }
 
-                let tooltip = (isToday ? 'HOY · ' : '') + formatIsoToDisplay(iso);
+                let tooltip = (isLastChatDay ? 'ÚLTIMO DÍA DE CONVERSACIÓN · ' : '') + formatIsoToDisplay(iso);
+                if (isConfirmedSameDay) {
+                    tooltip += ' [Inicio y Fin seleccionados]';
+                } else if (isStart && effectiveRange && effectiveRange.isPendingEnd) {
+                    tooltip += ' [Inicio marcado — presiona otra fecha o repite este día]';
+                }
                 if (dayInfo && dayInfo.totalMessages > 0) {
                     const extSummary = sortAlpha(Object.keys(dayInfo.filesByExt))
                         .map(ext => `${dayInfo.filesByExt[ext]} ${ext}`)
@@ -2559,7 +2571,13 @@
                 }
 
                 let dotsHtml = '<span class="cal-dots">';
-                if (dayInfo) {
+                if (isConfirmedSameDay) {
+                    // Dos puntos visibles marcando inicio y fin en el mismo día
+                    dotsHtml += '<span class="cal-dot-range" data-point="start"></span><span class="cal-dot-range" data-point="end"></span>';
+                } else if (isStart || isEnd) {
+                    // Un punto para extremo inicial o final
+                    dotsHtml += `<span class="cal-dot-range" data-point="${isStart ? 'start' : 'end'}"></span>`;
+                } else if (dayInfo) {
                     if (dayInfo.totalAttachments > 0) {
                         dotsHtml += '<span class="cal-dot cal-dot-file"></span>';
                     } else if (dayInfo.totalMessages > 0) {
@@ -2572,7 +2590,7 @@
                     <button type="button"
                             class="${classes.join(' ')}"
                             data-iso="${iso}"
-                            ${isToday ? 'aria-current="date"' : ''}
+                            ${isLastChatDay ? 'aria-current="date"' : ''}
                             title="${escapeHTML(tooltip)}"
                             onclick="handleCalendarDayClick('${iso}')"
                             onmouseenter="handleCalendarDayHover('${iso}')">
@@ -2613,12 +2631,16 @@
                     : `${formatIsoToDisplay(range.start)} al ${formatIsoToDisplay(range.end)}`;
 
                 statusPill.className = 'status-pill-filtered';
-                statusPill.innerText = `Filtro: ${labelRange}`;
                 clearBtn.classList.add('is-active-filter');
 
-                if (isSelectingRange) {
-                    hintEl.innerText = `Fecha marcada: ${labelRange}. Haz clic en otra fecha para completar un rango, o en el mismo día para ver todo el TXT.`;
+                if (range.isPendingEnd) {
+                    statusPill.innerText = `Inicio: ${labelRange} (elige fin)`;
+                    hintEl.innerText = `Inicio marcado: ${labelRange}. Selecciona otra fecha o vuelve a presionar el ${labelRange} para confirmar el rango en ese mismo día.`;
+                } else if (isSingleDay) {
+                    statusPill.innerText = `Rango: ${labelRange} (confirmado)`;
+                    hintEl.innerText = `Rango confirmado en el mismo día (${labelRange} al ${labelRange}).`;
                 } else {
+                    statusPill.innerText = `Filtro: ${labelRange}`;
                     hintEl.innerText = `Mostrando el periodo del ${labelRange} y su conversación (${data.sortedIsoDates.length} ${data.sortedIsoDates.length === 1 ? 'día con actividad' : 'días con actividad'}).`;
                 }
                 titleEl.innerText = `Desglose de archivos — ${labelRange}`;
