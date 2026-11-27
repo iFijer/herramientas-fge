@@ -544,6 +544,112 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #38bdf8;
         }
+
+        /* Panel de múltiples carpetas seleccionadas */
+        .selected-folders-card {
+            background: rgba(15, 23, 42, 0.72);
+            border: 1px solid rgba(56, 189, 248, 0.35);
+            border-radius: 0.75rem;
+            padding: 0.85rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+
+        .selected-folders-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+            max-height: 185px;
+            overflow-y: auto;
+        }
+
+        .selected-folder-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.5rem;
+            padding: 0.42rem 0.6rem;
+            border-radius: 0.5rem;
+            background: rgba(2, 6, 23, 0.72);
+            border: 1px solid rgba(51, 65, 85, 0.8);
+            font-size: 0.75rem;
+        }
+
+        .folder-remove-btn {
+            width: 1.35rem;
+            height: 1.35rem;
+            border-radius: 0.35rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #94a3b8;
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(71, 85, 105, 0.65);
+            font-size: 0.8rem;
+            font-weight: 700;
+            line-height: 1;
+            flex-shrink: 0;
+            transition: all 0.18s ease;
+        }
+
+        .folder-remove-btn:hover {
+            color: #fda4af;
+            border-color: rgba(244, 63, 94, 0.65);
+            background: rgba(76, 5, 25, 0.75);
+        }
+
+        .folder-actions-row {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 0.45rem;
+        }
+
+        .btn-add-folder {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+            padding: 0.48rem 0.7rem;
+            border-radius: 0.5rem;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            background: rgba(6, 182, 212, 0.16);
+            border: 1px solid rgba(34, 211, 238, 0.5);
+            color: #67e8f9;
+            transition: all 0.2s ease;
+        }
+
+        .btn-add-folder:hover {
+            background: rgba(6, 182, 212, 0.28);
+            border-color: #22d3ee;
+            color: #ffffff;
+        }
+
+        .btn-clear-folders {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.35rem;
+            padding: 0.48rem 0.65rem;
+            border-radius: 0.5rem;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            background: rgba(30, 41, 59, 0.85);
+            border: 1px solid rgba(71, 85, 105, 0.8);
+            color: #cbd5e1;
+            transition: all 0.2s ease;
+        }
+
+        .btn-clear-folders:hover {
+            background: rgba(76, 5, 25, 0.7);
+            border-color: rgba(244, 63, 94, 0.6);
+            color: #fda4af;
+        }
     </style>
 </head>
 <body class="flex flex-col items-center py-8 px-4 md-px-8 relative min-h-screen">
@@ -666,7 +772,7 @@
             <aside class="scanner-sidebar">
                 <div class="glass-panel p-6 flex flex-col gap-5">
 
-                    <!-- Botón de Escaneo de Unidad / Carpeta -->
+                    <!-- Botón de Escaneo de Una o Más Carpetas / Dispositivos -->
                     <div id="dropZone"
                          ondragover="handleDragOver(event)"
                          ondragleave="handleDragLeave(event)"
@@ -687,13 +793,35 @@
                             </div>
                             <div>
                                 <span class="block font-bold text-white text-base tracking-wide">
-                                    Selecciona/Arrastra aquí el dispositivo/carpeta
+                                    Selecciona/Arrastra una o más carpetas
                                 </span>
                                 <span class="block text-xs text-slate-300 mt-1 leading-relaxed">
-                                    Selecciona tu dispositivo para hacer un conteo general de los archivos
+                                    Arrastra varias carpetas a la vez o haz clic de nuevo para agregar más carpetas al mismo conteo
                                 </span>
                             </div>
-                            <input type="file" id="directoryInput" webkitdirectory directory onchange="scanDirectoryFallback(event)" onclick="event.stopPropagation()" class="hidden">
+                            <input type="file" id="directoryInput" webkitdirectory directory multiple onchange="scanDirectoryFallback(event)" onclick="event.stopPropagation()" class="hidden">
+                        </div>
+                    </div>
+
+                    <!-- Lista de Carpetas Seleccionadas (Multi-carpeta) -->
+                    <div id="selectedFoldersPanel" class="hidden selected-folders-card">
+                        <div class="flex items-center justify-between gap-2">
+                            <span id="selectedFoldersTitle" class="text-xs font-bold uppercase tracking-wider text-cyan-300">
+                                Carpetas seleccionadas (0)
+                            </span>
+                        </div>
+                        <div id="selectedFoldersList" class="selected-folders-list"></div>
+                        <div class="folder-actions-row">
+                            <button type="button" onclick="openInstantDirectoryPicker(event)" class="btn-add-folder">
+                                <svg class="svg-icon" viewBox="0 0 24 24">
+                                    <path d="M12 5v14"/>
+                                    <path d="M5 12h14"/>
+                                </svg>
+                                Agregar carpeta
+                            </button>
+                            <button type="button" onclick="clearAllScannedFolders()" class="btn-clear-folders" title="Limpiar todas las carpetas">
+                                Limpiar
+                            </button>
                         </div>
                     </div>
 
@@ -1047,12 +1175,24 @@
         const SVG_ICON_CHECK = `<svg class="svg-icon text-emerald-400" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`;
 
         // =========================================================
-        // 3. ESCANEO DE CARPETAS, PORCENTAJE EN VIVO Y FILTRO DE UNIDAD
+        // 3. ESCANEO MULTI-CARPETA, PORCENTAJE EN VIVO Y FILTRO DE UNIDAD
         // =========================================================
+        let scannedRoots = [];
+        let nextRootId = 1;
         let lastScannedRoot = null;
         let totalFilesProcessed = 0;
         let totalFoldersProcessed = 0;
         let waitingForFallbackDialog = false;
+
+        function escapeHTML(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
 
         function isHiddenOrSystemPart(partName) {
             if (!partName) return true;
@@ -1095,6 +1235,194 @@
             return new Promise(resolve => requestAnimationFrame(resolve));
         }
 
+        function countNodeMetrics(node) {
+            let files = 0;
+            let folders = 0;
+            if (!node) return { files, folders };
+            if (node.files) {
+                for (const k of Object.keys(node.files)) {
+                    files += node.files[k];
+                }
+            }
+            if (node.folders) {
+                for (const name of Object.keys(node.folders)) {
+                    folders += 1;
+                    const child = countNodeMetrics(node.folders[name]);
+                    files += child.files;
+                    folders += child.folders;
+                }
+            }
+            return { files, folders };
+        }
+
+        function mergeIntoTargetNode(targetNode, sourceNode) {
+            if (!sourceNode) return;
+            if (sourceNode.files) {
+                for (const ext of Object.keys(sourceNode.files)) {
+                    targetNode.files[ext] = (targetNode.files[ext] || 0) + sourceNode.files[ext];
+                }
+            }
+            if (sourceNode.folders) {
+                for (const folderName of Object.keys(sourceNode.folders)) {
+                    if (!targetNode.folders[folderName]) {
+                        targetNode.folders[folderName] = { name: folderName, folders: {}, files: {} };
+                    }
+                    mergeIntoTargetNode(targetNode.folders[folderName], sourceNode.folders[folderName]);
+                }
+            }
+        }
+
+        function getUniqueFolderKey(existingKeysSet, baseName) {
+            const cleanBase = (baseName || 'Carpeta').trim() || 'Carpeta';
+            if (!existingKeysSet.has(cleanBase)) return cleanBase;
+            let idx = 2;
+            while (existingKeysSet.has(`${cleanBase} (${idx})`)) {
+                idx++;
+            }
+            return `${cleanBase} (${idx})`;
+        }
+
+        function addScannedRootNode(rootNode, batchFiles, batchFolders) {
+            const cleanName = stripDriveLetterFromText(rootNode.name);
+            const fallbackLabel = rootNode.isDriveRoot
+                ? 'Unidad USB'
+                : (cleanName || 'Carpeta');
+
+            const existingNames = new Set(scannedRoots.map(r => r.displayName));
+            const uniqueDisplay = getUniqueFolderKey(existingNames, fallbackLabel);
+
+            scannedRoots.push({
+                id: nextRootId++,
+                displayName: uniqueDisplay,
+                node: rootNode,
+                fileCount: batchFiles,
+                folderCount: batchFolders
+            });
+        }
+
+        function buildCombinedRoot() {
+            if (scannedRoots.length === 0) return null;
+            if (scannedRoots.length === 1) {
+                return scannedRoots[0].node;
+            }
+
+            const combined = {
+                name: '',
+                isMultiRoot: true,
+                folders: {},
+                files: {}
+            };
+
+            const usedFolderNames = new Set();
+
+            for (const entry of scannedRoots) {
+                const node = entry.node;
+                const cleanName = stripDriveLetterFromText(node.name);
+                const hasValidName = cleanName.length > 0 && !isDriveRootLabel(cleanName) && !node.isDriveRoot;
+
+                if (hasValidName) {
+                    const folderKey = getUniqueFolderKey(usedFolderNames, cleanName);
+                    usedFolderNames.add(folderKey);
+                    combined.folders[folderKey] = {
+                        name: folderKey,
+                        folders: node.folders || {},
+                        files: node.files || {}
+                    };
+                } else {
+                    mergeIntoTargetNode(combined, node);
+                }
+            }
+
+            return combined;
+        }
+
+        function recomputeTotalsAndRefreshUI() {
+            lastScannedRoot = buildCombinedRoot();
+
+            if (scannedRoots.length === 0 || !lastScannedRoot) {
+                totalFilesProcessed = 0;
+                totalFoldersProcessed = 0;
+                document.getElementById('selectedFoldersPanel').classList.add('hidden');
+                document.getElementById('statsPanel').classList.add('hidden');
+                document.getElementById('statsPanel').classList.remove('flex');
+                document.getElementById('scanProgressContainer').classList.add('hidden');
+                document.getElementById('scanProgressContainer').classList.remove('flex');
+                document.getElementById('unitBadge').innerText = 'Sin unidad escaneada';
+                document.getElementById('previewContent').innerHTML = `
+                    <div class="text-center text-slate-400 py-28 italic flex flex-col items-center gap-3">
+                        <svg style="width: 3.5rem; height: 3.5rem; color: #cbd5e1;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/>
+                            <path d="M12 10v6"/>
+                            <path d="m15 13-3 3-3-3"/>
+                        </svg>
+                        <span>Selecciona una o más carpetas o una unidad USB en el panel izquierdo para generar el desglose automático...</span>
+                    </div>
+                `;
+                return;
+            }
+
+            const metrics = countNodeMetrics(lastScannedRoot);
+            totalFilesProcessed = metrics.files;
+            totalFoldersProcessed = metrics.folders;
+
+            document.getElementById('statsPanel').classList.remove('hidden');
+            document.getElementById('statsPanel').classList.add('flex');
+            document.getElementById('fileCount').innerText = totalFilesProcessed.toLocaleString('es-MX');
+            document.getElementById('folderCount').innerText = totalFoldersProcessed.toLocaleString('es-MX');
+
+            renderSelectedFoldersPanel();
+            reRenderCurrentTree();
+        }
+
+        function renderSelectedFoldersPanel() {
+            const panel = document.getElementById('selectedFoldersPanel');
+            const titleEl = document.getElementById('selectedFoldersTitle');
+            const listEl = document.getElementById('selectedFoldersList');
+
+            if (scannedRoots.length === 0) {
+                panel.classList.add('hidden');
+                listEl.innerHTML = '';
+                return;
+            }
+
+            panel.classList.remove('hidden');
+            const folderWord = scannedRoots.length === 1 ? 'Carpeta seleccionada' : 'Carpetas seleccionadas';
+            titleEl.innerText = `${folderWord} (${scannedRoots.length})`;
+
+            listEl.innerHTML = scannedRoots.map(item => {
+                const fileWord = item.fileCount === 1 ? 'archivo' : 'archivos';
+                return `
+                    <div class="selected-folder-item">
+                        <div class="truncate" style="min-width: 0;">
+                            <span class="font-bold text-white" title="${escapeHTML(item.displayName)}">${escapeHTML(item.displayName)}</span>
+                            <span class="text-slate-400 font-mono"> · ${item.fileCount.toLocaleString('es-MX')} ${fileWord}</span>
+                        </div>
+                        <button type="button"
+                                class="folder-remove-btn"
+                                onclick="removeScannedFolder(${item.id})"
+                                title="Quitar ${escapeHTML(item.displayName)}"
+                                aria-label="Quitar ${escapeHTML(item.displayName)}">&times;</button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function removeScannedFolder(id) {
+            scannedRoots = scannedRoots.filter(r => r.id !== id);
+            recomputeTotalsAndRefreshUI();
+            if (scannedRoots.length > 0) {
+                showToast("Carpeta eliminada del conteo.");
+            } else {
+                showToast("Lista de carpetas limpiada.");
+            }
+        }
+
+        function clearAllScannedFolders() {
+            scannedRoots = [];
+            recomputeTotalsAndRefreshUI();
+            showToast("Se limpiaron todas las carpetas seleccionadas.");
+        }
+
         function showImmediateProgressUI(initialMessage) {
             const progressContainer = document.getElementById('scanProgressContainer');
             const progressBar = document.getElementById('scanProgressBar');
@@ -1104,8 +1432,6 @@
             const statusLabel = document.getElementById('scanStatusLabel');
             const spinnerIcon = document.getElementById('scanSpinnerIcon');
             const statsPanel = document.getElementById('statsPanel');
-            const fileCountEl = document.getElementById('fileCount');
-            const folderCountEl = document.getElementById('folderCount');
 
             progressContainer.classList.remove('hidden');
             progressContainer.classList.add('flex');
@@ -1117,20 +1443,19 @@
             percentText.innerText = '0%';
             statusLabel.innerText = initialMessage || 'Iniciando lectura directa...';
             counterDetail.innerText = '0 leídos';
-            visibleDetail.innerText = '0 visibles';
-            fileCountEl.innerText = '0';
-            folderCountEl.innerText = '0';
+            visibleDetail.innerText = `${totalFilesProcessed.toLocaleString('es-MX')} visibles`;
         }
 
-        // Selector instantáneo: usa showDirectoryPicker() para empezar en 0 segundos sin congelar el navegador
+        // Selector instantáneo: permite agregar una o más carpetas de forma acumulativa
         async function openInstantDirectoryPicker(event) {
+            if (event) event.stopPropagation();
+
             if (window.showDirectoryPicker) {
                 try {
                     const dirHandle = await window.showDirectoryPicker({ mode: 'read' });
-                    await scanWithDirectoryHandle(dirHandle);
+                    await scanWithDirectoryHandles([dirHandle]);
                     return;
                 } catch (err) {
-                    // Si el usuario canceló la ventana, no hacer nada
                     if (err && err.name === 'AbortError') {
                         return;
                     }
@@ -1138,7 +1463,7 @@
                 }
             }
 
-            // Respaldo: mostrar barra en 0% mientras el navegador prepara los archivos
+            // Respaldo: abrir selector de carpeta del navegador
             const input = document.getElementById('directoryInput');
             input.value = '';
             waitingForFallbackDialog = true;
@@ -1152,17 +1477,30 @@
                 waitingForFallbackDialog = false;
                 const statusLabel = document.getElementById('scanStatusLabel');
                 if (statusLabel && statusLabel.innerText.includes('Esperando')) {
-                    statusLabel.innerText = 'Preparando índice de la USB...';
+                    if (scannedRoots.length > 0) {
+                        statusLabel.innerText = 'LECTURA COMPLETADA (100%)';
+                        document.getElementById('scanSpinnerIcon').innerHTML = SVG_ICON_CHECK;
+                        document.getElementById('scanProgressBar').style.width = '100%';
+                        document.getElementById('scanPercentText').innerText = '100%';
+                    } else {
+                        statusLabel.innerText = 'Preparando índice de la USB...';
+                    }
                 }
             }
         });
 
-        // Escaneo directo con progreso jerárquico estricto de 0% a 100% (sin retrocesos ni saltos)
         async function scanWithDirectoryHandle(rootDirHandle) {
-            totalFilesProcessed = 0;
-            totalFoldersProcessed = 0;
+            await scanWithDirectoryHandles([rootDirHandle]);
+        }
 
-            showImmediateProgressUI('Conectado a la unidad. Escaneando...');
+        // Escaneo directo multi-carpeta con progreso jerárquico estricto de 0% a 100%
+        async function scanWithDirectoryHandles(dirHandles, looseFileHandles = []) {
+            if ((!dirHandles || dirHandles.length === 0) && (!looseFileHandles || looseFileHandles.length === 0)) return;
+
+            const multiLabel = dirHandles.length > 1
+                ? `Escaneando ${dirHandles.length} carpetas...`
+                : 'Conectado a la unidad. Escaneando...';
+            showImmediateProgressUI(multiLabel);
             await nextFrame();
 
             const progressBar = document.getElementById('scanProgressBar');
@@ -1174,23 +1512,16 @@
             const fileCountEl = document.getElementById('fileCount');
             const folderCountEl = document.getElementById('folderCount');
 
-            const rawRootName = (rootDirHandle.name || "").trim();
-            const isSystemSlashRoot = isDriveRootLabel(rawRootName);
-
-            const rootNode = {
-                name: isSystemSlashRoot ? "" : rawRootName,
-                isDriveRoot: isSystemSlashRoot,
-                folders: {},
-                files: {}
-            };
-
+            const baseFiles = totalFilesProcessed;
+            const baseFolders = totalFoldersProcessed;
+            let batchFilesProcessed = 0;
+            let batchFoldersProcessed = 0;
             let totalReadEntries = 0;
             let completedWeight = 0;
             let highestTargetPercent = 0;
             let displayedPercent = 0;
             let lastFrameTime = performance.now();
 
-            // Función auxiliar que avanza el porcentaje de 1 en 1 sin retroceder jamás ni saltar números
             function stepProgressUI(folderName, targetPct) {
                 if (targetPct > highestTargetPercent) {
                     highestTargetPercent = Math.min(99, targetPct);
@@ -1204,92 +1535,132 @@
                     statusLabel.innerText = `LEYENDO: ${folderName}`;
                 }
                 counterDetail.innerText = `${totalReadEntries.toLocaleString('es-MX')} leídos`;
-                visibleDetail.innerText = `${totalFilesProcessed.toLocaleString('es-MX')} visibles`;
-                fileCountEl.innerText = totalFilesProcessed.toLocaleString('es-MX');
-                folderCountEl.innerText = totalFoldersProcessed.toLocaleString('es-MX');
+                visibleDetail.innerText = `${(baseFiles + batchFilesProcessed).toLocaleString('es-MX')} visibles`;
+                fileCountEl.innerText = (baseFiles + batchFilesProcessed).toLocaleString('es-MX');
+                folderCountEl.innerText = (baseFolders + batchFoldersProcessed).toLocaleString('es-MX');
             }
 
-            // Cola de carpetas con peso jerárquico (total = 99%) para que nunca disminuya al encontrar más carpetas
-            const queue = [{ handle: rootDirHandle, targetNode: rootNode, weight: 99 }];
+            const totalTopUnits = dirHandles.length + (looseFileHandles.length > 0 ? 1 : 0);
+            const weightPerRoot = 99 / Math.max(1, totalTopUnits);
 
-            while (queue.length > 0) {
-                const { handle, targetNode, weight } = queue.shift();
-                const discoveredSubDirs = [];
-                let entriesInFolder = 0;
+            for (const rootDirHandle of dirHandles) {
+                const rawRootName = (rootDirHandle.name || "").trim();
+                const isSystemSlashRoot = isDriveRootLabel(rawRootName);
 
-                try {
-                    for await (const entry of handle.values()) {
-                        totalReadEntries++;
-                        entriesInFolder++;
-                        const entryName = entry.name;
+                const rootNode = {
+                    name: isSystemSlashRoot ? "" : rawRootName,
+                    isDriveRoot: isSystemSlashRoot,
+                    folders: {},
+                    files: {}
+                };
 
-                        // Si es carpeta o archivo oculto, se ignora de inmediato sin leer su interior
-                        if (isHiddenOrSystemPart(entryName)) {
-                            continue;
-                        }
+                let thisRootFiles = 0;
+                let thisRootFolders = 0;
 
-                        if (entry.kind === 'directory') {
-                            targetNode.folders[entryName] = {
-                                name: entryName,
-                                folders: {},
-                                files: {}
-                            };
-                            totalFoldersProcessed++;
-                            discoveredSubDirs.push({
-                                handle: entry,
-                                targetNode: targetNode.folders[entryName]
-                            });
-                        } else if (entry.kind === 'file') {
-                            const ext = normalizeExtension(entryName);
+                const queue = [{ handle: rootDirHandle, targetNode: rootNode, weight: weightPerRoot }];
 
-                            if (!targetNode.files[ext]) {
-                                targetNode.files[ext] = 0;
+                while (queue.length > 0) {
+                    const { handle, targetNode, weight } = queue.shift();
+                    const discoveredSubDirs = [];
+                    let entriesInFolder = 0;
+
+                    try {
+                        for await (const entry of handle.values()) {
+                            totalReadEntries++;
+                            entriesInFolder++;
+                            const entryName = entry.name;
+
+                            if (isHiddenOrSystemPart(entryName)) {
+                                continue;
                             }
-                            targetNode.files[ext]++;
-                            totalFilesProcessed++;
-                        }
 
-                        // Actualizar la interfaz cada ~25ms subiendo de 1% en 1%
-                        const now = performance.now();
-                        if (now - lastFrameTime > 25) {
-                            const intraFolderWeight = weight * 0.75 * (1 - (1 / (1 + entriesInFolder / 3000)));
-                            const estimatedPct = Math.floor(completedWeight + intraFolderWeight);
-                            stepProgressUI(targetNode.name || 'UNIDAD USB', estimatedPct);
-                            lastFrameTime = now;
-                            await nextFrame();
+                            if (entry.kind === 'directory') {
+                                targetNode.folders[entryName] = {
+                                    name: entryName,
+                                    folders: {},
+                                    files: {}
+                                };
+                                thisRootFolders++;
+                                batchFoldersProcessed++;
+                                discoveredSubDirs.push({
+                                    handle: entry,
+                                    targetNode: targetNode.folders[entryName]
+                                });
+                            } else if (entry.kind === 'file') {
+                                const ext = normalizeExtension(entryName);
+                                if (!targetNode.files[ext]) {
+                                    targetNode.files[ext] = 0;
+                                }
+                                targetNode.files[ext]++;
+                                thisRootFiles++;
+                                batchFilesProcessed++;
+                            }
+
+                            const now = performance.now();
+                            if (now - lastFrameTime > 25) {
+                                const intraFolderWeight = weight * 0.75 * (1 - (1 / (1 + entriesInFolder / 3000)));
+                                const estimatedPct = Math.floor(completedWeight + intraFolderWeight);
+                                stepProgressUI(targetNode.name || 'UNIDAD USB', estimatedPct);
+                                lastFrameTime = now;
+                                await nextFrame();
+                            }
+                        }
+                    } catch (dirErr) {
+                        // Ignorar carpetas del sistema sin permisos de lectura
+                    }
+
+                    if (discoveredSubDirs.length === 0) {
+                        completedWeight += weight;
+                    } else {
+                        const selfPortion = weight * 0.12;
+                        completedWeight += selfPortion;
+                        const childWeight = (weight - selfPortion) / discoveredSubDirs.length;
+                        for (const sub of discoveredSubDirs) {
+                            queue.push({
+                                handle: sub.handle,
+                                targetNode: sub.targetNode,
+                                weight: childWeight
+                            });
                         }
                     }
-                } catch (dirErr) {
-                    // Ignorar carpetas del sistema sin permisos de lectura
-                }
 
-                // Repartir el peso de esta carpeta entre sus subcarpetas o sumarlo si ya no tiene subcarpetas
-                if (discoveredSubDirs.length === 0) {
-                    completedWeight += weight;
-                } else {
-                    const selfPortion = weight * 0.12;
-                    completedWeight += selfPortion;
-                    const childWeight = (weight - selfPortion) / discoveredSubDirs.length;
-                    for (const sub of discoveredSubDirs) {
-                        queue.push({
-                            handle: sub.handle,
-                            targetNode: sub.targetNode,
-                            weight: childWeight
-                        });
+                    const currentTargetPct = Math.floor(completedWeight);
+                    if (performance.now() - lastFrameTime > 20) {
+                        stepProgressUI(targetNode.name || 'UNIDAD USB', currentTargetPct);
+                        lastFrameTime = performance.now();
+                        await nextFrame();
+                    } else if (currentTargetPct > highestTargetPercent) {
+                        highestTargetPercent = Math.min(99, currentTargetPct);
                     }
                 }
 
-                const currentTargetPct = Math.floor(completedWeight);
-                if (performance.now() - lastFrameTime > 20) {
-                    stepProgressUI(targetNode.name || 'UNIDAD USB', currentTargetPct);
-                    lastFrameTime = performance.now();
-                    await nextFrame();
-                } else if (currentTargetPct > highestTargetPercent) {
-                    highestTargetPercent = Math.min(99, currentTargetPct);
-                }
+                addScannedRootNode(rootNode, thisRootFiles, thisRootFolders);
             }
 
-            // Completar suavemente de 1% en 1% hasta llegar a 100% sin saltos bruscos
+            // Si también se arrastraron archivos sueltos junto con carpetas
+            if (looseFileHandles.length > 0) {
+                const looseNode = {
+                    name: 'Archivos_Sueltos',
+                    isDriveRoot: false,
+                    folders: {},
+                    files: {}
+                };
+                let looseCount = 0;
+                for (const fileHandle of looseFileHandles) {
+                    const entryName = fileHandle.name;
+                    if (!entryName || isHiddenOrSystemPart(entryName)) continue;
+                    const ext = normalizeExtension(entryName);
+                    looseNode.files[ext] = (looseNode.files[ext] || 0) + 1;
+                    looseCount++;
+                    batchFilesProcessed++;
+                    totalReadEntries++;
+                }
+                if (looseCount > 0) {
+                    addScannedRootNode(looseNode, looseCount, 0);
+                }
+                completedWeight += weightPerRoot;
+            }
+
             while (displayedPercent < 100) {
                 displayedPercent = Math.min(100, displayedPercent + 2);
                 progressBar.style.width = `${displayedPercent}%`;
@@ -1297,22 +1668,23 @@
                 await nextFrame();
             }
 
-            // Finalizar al 100%
             progressBar.style.width = '100%';
             percentText.innerText = '100%';
             spinnerIcon.innerHTML = SVG_ICON_CHECK;
             statusLabel.innerText = 'LECTURA COMPLETADA (100%)';
             counterDetail.innerText = `${totalReadEntries.toLocaleString('es-MX')} / ${totalReadEntries.toLocaleString('es-MX')} leídos`;
-            visibleDetail.innerText = `${totalFilesProcessed.toLocaleString('es-MX')} visibles`;
-            fileCountEl.innerText = totalFilesProcessed.toLocaleString('es-MX');
-            folderCountEl.innerText = totalFoldersProcessed.toLocaleString('es-MX');
 
-            lastScannedRoot = rootNode;
-            reRenderCurrentTree();
-            showToast("Escaneo completado y estructurado de la A-Z");
+            recomputeTotalsAndRefreshUI();
+            visibleDetail.innerText = `${totalFilesProcessed.toLocaleString('es-MX')} visibles`;
+
+            const addedCount = dirHandles.length;
+            const toastMsg = scannedRoots.length > 1
+                ? `${addedCount > 1 ? addedCount + ' carpetas agregadas' : 'Carpeta agregada'} (${scannedRoots.length} en total).`
+                : "Escaneo completado y estructurado de la A-Z";
+            showToast(toastMsg);
         }
 
-        // Soporte para Arrastrar y Soltar (Drag & Drop) una carpeta o unidad directamente
+        // Soporte para Arrastrar y Soltar (Drag & Drop) una o VARIAS carpetas simultáneamente
         function handleDragOver(event) {
             event.preventDefault();
             event.stopPropagation();
@@ -1325,37 +1697,155 @@
             document.getElementById('dropZone').classList.remove('drag-active');
         }
 
+        function readAllWebkitDirEntries(dirReader) {
+            return new Promise((resolve) => {
+                const all = [];
+                function readBatch() {
+                    dirReader.readEntries((entries) => {
+                        if (!entries || entries.length === 0) {
+                            resolve(all);
+                        } else {
+                            all.push(...entries);
+                            readBatch();
+                        }
+                    }, () => resolve(all));
+                }
+                readBatch();
+            });
+        }
+
+        async function scanWithWebkitEntries(entries) {
+            const dirEntries = entries.filter(e => e && e.isDirectory);
+            const fileEntries = entries.filter(e => e && e.isFile);
+            if (dirEntries.length === 0 && fileEntries.length === 0) return;
+
+            showImmediateProgressUI(dirEntries.length > 1 ? `Escaneando ${dirEntries.length} carpetas...` : 'Escaneando carpeta...');
+            await nextFrame();
+
+            const progressBar = document.getElementById('scanProgressBar');
+            const percentText = document.getElementById('scanPercentText');
+            const counterDetail = document.getElementById('scanCounterDetail');
+            const visibleDetail = document.getElementById('scanVisibleDetail');
+            const statusLabel = document.getElementById('scanStatusLabel');
+            const spinnerIcon = document.getElementById('scanSpinnerIcon');
+
+            let totalRead = 0;
+
+            for (let idx = 0; idx < dirEntries.length; idx++) {
+                const rootEntry = dirEntries[idx];
+                const rawName = (rootEntry.name || '').trim();
+                const isDrive = isDriveRootLabel(rawName);
+                const rootNode = { name: isDrive ? '' : rawName, isDriveRoot: isDrive, folders: {}, files: {} };
+                let thisFiles = 0;
+                let thisFolders = 0;
+
+                const queue = [{ entry: rootEntry, node: rootNode }];
+                while (queue.length > 0) {
+                    const { entry, node } = queue.shift();
+                    const children = await readAllWebkitDirEntries(entry.createReader());
+                    for (const child of children) {
+                        totalRead++;
+                        if (!child || isHiddenOrSystemPart(child.name)) continue;
+                        if (child.isDirectory) {
+                            node.folders[child.name] = { name: child.name, folders: {}, files: {} };
+                            thisFolders++;
+                            queue.push({ entry: child, node: node.folders[child.name] });
+                        } else if (child.isFile) {
+                            const ext = normalizeExtension(child.name);
+                            node.files[ext] = (node.files[ext] || 0) + 1;
+                            thisFiles++;
+                        }
+                    }
+                }
+
+                addScannedRootNode(rootNode, thisFiles, thisFolders);
+                const pct = Math.round(((idx + 1) / Math.max(1, dirEntries.length)) * 100);
+                progressBar.style.width = `${pct}%`;
+                percentText.innerText = `${pct}%`;
+                await nextFrame();
+            }
+
+            if (fileEntries.length > 0) {
+                const looseNode = { name: 'Archivos_Sueltos', isDriveRoot: false, folders: {}, files: {} };
+                let looseCount = 0;
+                for (const fe of fileEntries) {
+                    totalRead++;
+                    if (!fe || isHiddenOrSystemPart(fe.name)) continue;
+                    const ext = normalizeExtension(fe.name);
+                    looseNode.files[ext] = (looseNode.files[ext] || 0) + 1;
+                    looseCount++;
+                }
+                if (looseCount > 0) addScannedRootNode(looseNode, looseCount, 0);
+            }
+
+            progressBar.style.width = '100%';
+            percentText.innerText = '100%';
+            spinnerIcon.innerHTML = SVG_ICON_CHECK;
+            statusLabel.innerText = 'LECTURA COMPLETADA (100%)';
+            counterDetail.innerText = `${totalRead.toLocaleString('es-MX')} / ${totalRead.toLocaleString('es-MX')} leídos`;
+
+            recomputeTotalsAndRefreshUI();
+            visibleDetail.innerText = `${totalFilesProcessed.toLocaleString('es-MX')} visibles`;
+            showToast(scannedRoots.length > 1
+                ? `Carpetas agregadas (${scannedRoots.length} en total).`
+                : "Escaneo completado y estructurado de la A-Z");
+        }
+
         async function handleDropFolder(event) {
             event.preventDefault();
             event.stopPropagation();
             document.getElementById('dropZone').classList.remove('drag-active');
 
-            const items = event.dataTransfer ? event.dataTransfer.items : null;
-            if (!items || items.length === 0) return;
+            const items = event.dataTransfer ? Array.from(event.dataTransfer.items || []) : [];
+            if (items.length === 0) return;
 
-            const firstItem = items[0];
-            if (firstItem.getAsFileSystemHandle) {
+            // Capturar TODOS los handles o webkitEntries de manera síncrona antes de cualquier await
+            const supportsFSHandle = items.some(it => typeof it.getAsFileSystemHandle === 'function');
+            if (supportsFSHandle) {
+                const handlePromises = items
+                    .filter(it => typeof it.getAsFileSystemHandle === 'function')
+                    .map(it => it.getAsFileSystemHandle().catch(() => null));
+                const webkitFallbackEntries = items
+                    .map(it => (typeof it.webkitGetAsEntry === 'function' ? it.webkitGetAsEntry() : null))
+                    .filter(Boolean);
+
                 try {
-                    const handle = await firstItem.getAsFileSystemHandle();
-                    if (handle && handle.kind === 'directory') {
-                        await scanWithDirectoryHandle(handle);
+                    const handles = (await Promise.all(handlePromises)).filter(Boolean);
+                    const dirHandles = handles.filter(h => h.kind === 'directory');
+                    const fileHandles = handles.filter(h => h.kind === 'file');
+                    if (dirHandles.length > 0 || fileHandles.length > 0) {
+                        await scanWithDirectoryHandles(dirHandles, fileHandles);
                         return;
                     }
                 } catch (e) {
-                    // Continuar con webkitGetAsEntry si falla
+                    // Continuar con respaldo webkitGetAsEntry
                 }
+
+                if (webkitFallbackEntries.length > 0) {
+                    await scanWithWebkitEntries(webkitFallbackEntries);
+                }
+                return;
+            }
+
+            const webkitEntries = items
+                .map(it => (typeof it.webkitGetAsEntry === 'function' ? it.webkitGetAsEntry() : null))
+                .filter(Boolean);
+            if (webkitEntries.length > 0) {
+                await scanWithWebkitEntries(webkitEntries);
             }
         }
 
-        // Modo de respaldo tradicional (webkitdirectory) con animación fluida de 0% a 100%
+        // Modo de respaldo tradicional (webkitdirectory) acumulativo multi-carpeta
         async function scanDirectoryFallback(event) {
             waitingForFallbackDialog = false;
             const files = event.target.files;
             if (!files || files.length === 0) return;
 
             const totalRawFiles = files.length;
-            totalFilesProcessed = 0;
-            totalFoldersProcessed = 0;
+            const baseFiles = totalFilesProcessed;
+            const baseFolders = totalFoldersProcessed;
+            let batchFiles = 0;
+            let batchFolders = 0;
 
             showImmediateProgressUI('Leyendo archivos...');
             await nextFrame();
@@ -1369,7 +1859,8 @@
             const fileCountEl = document.getElementById('fileCount');
             const folderCountEl = document.getElementById('folderCount');
 
-            const rootNode = { name: "Carpeta_Principal", folders: {}, files: {} };
+            // Agrupar por carpeta raíz por si el navegador entrega archivos de múltiples carpetas
+            const rootsByTopName = {};
             const steps = Math.min(90, Math.max(30, totalRawFiles));
             const batchSize = Math.max(1, Math.ceil(totalRawFiles / steps));
             let lastPercentShown = -1;
@@ -1378,19 +1869,29 @@
                 const file = files[i];
                 const rawPath = file.webkitRelativePath || file.name;
                 const pathParts = rawPath.split('/').filter(p => p.length > 0);
+                if (pathParts.length === 0) continue;
 
-                if (i === 0 && pathParts.length > 0) {
-                    rootNode.name = pathParts[0];
+                const topName = pathParts.length > 1 ? pathParts[0] : 'Carpeta_Principal';
+                if (!rootsByTopName[topName]) {
+                    const isDrive = isDriveRootLabel(topName);
+                    rootsByTopName[topName] = {
+                        node: { name: isDrive ? '' : topName, isDriveRoot: isDrive, folders: {}, files: {} },
+                        files: 0,
+                        folders: 0
+                    };
                 }
 
-                const innerParts = pathParts.slice(1);
+                const rootBucket = rootsByTopName[topName];
+                const innerParts = pathParts.length > 1 ? pathParts.slice(1) : pathParts;
+
                 if (!innerParts.some(part => isHiddenOrSystemPart(part))) {
-                    let current = rootNode;
+                    let current = rootBucket.node;
                     for (let j = 1; j < pathParts.length - 1; j++) {
                         const folderName = pathParts[j];
                         if (!current.folders[folderName]) {
                             current.folders[folderName] = { name: folderName, folders: {}, files: {} };
-                            totalFoldersProcessed++;
+                            rootBucket.folders++;
+                            batchFolders++;
                         }
                         current = current.folders[folderName];
                     }
@@ -1398,12 +1899,12 @@
                     const fileName = pathParts[pathParts.length - 1];
                     if (fileName && !isHiddenOrSystemPart(fileName)) {
                         const ext = normalizeExtension(fileName);
-
                         if (!current.files[ext]) {
                             current.files[ext] = 0;
                         }
                         current.files[ext]++;
-                        totalFilesProcessed++;
+                        rootBucket.files++;
+                        batchFiles++;
                     }
                 }
 
@@ -1415,9 +1916,9 @@
                     percentText.innerText = `${percent}%`;
                     statusLabel.innerText = `LEYENDO DISPOSITIVO (${percent}%)`;
                     counterDetail.innerText = `${currentCount.toLocaleString('es-MX')} / ${totalRawFiles.toLocaleString('es-MX')} leídos`;
-                    visibleDetail.innerText = `${totalFilesProcessed.toLocaleString('es-MX')} visibles`;
-                    fileCountEl.innerText = totalFilesProcessed.toLocaleString('es-MX');
-                    folderCountEl.innerText = totalFoldersProcessed.toLocaleString('es-MX');
+                    visibleDetail.innerText = `${(baseFiles + batchFiles).toLocaleString('es-MX')} visibles`;
+                    fileCountEl.innerText = (baseFiles + batchFiles).toLocaleString('es-MX');
+                    folderCountEl.innerText = (baseFolders + batchFolders).toLocaleString('es-MX');
 
                     if (percent !== lastPercentShown) {
                         lastPercentShown = percent;
@@ -1426,13 +1927,19 @@
                 }
             }
 
+            for (const topName of sortAlpha(Object.keys(rootsByTopName))) {
+                const bucket = rootsByTopName[topName];
+                addScannedRootNode(bucket.node, bucket.files, bucket.folders);
+            }
+
             spinnerIcon.innerHTML = SVG_ICON_CHECK;
             statusLabel.innerText = 'LECTURA COMPLETADA (100%)';
-            lastScannedRoot = rootNode;
 
-            reRenderCurrentTree();
+            recomputeTotalsAndRefreshUI();
 
-            showToast("Escaneo completado y estructurado de la A-Z");
+            showToast(scannedRoots.length > 1
+                ? `Carpeta agregada (${scannedRoots.length} carpetas en total).`
+                : "Escaneo completado y estructurado de la A-Z");
         }
 
         // Normaliza la extensión del archivo y suma .JPG y .JPEG en un solo conteo (*.JPG)
@@ -1450,10 +1957,14 @@
             const resultHTML = renderTreeHTML(lastScannedRoot, omitUnitName);
             document.getElementById('previewContent').innerHTML = resultHTML;
 
-            const topFolders = sortAlpha(Object.keys(lastScannedRoot.folders));
-            const cleanRootName = stripDriveLetterFromText(lastScannedRoot.name);
-            let badgeLabel = cleanRootName || (topFolders.length === 1 ? topFolders[0] : "Unidad USB");
-            document.getElementById('unitBadge').innerText = `Origen: ${badgeLabel}`;
+            if (scannedRoots.length > 1) {
+                document.getElementById('unitBadge').innerText = `Origen: ${scannedRoots.length} carpetas seleccionadas`;
+            } else {
+                const topFolders = sortAlpha(Object.keys(lastScannedRoot.folders));
+                const cleanRootName = stripDriveLetterFromText(lastScannedRoot.name);
+                let badgeLabel = cleanRootName || (topFolders.length === 1 ? topFolders[0] : "Unidad USB");
+                document.getElementById('unitBadge').innerText = `Origen: ${badgeLabel}`;
+            }
         }
 
         function sortAlpha(keysArray) {
@@ -1531,11 +2042,21 @@
             const hasValidRootName = cleanRootName.length > 0 && !isDriveRootLabel(cleanRootName);
             const summaryBoxHTML = renderGlobalSummaryBox(rootNode);
 
+            // Caso 0: Múltiples carpetas seleccionadas -> listar cada carpeta por separado A-Z + resumen global único
+            if (rootNode.isMultiRoot) {
+                let html = `<ul>`;
+                for (let folder of sortedFolders) {
+                    html += renderFolderNode(rootNode.folders[folder]);
+                }
+                for (let ext of sortedExts) {
+                    html += renderFileItem(rootNode.files[ext], ext);
+                }
+                html += `</ul>` + summaryBoxHTML;
+                return html;
+            }
+
             // Caso 1: Se seleccionó directamente la raíz de una unidad (ej. I:\ donde el sistema devuelve "\")
-            // Nunca se imprime "Carpeta con nombre: \".
             if (!hasValidRootName) {
-                // Si dentro de la unidad hay una única carpeta principal y el usuario marca "Omitir el nombre de la unidad",
-                // se omite esa carpeta contenedora y se listan directamente sus subcarpetas/archivos.
                 if (omitUnitName && sortedFolders.length === 1 && sortedExts.length === 0) {
                     const singleMainFolder = rootNode.folders[sortedFolders[0]];
                     const innerFolders = sortAlpha(Object.keys(singleMainFolder.folders));
@@ -1562,8 +2083,7 @@
                 return html;
             }
 
-            // Caso 2: Se seleccionó una carpeta con nombre (ej. USB_Fiscalia_Caso_Angeles)
-            // Si "Omitir el nombre de la unidad" está activo, se omite el nodo raíz y se muestra puro contenido.
+            // Caso 2: Se seleccionó una sola carpeta con nombre
             if (omitUnitName) {
                 let html = `<ul>`;
                 for (let folder of sortedFolders) {
@@ -1585,7 +2105,7 @@
         function renderFolderNode(node) {
             const displayName = stripDriveLetterFromText(node.name) || node.name;
 
-            let html = `<li><strong>Carpeta con nombre:</strong> ${displayName}`;
+            let html = `<li><strong>Carpeta con nombre:</strong> ${escapeHTML(displayName)}`;
 
             const sortedFolders = sortAlpha(Object.keys(node.folders));
             const sortedExts = sortAlpha(Object.keys(node.files));
@@ -1624,7 +2144,7 @@
         function copyToClipboard() {
             const content = document.getElementById('previewContent');
             if (!lastScannedRoot || totalFilesProcessed === 0) {
-                showToast("Primero escanea una carpeta o unidad USB.");
+                showToast("Primero escanea una o más carpetas o una unidad USB.");
                 return;
             }
 
@@ -1646,7 +2166,7 @@
 
         function exportToWord() {
             if (!lastScannedRoot || totalFilesProcessed === 0) {
-                showToast("Primero escanea una carpeta o unidad USB.");
+                showToast("Primero escanea una o más carpetas o una unidad USB.");
                 return;
             }
 
@@ -1697,7 +2217,9 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            const safeName = stripDriveLetterFromText(lastScannedRoot.name) || 'Dispositivo_USB';
+            const safeName = scannedRoots.length > 1
+                ? `${scannedRoots.length}_Carpetas`
+                : (stripDriveLetterFromText(lastScannedRoot.name) || 'Dispositivo_USB');
             a.download = `Contenido_Forense_${safeName}.doc`;
             document.body.appendChild(a);
             a.click();
