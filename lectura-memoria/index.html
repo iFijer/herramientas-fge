@@ -1240,8 +1240,7 @@
                                 targetNode: targetNode.folders[entryName]
                             });
                         } else if (entry.kind === 'file') {
-                            const extMatch = entryName.match(/\.([^.]+)$/);
-                            const ext = extMatch ? extMatch[1].toUpperCase() : 'SIN EXTENSIÓN';
+                            const ext = normalizeExtension(entryName);
 
                             if (!targetNode.files[ext]) {
                                 targetNode.files[ext] = 0;
@@ -1398,8 +1397,7 @@
 
                     const fileName = pathParts[pathParts.length - 1];
                     if (fileName && !isHiddenOrSystemPart(fileName)) {
-                        const extMatch = fileName.match(/\.([^.]+)$/);
-                        const ext = extMatch ? extMatch[1].toUpperCase() : 'SIN EXTENSIÓN';
+                        const ext = normalizeExtension(fileName);
 
                         if (!current.files[ext]) {
                             current.files[ext] = 0;
@@ -1437,6 +1435,15 @@
             showToast("Escaneo completado y estructurado de la A-Z");
         }
 
+        // Normaliza la extensión del archivo y suma .JPG y .JPEG en un solo conteo (*.JPG)
+        function normalizeExtension(fileName) {
+            const extMatch = (fileName || '').match(/\.([^.]+)$/);
+            if (!extMatch) return 'SIN EXTENSIÓN';
+            const ext = extMatch[1].toUpperCase();
+            if (ext === 'JPEG') return 'JPG';
+            return ext;
+        }
+
         function reRenderCurrentTree() {
             if (!lastScannedRoot) return;
             const omitUnitName = document.getElementById('omitDriveLetterToggle').checked;
@@ -1458,9 +1465,10 @@
             if (!node) return totals;
 
             if (node.files) {
-                for (const ext of Object.keys(node.files)) {
-                    if (ext !== 'SIN EXTENSIÓN') {
-                        totals[ext] = (totals[ext] || 0) + node.files[ext];
+                for (const rawExt of Object.keys(node.files)) {
+                    if (rawExt !== 'SIN EXTENSIÓN') {
+                        const ext = rawExt === 'JPEG' ? 'JPG' : rawExt;
+                        totals[ext] = (totals[ext] || 0) + node.files[rawExt];
                     }
                 }
             }
